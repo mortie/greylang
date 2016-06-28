@@ -5,6 +5,7 @@ typedef enum l_token_type
 {
 	TOKEN_NONE,
 	TOKEN_ERROR,
+	TOKEN_IGNORED,
 	TOKEN_STRING_LITERAL,
 	TOKEN_CHAR_LITERAL,
 	TOKEN_NUM_LITERAL,
@@ -21,7 +22,7 @@ typedef enum l_token_type
 
 typedef struct l_token
 {
-	l_token_type tokentype;
+	l_token_type type;
 	char* content;
 	int contentlen;
 	int line;

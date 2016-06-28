@@ -3,6 +3,17 @@
 
 #include "token.h"
 
-l_token* l_scan(char* input, int len);
+#include <stdio.h>
+
+typedef struct l_scanner
+{
+	FILE* f;
+	int line;
+	char curr;
+	char next;
+} l_scanner;
+
+l_scanner* l_scanner_create(FILE* f);
+l_token l_scanner_next(l_scanner* scanner);
 
 #endif

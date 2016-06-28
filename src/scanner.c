@@ -2,263 +2,318 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <string.h>
 #include <ctype.h>
 
-l_token* l_scan(char* input, int len)
+static char nextchar(l_scanner* scanner)
 {
-	char c;
-	char prev = '\0';
-	int line = 1;
-
-	int tokena = 64;
-	int tokenc = 0;
-	l_token* tokenv = malloc(sizeof(l_token) * tokena);
-	memset(tokenv, 0, sizeof(l_token) * tokena);
-
-#define SETTOKEN(type, c, cl) \
-		token.tokentype = type; \
-		token.content = c; \
-		token.contentlen = cl; \
-		token.line = line; \
-		tokendefined = 1
-
-	int i = 0;
-	while (i < len)
+	if (scanner->curr == EOF || scanner->next == EOF)
 	{
-		c = input[i];
+		scanner->curr = scanner->next = EOF;
+		return EOF;
+	}
 
-		l_token token;
-		int tokendefined = 0;
+	char c = scanner->next;
+	scanner->curr = scanner->next;
 
-		/*
-		 * String Literal
-		 */
-		if (c == '"')
+	scanner->next = fgetc(scanner->f);
+	return c;
+}
+
+static l_token gettoken(l_scanner* scanner)
+{
+	char c = scanner->curr;
+	char next = scanner->next;
+	int line = scanner->line;
+	FILE* f = scanner->f;
+	int i = ftell(scanner->f);
+
+	char* content = "";
+	int contentlen = 0;
+	int contenta = 0;
+
+#define APPENDCONTENT(c) \
+		if (contentlen == 0) { content = malloc(32); contenta = 32; } \
+		contentlen += 1; \
+		if (contentlen > contenta) \
+		{ \
+			contenta *= 2; \
+			content = realloc(content, contenta); \
+		} \
+		content[contentlen - 1] = c; \
+		content[contentlen] = '\0'
+
+#define SETTOKEN(ttype, c) \
+		token.type = ttype; \
+		token.content = c; \
+		token.line = line
+
+	l_token token;
+	SETTOKEN(TOKEN_NONE, "");
+
+	/*
+	 * String Literal
+	 */
+	if (c == '"')
+	{
+		int closed = 1;
+		char cc = nextchar(scanner);
+		while (cc != '"')
 		{
-			int closed = 1;
-			int start = i;
-			i += 1;
-			while (input[i] != '"')
+			if (cc == '\n') scanner->line += 1;
+			if (cc == EOF)
 			{
-				if (input[i] == '\n') line += 1;
-				i += 1;
-				if (i < len)
-				{
-					closed = 0;
-					break;
-				}
+				closed = 0;
+				break;
 			}
-			i += 1;
-
-			if (closed)
-			{
-				SETTOKEN(TOKEN_STRING_LITERAL, input + start + 1, i - start - 2);
-			}
-			else
-			{
-				SETTOKEN(TOKEN_ERROR, "String literal not closed", 0);
-			}
+			APPENDCONTENT(cc);
+			cc = nextchar(scanner);
 		}
+		nextchar(scanner);
 
-		/*
-		 * Char Literal
-		 */
-		else if (c == '\'')
+		if (closed)
 		{
-			if (i + 2 < len && input[i + 2] == '\'')
-			{
-				SETTOKEN(TOKEN_CHAR_LITERAL, input + i + 1, 1);
-			}
-			else
-			{
-				SETTOKEN(TOKEN_ERROR, "Char literal not closed", 0);
-			}
-			i += 3;
+			SETTOKEN(TOKEN_STRING_LITERAL, content);
 		}
-
-		/*
-		 * Number Literal
-		 */
-		else if (c >= '0' && c <= '9')
-		{
-			int start = i;
-			int period = 0;
-			char cc = c;
-			while (
-					i < len && (
-					(cc >= '0' && cc <= '9') ||
-					(cc == '.' && !period)))
-			{
-				i += 1;
-				if (cc == '.') period = 1;
-				cc = input[i];
-			}
-			prev = cc;
-
-			SETTOKEN(TOKEN_NUM_LITERAL, input + start, i - start);
-		}
-
-		/*
-		 * Semicolon
-		 */
-		else if (c == ';')
-		{
-			SETTOKEN(TOKEN_SEMICOLON, ";", 1);
-			i += 1;
-		}
-
-		/*
-		 * Comma
-		 */
-		else if (c == ',')
-		{
-			SETTOKEN(TOKEN_COMMA, ",", 1);
-			i += 1;
-		}
-
-		/*
-		 * Open Paren
-		 */
-		else if (c == '(')
-		{
-			SETTOKEN(TOKEN_OPENPAREN, "(", 1);
-			i += 1;
-		}
-
-		/*
-		 * Close Paren
-		 */
-		else if (c == ')')
-		{
-			SETTOKEN(TOKEN_CLOSEPAREN, ")", 1);
-			i += 1;
-		}
-
-		/*
-		 * Open Bracket
-		 */
-		else if (c == '[')
-		{
-			SETTOKEN(TOKEN_OPENBRACKET, "[", 1);
-			i += 1;
-		}
-
-		/*
-		 * Close Bracket
-		 */
-		else if (c == ']')
-		{
-			SETTOKEN(TOKEN_CLOSEBRACKET, "]", 1);
-			i += 1;
-		}
-
-		/*
-		 * Open Brace
-		 */
-		else if (c == '{')
-		{
-			SETTOKEN(TOKEN_OPENBRACE, "{", 1);
-			i += 1;
-		}
-
-		/*
-		 * Close Brace
-		 */
-		else if (c == '}')
-		{
-			SETTOKEN(TOKEN_CLOSEBRACE, "}", 1);
-			i += 1;
-		}
-
-		/*
-		 * Skip multi line comment
-		 */
-		else if (prev == '/' && c == '*')
-		{
-			while (i < len && input[i-1] == '*' && input[i] != '/')
-			{
-				if (input[i] == '\n') i += 1;
-				i += 1;
-			}
-		}
-
-		/*
-		 * Skip single line comment
-		 */
-		else if (prev == '/' && c == '*')
-		{
-			while (i < len && input[i] != '\n') i += 1;
-			line += 1;
-		}
-
-		/*
-		 * Skip Whitespace
-		 */
-		else if (isspace(c))
-		{
-			while (i < len && isspace(input[i]))
-			{
-				if (input[i] == '\n') line += 1;
-				i += 1;
-			}
-		}
-
-		/*
-		 * Name
-		 */
 		else
 		{
-			int start = i;
-			char cc = input[i];
-			while (i < len && !isspace(cc) &&
-					(cc != '(' && cc != ')') &&
-					(cc != '[' && cc != ']') &&
-					(cc != ';' && cc != ','))
-			{
-				i += 1;
-				cc = input[i];
-			}
-			prev = cc;
-
-			SETTOKEN(TOKEN_NAME, input + start, i - start);
+			SETTOKEN(TOKEN_ERROR, "String literal not closed");
 		}
+	}
 
-		prev = input[i];
+	/*
+	 * Char Literal
+	 */
+	else if (c == '\'')
+	{
+		char* str = malloc(1);
+		str[0] = nextchar(scanner);
+		char end = nextchar(scanner);
+		nextchar(scanner);
 
-		/*
-		 * Add token if it's defined
-		 */
-		if (tokendefined)
+		if (str[0] != EOF && end == '\'')
 		{
-
-			/*
-			 * Die on error
-			 */
-			if (token.tokentype == TOKEN_ERROR)
-			{
-				fprintf(stderr, "%s at line %i\n", token.content, token.line);
-
-				return NULL;
-			}
-
-			tokenc += 1;
-
-			if (tokenc > tokena)
-			{
-				tokena *= 2;
-				tokenv = realloc(tokenv, sizeof(l_token) * tokena);
-				memset(
-					tokenv + tokenc - 2,
-					0,
-					sizeof(l_token) * (tokena - tokenc - 1));
-			}
-
-			memcpy(tokenv + tokenc - 1, &token, sizeof(l_token));
+			SETTOKEN(TOKEN_CHAR_LITERAL, str);
 		}
+		else
+		{
+			SETTOKEN(TOKEN_ERROR, "Char literal not closed");
+		}
+	}
+
+	/*
+	 * Number Literal
+	 */
+	else if (c >= '0' && c <= '9')
+	{
+		int period = 0;
+		char cc = c;
+		while (
+				cc != EOF && (
+				(cc >= '0' && cc <= '9') ||
+				(cc == '.' && !period)))
+		{
+			if (cc == '.') period = 1;
+			APPENDCONTENT(cc);
+			cc = nextchar(scanner);
+		}
+
+		SETTOKEN(TOKEN_NUM_LITERAL, content);
+	}
+
+	/*
+	 * Semicolon
+	 */
+	else if (c == ';')
+	{
+		SETTOKEN(TOKEN_SEMICOLON, ";");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Comma
+	 */
+	else if (c == ',')
+	{
+		SETTOKEN(TOKEN_COMMA, ",");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Open Paren
+	 */
+	else if (c == '(')
+	{
+		SETTOKEN(TOKEN_OPENPAREN, "(");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Close Paren
+	 */
+	else if (c == ')')
+	{
+		SETTOKEN(TOKEN_CLOSEPAREN, ")");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Open Bracket
+	 */
+	else if (c == '[')
+	{
+		SETTOKEN(TOKEN_OPENBRACKET, "[");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Close Bracket
+	 */
+	else if (c == ']')
+	{
+		SETTOKEN(TOKEN_CLOSEBRACKET, "]");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Open Brace
+	 */
+	else if (c == '{')
+	{
+		SETTOKEN(TOKEN_OPENBRACE, "{");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Close Brace
+	 */
+	else if (c == '}')
+	{
+		SETTOKEN(TOKEN_CLOSEBRACE, "}");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Skip multi line comment
+	 */
+	else if (c == '/' && next == '*')
+	{
+		char prev = c;
+		char cc = nextchar(scanner);
+		while (cc != EOF && prev != '*' && cc != '/')
+		{
+			if (cc == '\n') scanner->line += 1;
+			i += 1;
+			prev = cc;
+			cc = nextchar(scanner);
+		}
+		token.type = TOKEN_IGNORED;
+		nextchar(scanner);
+	}
+
+	/*
+	 * Skip single line comment
+	 */
+	else if (c == '/' && next == '*')
+	{
+		char cc = nextchar(scanner);
+		while (cc != EOF && cc != '\n') cc = nextchar(scanner);
+		line += 1;
+		token.type = TOKEN_IGNORED;
+		nextchar(scanner);
+	}
+
+	/*
+	 * Skip Whitespace
+	 */
+	else if (isspace(c))
+	{
+		char cc = nextchar(scanner);
+		while (cc != EOF && isspace(cc))
+		{
+			if (cc == '\n') scanner->line += 1;
+			cc = nextchar(scanner);
+		}
+		token.type = TOKEN_IGNORED;
+		nextchar(scanner);
+	}
+
+	/*
+	 * None
+	 */
+	else if (c == EOF)
+	{
+		SETTOKEN(TOKEN_NONE, "");
+	}
+
+	/*
+	 * Name
+	 */
+	else
+	{
+		char cc = c;
+		while (cc != EOF && !isspace(cc) &&
+				(cc != '(' && cc != ')') &&
+				(cc != '[' && cc != ']') &&
+				(cc != ';' && cc != ','))
+		{
+			APPENDCONTENT(cc);
+			cc = nextchar(scanner);
+		}
+
+		SETTOKEN(TOKEN_NAME, content);
+		nextchar(scanner);
+	}
+
+	/*
+	 * Die on error
+	 */
+	if (token.type == TOKEN_ERROR)
+	{
+		fprintf(stderr, "%s at line %i\n", token.content, token.line);
+		SETTOKEN(TOKEN_NONE, "");
 	}
 
 #undef SETTOKEN
 
-	return tokenv;
+	return token;
+}
+
+l_scanner* l_scanner_create(FILE* f)
+{
+	l_scanner* scanner = malloc(sizeof(l_scanner));
+	scanner->f = f;
+	scanner->line = 1;
+	scanner->curr = '\0';
+	scanner->next = '\0';
+	nextchar(scanner);
+	nextchar(scanner);
+
+	return scanner;
+}
+
+l_token l_scanner_next(l_scanner* scanner)
+{
+	l_token token;
+
+	do
+	{
+		token = gettoken(scanner);
+	} while (token.type == TOKEN_IGNORED);
+
+	return token;
+}
+
+void l_scanner_skip(l_scanner* scanner, l_token_type type)
+{
+	l_token token = l_scanner_next(scanner);
+	if (token.type != type)
+	{
+		fprintf(stderr,
+			"Expected %s, got %s, on line %i\n",
+			l_token_type_string(type),
+			l_token_type_string(token.type),
+			token.line);
+	}
 }
