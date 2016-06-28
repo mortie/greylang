@@ -6,6 +6,19 @@
 #include <string.h>
 #include <ctype.h>
 
+#define STRAPPEND(name, a, len, c) \
+	do { \
+		if (len == 0) { name = malloc(32); a = 32; } \
+		len += 1; \
+		if (len > a) \
+		{ \
+			a *= 2; \
+			name = realloc(name, a); \
+		} \
+		name[len - 1] = c; \
+		name[len] = '\0'; \
+	} while(0)
+
 static char nextchar(l_scanner* scanner)
 {
 	if (scanner->curr == EOF || scanner->next == EOF)
@@ -16,8 +29,10 @@ static char nextchar(l_scanner* scanner)
 
 	char c = scanner->next;
 	scanner->curr = scanner->next;
-
 	scanner->next = fgetc(scanner->f);
+
+	if (c == '\n') scanner->line += 1;
+
 	return c;
 }
 
@@ -27,27 +42,17 @@ static l_token gettoken(l_scanner* scanner)
 	char next = scanner->next;
 	int line = scanner->line;
 	FILE* f = scanner->f;
-	int i = ftell(scanner->f);
 
 	char* content = "";
 	int contentlen = 0;
 	int contenta = 0;
 
-#define APPENDCONTENT(c) \
-		if (contentlen == 0) { content = malloc(32); contenta = 32; } \
-		contentlen += 1; \
-		if (contentlen > contenta) \
-		{ \
-			contenta *= 2; \
-			content = realloc(content, contenta); \
-		} \
-		content[contentlen - 1] = c; \
-		content[contentlen] = '\0'
-
 #define SETTOKEN(ttype, c) \
+	do {\
 		token.type = ttype; \
 		token.content = c; \
-		token.line = line
+		token.line = line; \
+	} while(0)
 
 	l_token token;
 	SETTOKEN(TOKEN_NONE, "");
@@ -61,13 +66,12 @@ static l_token gettoken(l_scanner* scanner)
 		char cc = nextchar(scanner);
 		while (cc != '"')
 		{
-			if (cc == '\n') scanner->line += 1;
 			if (cc == EOF)
 			{
 				closed = 0;
 				break;
 			}
-			APPENDCONTENT(cc);
+			STRAPPEND(content, contenta, contentlen, cc);
 			cc = nextchar(scanner);
 		}
 		nextchar(scanner);
@@ -115,11 +119,20 @@ static l_token gettoken(l_scanner* scanner)
 				(cc == '.' && !period)))
 		{
 			if (cc == '.') period = 1;
-			APPENDCONTENT(cc);
+			STRAPPEND(content, contenta, contentlen, cc);
 			cc = nextchar(scanner);
 		}
 
 		SETTOKEN(TOKEN_NUM_LITERAL, content);
+	}
+
+	/*
+	 * Comma
+	 */
+	else if (c == ',')
+	{
+		SETTOKEN(TOKEN_COMMA, ",");
+		nextchar(scanner);
 	}
 
 	/*
@@ -132,11 +145,11 @@ static l_token gettoken(l_scanner* scanner)
 	}
 
 	/*
-	 * Comma
+	 * Equals
 	 */
-	else if (c == ',')
+	else if (c == '=')
 	{
-		SETTOKEN(TOKEN_COMMA, ",");
+		SETTOKEN(TOKEN_EQUALS, "=");
 		nextchar(scanner);
 	}
 
@@ -203,8 +216,6 @@ static l_token gettoken(l_scanner* scanner)
 		char cc = nextchar(scanner);
 		while (cc != EOF && prev != '*' && cc != '/')
 		{
-			if (cc == '\n') scanner->line += 1;
-			i += 1;
 			prev = cc;
 			cc = nextchar(scanner);
 		}
@@ -219,7 +230,6 @@ static l_token gettoken(l_scanner* scanner)
 	{
 		char cc = nextchar(scanner);
 		while (cc != EOF && cc != '\n') cc = nextchar(scanner);
-		line += 1;
 		token.type = TOKEN_IGNORED;
 		nextchar(scanner);
 	}
@@ -232,11 +242,9 @@ static l_token gettoken(l_scanner* scanner)
 		char cc = nextchar(scanner);
 		while (cc != EOF && isspace(cc))
 		{
-			if (cc == '\n') scanner->line += 1;
 			cc = nextchar(scanner);
 		}
 		token.type = TOKEN_IGNORED;
-		nextchar(scanner);
 	}
 
 	/*
@@ -258,12 +266,11 @@ static l_token gettoken(l_scanner* scanner)
 				(cc != '[' && cc != ']') &&
 				(cc != ';' && cc != ','))
 		{
-			APPENDCONTENT(cc);
+			STRAPPEND(content, contentlen, contenta, cc);
 			cc = nextchar(scanner);
 		}
 
 		SETTOKEN(TOKEN_NAME, content);
-		nextchar(scanner);
 	}
 
 	/*
@@ -274,8 +281,6 @@ static l_token gettoken(l_scanner* scanner)
 		fprintf(stderr, "%s at line %i\n", token.content, token.line);
 		SETTOKEN(TOKEN_NONE, "");
 	}
-
-#undef SETTOKEN
 
 	return token;
 }

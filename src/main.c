@@ -13,7 +13,13 @@ int main(int argc, char** argv)
 	l_token token = l_scanner_next(scanner);
 	while (token.type != TOKEN_NONE)
 	{
-		printf("%s: %s\n", l_token_type_string(token.type), token.content);
+		char* typestring = l_token_type_string(token.type);
+		int wslen = 20 - strlen(typestring);
+		char* ws = malloc(wslen + 1);
+		memset(ws, ' ', wslen);
+		ws[wslen] = '\0';
+
+		printf("%s:%s%s\n", typestring, ws, token.content);
 		token = l_scanner_next(scanner);
 	}
 }

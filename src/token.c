@@ -20,6 +20,8 @@ char* l_token_type_string(l_token_type type)
 		return "comma ','";
 	case TOKEN_SEMICOLON:
 		return "semicolon ';'";
+	case TOKEN_EQUALS:
+		return "equals '='";
 	case TOKEN_OPENPAREN:
 		return "open paren '('";
 	case TOKEN_CLOSEPAREN:
