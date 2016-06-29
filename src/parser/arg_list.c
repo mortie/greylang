@@ -35,7 +35,7 @@ l_p_arg_list* l_parse_arg_list(l_scanner* stream)
 		{
 			l_scanner_skip(stream, TOKEN_COMMA);
 		}
-		else if (next.type == TOKEN_CLOSEBRACE)
+		else if (next.type == TOKEN_CLOSEPAREN)
 		{
 			break;
 		}
@@ -50,4 +50,19 @@ l_p_arg_list* l_parse_arg_list(l_scanner* stream)
 	}
 
 	return list;
+}
+
+void l_pretty_arg_list(
+		l_p_arg_list* arg_list,
+		int depth,
+		FILE* file)
+{
+	for (int i = 0; i < arg_list->namec; ++i)
+	{
+		fprintf(file, arg_list->names[i]);
+		if (i + 1 < arg_list->namec)
+		{
+			fprintf(file, ", ");
+		}
+	}
 }

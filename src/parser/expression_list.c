@@ -24,7 +24,7 @@ l_p_expression_list* l_parse_expression_list(l_scanner* stream)
 				list->expressions,
 				alloced * sizeof(l_p_expression));
 		}
-		list->expressions[list->expressionc] = expr;
+		list->expressions[list->expressionc - 1] = expr;
 
 		/*
 		 * Continue (semicolon), stop (period), or error
@@ -45,6 +45,25 @@ l_p_expression_list* l_parse_expression_list(l_scanner* stream)
 				TOKEN_PERIOD
 			};
 			l_scanner_unexpecteda(expected, 2, next);
+		}
+	}
+}
+
+void l_pretty_expression_list(
+		l_p_expression_list* list,
+		int depth,
+		FILE* file)
+{
+	for (int i = 0; i < list->expressionc; ++i)
+	{
+		l_pretty_expression(list->expressions[i], depth, file);
+		if (i == list->expressionc - 1)
+		{
+			fprintf(file, ".\n");
+		}
+		else
+		{
+			fprintf(file, ";\n");
 		}
 	}
 }

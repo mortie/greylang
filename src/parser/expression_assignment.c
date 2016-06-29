@@ -18,3 +18,14 @@ l_p_expression_assignment* l_parse_expression_assignment(l_scanner* stream)
 
 	return expr;
 }
+
+void l_pretty_expression_assignment(
+		l_p_expression_assignment* expr,
+		int depth,
+		FILE* file)
+{
+	char* tabs;
+	P_TABS(depth, tabs);
+	fprintf(file, "%s%s = ", tabs, expr->name);
+	l_pretty_expression(expr->expression, 0, file);
+}

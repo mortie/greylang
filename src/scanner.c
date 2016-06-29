@@ -116,7 +116,10 @@ static l_token gettoken(l_scanner* scanner)
 		while (
 				cc != EOF && (
 				(cc >= '0' && cc <= '9') ||
-				(cc == '.' && !period)))
+				(
+					cc == '.' && !period &&
+					scanner->next >= '0' && scanner->next <= '9')
+				))
 		{
 			if (cc == '.') period = 1;
 			STRAPPEND(content, contenta, contentlen, cc);
@@ -348,6 +351,7 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 			"line %i: Unexpected token %s\n",
 			token.line,
 			l_token_type_string(token.type));
+		exit(1);
 	}
 
 	int totallen = (len * 4) - 4; // Account for ' or ' between the words
@@ -365,7 +369,7 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 		memcpy(str + i, s, sl);
 		i += sl;
 
-		if (j < len)
+		if (j + 1 < len)
 		{
 			memcpy(str + i, " or ", 4);
 			i += 4;
@@ -379,6 +383,8 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 		l_token_type_string(token.type));
 
 	free(str);
+
+	exit(1);
 }
 
 void l_scanner_unexpected(l_token_type expected, l_token token)
@@ -388,6 +394,8 @@ void l_scanner_unexpected(l_token_type expected, l_token token)
 		token.line,
 		l_token_type_string(expected),
 		l_token_type_string(token.type));
+
+	exit(1);
 }
 
 void l_scanner_skip(l_scanner* scanner, l_token_type type)
