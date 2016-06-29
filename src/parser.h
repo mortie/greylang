@@ -16,7 +16,7 @@ typedef struct l_p_arg_list
 l_p_arg_list* l_parse_arg_list(l_scanner* stream);
 
 void l_pretty_arg_list(
-		l_p_arg_list* arglist,
+		l_p_arg_list* arg_list,
 		int depth,
 		FILE* file);
 
@@ -79,7 +79,7 @@ void l_pretty_expression_assignment(
 typedef struct l_p_expression_func_call
 {
 	char* name;
-	l_p_arg_list* arglist;
+	l_p_expression_list* expr_list;
 } l_p_expression_func_call;
 
 l_p_expression_func_call* l_parse_expression_func_call(l_scanner* stream);
@@ -94,7 +94,7 @@ void l_pretty_expression_func_call(
  */
 typedef struct l_p_expression_function
 {
-	l_p_arg_list* arglist;
+	l_p_arg_list* arg_list;
 	l_p_expression_list* expr_list;
 } l_p_expression_function;
 
