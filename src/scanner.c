@@ -127,6 +127,15 @@ static l_token gettoken(l_scanner* scanner)
 	}
 
 	/*
+	 * Period
+	 */
+	else if (c == '.')
+	{
+		SETTOKEN(TOKEN_PERIOD, ".");
+		nextchar(scanner);
+	}
+
+	/*
 	 * Comma
 	 */
 	else if (c == ',')
@@ -278,7 +287,7 @@ static l_token gettoken(l_scanner* scanner)
 	 */
 	if (token.type == TOKEN_ERROR)
 	{
-		fprintf(stderr, "%s at line %i\n", token.content, token.line);
+		fprintf(stderr, "line %i: %s\n", token.line, token.content);
 		SETTOKEN(TOKEN_NONE, "");
 	}
 
@@ -295,6 +304,13 @@ l_scanner* l_scanner_create(FILE* f)
 	nextchar(scanner);
 	nextchar(scanner);
 
+	l_token token;
+	do
+	{
+		token = gettoken(scanner);
+	} while (token.type == TOKEN_IGNORED);
+	scanner->nexttoken = token;
+
 	return scanner;
 }
 
@@ -307,7 +323,56 @@ l_token l_scanner_next(l_scanner* scanner)
 		token = gettoken(scanner);
 	} while (token.type == TOKEN_IGNORED);
 
-	return token;
+	l_token next = scanner->nexttoken;
+	scanner->nexttoken = token;
+	return next;
+}
+
+l_token l_scanner_peek(l_scanner* scanner)
+{
+	return scanner->nexttoken;
+}
+
+void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
+{
+	int totallen = (len * 4) - 4; // Account for ' or ' between the words
+	for (int i = 0; i < len; ++i)
+	{
+		totallen += strlen(l_token_type_string(expected[i]));
+	}
+
+	char* str = malloc(totallen + 1);
+	int i = 0;
+	for (int j = 0; j < len; ++j)
+	{
+		char* s = l_token_type_string(expected[j]);
+		int sl = strlen(s);
+		memcpy(str + i, s, sl);
+		i += sl;
+
+		if (j < len)
+		{
+			memcpy(str + i, " or ", 4);
+			i += 4;
+		}
+	}
+
+	fprintf(stderr,
+		"line %i: Expected %s, got %s\n",
+		token.line,
+		str,
+		l_token_type_string(token.type));
+
+	free(str);
+}
+
+void l_scanner_unexpected(l_token_type expected, l_token token)
+{
+	fprintf(stderr,
+		"line %i: Expected %s, got %s\n",
+		token.line,
+		l_token_type_string(expected),
+		l_token_type_string(token.type));
 }
 
 void l_scanner_skip(l_scanner* scanner, l_token_type type)
@@ -315,10 +380,6 @@ void l_scanner_skip(l_scanner* scanner, l_token_type type)
 	l_token token = l_scanner_next(scanner);
 	if (token.type != type)
 	{
-		fprintf(stderr,
-			"Expected %s, got %s, on line %i\n",
-			l_token_type_string(type),
-			l_token_type_string(token.type),
-			token.line);
+		l_scanner_unexpected(type, token);
 	}
 }
