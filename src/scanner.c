@@ -294,6 +294,16 @@ static l_token gettoken(l_scanner* scanner)
 	return token;
 }
 
+static l_token nexttoken(l_scanner* scanner)
+{
+	l_token token;
+	do
+	{
+		token = gettoken(scanner);
+	} while (token.type == TOKEN_IGNORED);
+	return token;
+}
+
 l_scanner* l_scanner_create(FILE* f)
 {
 	l_scanner* scanner = malloc(sizeof(l_scanner));
@@ -304,27 +314,19 @@ l_scanner* l_scanner_create(FILE* f)
 	nextchar(scanner);
 	nextchar(scanner);
 
-	l_token token;
-	do
-	{
-		token = gettoken(scanner);
-	} while (token.type == TOKEN_IGNORED);
-	scanner->nexttoken = token;
+	scanner->nexttoken = nexttoken(scanner);
+	scanner->nexttoken2 = nexttoken(scanner);
 
 	return scanner;
 }
 
 l_token l_scanner_next(l_scanner* scanner)
 {
-	l_token token;
-
-	do
-	{
-		token = gettoken(scanner);
-	} while (token.type == TOKEN_IGNORED);
+	l_token token = nexttoken(scanner);
 
 	l_token next = scanner->nexttoken;
-	scanner->nexttoken = token;
+	scanner->nexttoken = scanner->nexttoken2;
+	scanner->nexttoken2 = token;
 	return next;
 }
 
@@ -333,8 +335,21 @@ l_token l_scanner_peek(l_scanner* scanner)
 	return scanner->nexttoken;
 }
 
+l_token l_scanner_peek2(l_scanner* scanner)
+{
+	return scanner->nexttoken2;
+}
+
 void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 {
+	if (len == 0)
+	{
+		fprintf(stderr,
+			"line %i: Unexpected token %s\n",
+			token.line,
+			l_token_type_string(token.type));
+	}
+
 	int totallen = (len * 4) - 4; // Account for ' or ' between the words
 	for (int i = 0; i < len; ++i)
 	{
