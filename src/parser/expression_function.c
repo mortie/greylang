@@ -17,7 +17,7 @@ l_p_expression_function* l_parse_expression_function(l_scanner* stream)
 		l_scanner_skip(stream, TOKEN_OPENPAREN);
 
 		// argument list
-		expr->arg_list = l_parse_arg_list(stream);
+		expr->arg_definition = l_parse_arg_definition(stream);
 
 		// );
 		l_scanner_skip(stream, TOKEN_CLOSEPAREN);
@@ -25,7 +25,7 @@ l_p_expression_function* l_parse_expression_function(l_scanner* stream)
 	}
 	else
 	{
-		expr->arg_list = NULL;
+		expr->arg_definition = NULL;
 	}
 
 	// expression list
@@ -47,10 +47,10 @@ void l_pretty_expression_function(
 
 	fprintf(file, "%s{\n", tabs);
 
-	if (expr->arg_list != NULL)
+	if (expr->arg_definition != NULL)
 	{
 		fprintf(file, "%s\t(", tabs);
-		l_pretty_arg_list(expr->arg_list, 0, file);
+		l_pretty_arg_definition(expr->arg_definition, 0, file);
 		fprintf(file, ");\n");
 	}
 

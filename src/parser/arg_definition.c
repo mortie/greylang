@@ -2,15 +2,15 @@
 
 #include <stdlib.h>
 
-l_p_arg_list* l_parse_arg_list(l_scanner* stream)
+l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 {
 	int namea = 4;
-	l_p_arg_list* list = malloc(sizeof(l_p_arg_list));
+	l_p_arg_definition* list = malloc(sizeof(l_p_arg_definition));
 	list->names = malloc(namea);
 	list->names[0] = '\0';
 	list->namec = 0;
 
-	// Empty argument list
+	// Empty argument definition
 	l_token t = l_scanner_peek(stream);
 	if (t.type == TOKEN_CLOSEPAREN)
 		return list;
@@ -52,15 +52,15 @@ l_p_arg_list* l_parse_arg_list(l_scanner* stream)
 	return list;
 }
 
-void l_pretty_arg_list(
-		l_p_arg_list* arg_list,
+void l_pretty_arg_definition(
+		l_p_arg_definition* arg_definition,
 		int depth,
 		FILE* file)
 {
-	for (int i = 0; i < arg_list->namec; ++i)
+	for (int i = 0; i < arg_definition->namec; ++i)
 	{
-		fprintf(file, arg_list->names[i]);
-		if (i + 1 < arg_list->namec)
+		fprintf(file, arg_definition->names[i]);
+		if (i + 1 < arg_definition->namec)
 		{
 			fprintf(file, ", ");
 		}

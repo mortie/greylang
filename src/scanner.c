@@ -30,8 +30,13 @@ static char nextchar(l_scanner* scanner)
 	char c = scanner->next;
 	scanner->curr = scanner->next;
 	scanner->next = fgetc(scanner->f);
+	scanner->character += 1;
 
-	if (c == '\n') scanner->line += 1;
+	if (c == '\n')
+	{
+		scanner->line += 1;
+		scanner->character = 0;
+	}
 
 	return c;
 }
@@ -40,6 +45,7 @@ static l_token gettoken(l_scanner* scanner)
 {
 	char c = scanner->curr;
 	char next = scanner->next;
+	int character = scanner->character;
 	int line = scanner->line;
 	FILE* f = scanner->f;
 
@@ -51,6 +57,7 @@ static l_token gettoken(l_scanner* scanner)
 	do {\
 		token.type = ttype; \
 		token.content = c; \
+		token.character = character; \
 		token.line = line; \
 	} while(0)
 
@@ -290,7 +297,11 @@ static l_token gettoken(l_scanner* scanner)
 	 */
 	if (token.type == TOKEN_ERROR)
 	{
-		fprintf(stderr, "line %i: %s\n", token.line, token.content);
+		fprintf(stderr,
+			"line %i:%i: %s\n",
+			token.line,
+			token.character,
+			token.content);
 		SETTOKEN(TOKEN_NONE, "");
 	}
 
@@ -311,6 +322,7 @@ l_scanner* l_scanner_create(FILE* f)
 {
 	l_scanner* scanner = malloc(sizeof(l_scanner));
 	scanner->f = f;
+	scanner->character = -1;
 	scanner->line = 1;
 	scanner->curr = '\0';
 	scanner->next = '\0';
@@ -348,8 +360,9 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 	if (len == 0)
 	{
 		fprintf(stderr,
-			"line %i: Unexpected token %s\n",
+			"line %i:%i: Unexpected token %s\n",
 			token.line,
+			token.character,
 			l_token_type_string(token.type));
 		exit(1);
 	}
@@ -377,8 +390,9 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 	}
 
 	fprintf(stderr,
-		"line %i: Expected %s, got %s\n",
+		"line %i:%i: Expected %s, got %s\n",
 		token.line,
+		token.character,
 		str,
 		l_token_type_string(token.type));
 
@@ -390,8 +404,9 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 void l_scanner_unexpected(l_token_type expected, l_token token)
 {
 	fprintf(stderr,
-		"line %i: Expected %s, got %s\n",
+		"line %i:%i: Expected %s, got %s\n",
 		token.line,
+		token.character,
 		l_token_type_string(expected),
 		l_token_type_string(token.type));
 

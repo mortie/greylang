@@ -8,6 +8,7 @@
 typedef struct l_scanner
 {
 	FILE* f;
+	int character;
 	int line;
 	char curr;
 	char next;
