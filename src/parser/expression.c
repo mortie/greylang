@@ -82,6 +82,16 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		}
 
 		/*
+		 * Variable
+		 */
+		else if (t.type == TOKEN_NAME)
+		{
+			expr->expression.variable =
+				l_parse_expression_variable(stream);
+			expr->type = EXPRESSION_VARIABLE;
+		}
+
+		/*
 		 * I dunno
 		 */
 		else
@@ -132,6 +142,11 @@ void l_pretty_expression(
 	case EXPRESSION_CHAR_LITERAL:
 		l_pretty_expression_char_literal(
 			expr->expression.char_literal,
+			depth, file);
+		break;
+	case EXPRESSION_VARIABLE:
+		l_pretty_expression_variable(
+			expr->expression.variable,
 			depth, file);
 		break;
 	}

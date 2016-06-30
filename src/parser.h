@@ -49,7 +49,8 @@ typedef enum l_p_expression_type
 	EXPRESSION_FUNCTION,
 	EXPRESSION_STRING_LITERAL,
 	EXPRESSION_CHAR_LITERAL,
-	EXPRESSION_NUM_LITERAL
+	EXPRESSION_NUM_LITERAL,
+	EXPRESSION_VARIABLE
 } l_p_expression_type;
 
 /*
@@ -185,6 +186,21 @@ void l_pretty_expression_num_literal(
 		FILE* file);
 
 /*
+ * Variable Expression
+ */
+typedef struct l_p_expression_variable
+{
+	char* name;
+} l_p_expression_variable;
+
+l_p_expression_variable* l_parse_expression_variable(l_scanner* stream);
+
+void l_pretty_expression_variable(
+		l_p_expression_variable* expr,
+		int depth,
+		FILE* file);
+
+/*
  * Expression (For real this time)
  */
 typedef struct l_p_expression
@@ -198,6 +214,7 @@ typedef struct l_p_expression
 		l_p_expression_num_literal* num_literal;
 		l_p_expression_string_literal* string_literal;
 		l_p_expression_char_literal* char_literal;
+		l_p_expression_variable* variable;
 	} expression;
 	l_p_expression_type type;
 } l_p_expression;
