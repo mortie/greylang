@@ -54,7 +54,7 @@ static l_token gettoken(l_scanner* scanner)
 	int contenta = 0;
 
 #define SETTOKEN(ttype, c) \
-	do {\
+	do { \
 		token.type = ttype; \
 		token.content = c; \
 		token.character = character; \
