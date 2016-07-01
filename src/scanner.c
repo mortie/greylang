@@ -232,19 +232,19 @@ static l_token gettoken(l_scanner* scanner)
 	{
 		char prev = c;
 		char cc = nextchar(scanner);
-		while (cc != EOF && prev != '*' && cc != '/')
+		while (cc != EOF && !(prev == '*' && cc == '/'))
 		{
 			prev = cc;
 			cc = nextchar(scanner);
 		}
-		token.type = TOKEN_IGNORED;
 		nextchar(scanner);
+		token.type = TOKEN_IGNORED;
 	}
 
 	/*
 	 * Skip single line comment
 	 */
-	else if (c == '/' && next == '*')
+	else if (c == '/' && next == '/')
 	{
 		char cc = nextchar(scanner);
 		while (cc != EOF && cc != '\n') cc = nextchar(scanner);
