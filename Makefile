@@ -1,2 +1,2 @@
 build:
-	gcc -g -o lang src/*.c src/parser/*.c
+	gcc -Wall -Wpedantic -g -o lang src/*.c src/parser/*.c

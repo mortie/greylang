@@ -96,7 +96,7 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		 */
 		else
 		{
-			l_scanner_unexpecteda(NULL, 0, t);
+			l_scanner_unexpecteda(NULL, 0, t, "expression");
 		}
 	}
 

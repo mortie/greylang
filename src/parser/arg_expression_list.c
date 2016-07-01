@@ -32,7 +32,7 @@ l_p_arg_expression_list* l_parse_arg_expression_list(l_scanner* stream)
 		l_token next = l_scanner_peek(stream);
 		if (next.type == TOKEN_COMMA)
 		{
-			l_scanner_skip(stream, TOKEN_COMMA);
+			l_scanner_skip(stream, TOKEN_COMMA, "arg expression list");
 		}
 		else if (next.type == TOKEN_CLOSEPAREN)
 		{
@@ -44,7 +44,7 @@ l_p_arg_expression_list* l_parse_arg_expression_list(l_scanner* stream)
 				TOKEN_COMMA,
 				TOKEN_CLOSEPAREN
 			};
-			l_scanner_unexpecteda(expected, 2, next);
+			l_scanner_unexpecteda(expected, 2, next, "arg expression list");
 		}
 	}
 }

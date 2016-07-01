@@ -6,8 +6,7 @@ l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 {
 	int namea = 4;
 	l_p_arg_definition* list = malloc(sizeof(l_p_arg_definition));
-	list->names = malloc(namea);
-	list->names[0] = '\0';
+	list->names = malloc(namea * sizeof(char*));
 	list->namec = 0;
 
 	// Empty argument definition
@@ -18,14 +17,12 @@ l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 	while (1)
 	{
 		// name
-		l_token name = l_scanner_next(stream);
-		if (name.type != TOKEN_NAME)
-			l_scanner_unexpected(TOKEN_NAME, name);
+		l_token name = l_scanner_expect(stream, TOKEN_NAME, "arg definition");
 		list->namec += 1;
 		if (namea < list->namec)
 		{
 			namea *= 2;
-			list->names = realloc(list->names, namea);
+			list->names = realloc(list->names, namea * sizeof(char*));
 		}
 		list->names[list->namec - 1] = name.content;
 
@@ -33,7 +30,7 @@ l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 		l_token next = l_scanner_peek(stream);
 		if (next.type == TOKEN_COMMA)
 		{
-			l_scanner_skip(stream, TOKEN_COMMA);
+			l_scanner_skip(stream, TOKEN_COMMA, "arg definition");
 		}
 		else if (next.type == TOKEN_CLOSEPAREN)
 		{
@@ -45,7 +42,7 @@ l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 				TOKEN_COMMA,
 				TOKEN_CLOSEPAREN
 			};
-			l_scanner_unexpecteda(expected, 2, next);
+			l_scanner_unexpecteda(expected, 2, next, "arg definition");
 		}
 	}
 

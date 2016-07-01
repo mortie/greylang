@@ -47,7 +47,6 @@ static l_token gettoken(l_scanner* scanner)
 	char next = scanner->next;
 	int character = scanner->character;
 	int line = scanner->line;
-	FILE* f = scanner->f;
 
 	char* content = "";
 	int contentlen = 0;
@@ -342,6 +341,7 @@ l_token l_scanner_next(l_scanner* scanner)
 	l_token next = scanner->nexttoken;
 	scanner->nexttoken = scanner->nexttoken2;
 	scanner->nexttoken2 = token;
+
 	return next;
 }
 
@@ -355,14 +355,19 @@ l_token l_scanner_peek2(l_scanner* scanner)
 	return scanner->nexttoken2;
 }
 
-void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
+void l_scanner_unexpecteda(
+		l_token_type* expected,
+		int len,
+		l_token token,
+		char* section)
 {
 	if (len == 0)
 	{
 		fprintf(stderr,
-			"line %i:%i: Unexpected token %s\n",
+			"line %i:%i (%s): Unexpected token %s\n",
 			token.line,
 			token.character,
+			section,
 			l_token_type_string(token.type));
 		exit(1);
 	}
@@ -390,9 +395,10 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 	}
 
 	fprintf(stderr,
-		"line %i:%i: Expected %s, got %s\n",
+		"line %i:%i (%s): Expected %s, got %s\n",
 		token.line,
 		token.character,
+		section,
 		str,
 		l_token_type_string(token.type));
 
@@ -401,23 +407,35 @@ void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token)
 	exit(1);
 }
 
-void l_scanner_unexpected(l_token_type expected, l_token token)
+void l_scanner_unexpected(l_token_type expected, l_token token, char* section)
 {
 	fprintf(stderr,
-		"line %i:%i: Expected %s, got %s\n",
+		"line %i:%i (%s): Expected %s, got %s\n",
 		token.line,
 		token.character,
+		section,
 		l_token_type_string(expected),
 		l_token_type_string(token.type));
 
 	exit(1);
 }
 
-void l_scanner_skip(l_scanner* scanner, l_token_type type)
+void l_scanner_skip(l_scanner* scanner, l_token_type type, char* section)
 {
 	l_token token = l_scanner_next(scanner);
 	if (token.type != type)
 	{
-		l_scanner_unexpected(type, token);
+		l_scanner_unexpected(type, token, section);
 	}
+}
+
+l_token l_scanner_expect(l_scanner* scanner, l_token_type type, char* section)
+{
+	l_token token = l_scanner_next(scanner);
+	if (token.type != type)
+	{
+		l_scanner_unexpected(type, token, section);
+	}
+
+	return token;
 }

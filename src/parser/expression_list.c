@@ -44,7 +44,7 @@ l_p_expression_list* l_parse_expression_list(l_scanner* stream)
 				TOKEN_SEMICOLON,
 				TOKEN_PERIOD
 			};
-			l_scanner_unexpecteda(expected, 2, next);
+			l_scanner_unexpecteda(expected, 2, next, "expression list");
 		}
 	}
 }

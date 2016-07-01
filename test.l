@@ -1,5 +1,4 @@
-a = {
-	(n, str);
+a = {(n, str);
 	repeat(n, {
 		print(str).
 	}).

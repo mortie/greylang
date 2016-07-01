@@ -7,7 +7,7 @@ l_p_expression_string_literal* l_parse_expression_string_literal(l_scanner* stre
 	l_p_expression_string_literal* expr = malloc(sizeof(l_p_expression_string_literal));
 
 	// string literal
-	l_token str = l_scanner_next(stream);
+	l_token str = l_scanner_expect(stream, TOKEN_STRING_LITERAL, "string literal");
 	expr->string = str.content;
 
 	return expr;

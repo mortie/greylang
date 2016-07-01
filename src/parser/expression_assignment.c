@@ -7,11 +7,11 @@ l_p_expression_assignment* l_parse_expression_assignment(l_scanner* stream)
 	l_p_expression_assignment* expr = malloc(sizeof(l_p_expression_assignment));
 
 	// name
-	l_token name = l_scanner_next(stream);
+	l_token name = l_scanner_expect(stream, TOKEN_NAME, "assignment");
 	expr->name = name.content;
 
 	// =
-	l_scanner_skip(stream, TOKEN_EQUALS);
+	l_scanner_skip(stream, TOKEN_EQUALS, "assignment");
 
 	// expression
 	expr->expression = l_parse_expression(stream);
