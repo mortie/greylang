@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void l_pretty_expression_empty(int depth, FILE* file)
+void l_pretty_expr_empty(int depth, FILE* file)
 {
 	char* tabs;
 	P_TABS(depth, tabs);

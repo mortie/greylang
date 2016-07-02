@@ -2,16 +2,16 @@
 
 #include <stdlib.h>
 
-l_p_expression_list* l_parse_expression_list(l_scanner* stream)
+l_p_expr_list* l_parse_expr_list(l_scanner* stream)
 {
 	int alloced = 16;
-	l_p_expression_list* list = malloc(sizeof(l_p_expression_list));
-	list->expressions = malloc(alloced * sizeof(l_p_expression));
+	l_p_expr_list* list = malloc(sizeof(l_p_expr_list));
+	list->expressions = malloc(alloced * sizeof(l_p_expr));
 	list->expressionc = 0;
 
 	while (1)
 	{
-		l_p_expression* expr = l_parse_expression(stream);
+		l_p_expr* expr = l_parse_expr(stream);
 
 		/*
 		 * Add expression
@@ -22,7 +22,7 @@ l_p_expression_list* l_parse_expression_list(l_scanner* stream)
 			alloced *= 2;
 			list->expressions = realloc(
 				list->expressions,
-				alloced * sizeof(l_p_expression));
+				alloced * sizeof(l_p_expr));
 		}
 		list->expressions[list->expressionc - 1] = expr;
 
@@ -49,14 +49,14 @@ l_p_expression_list* l_parse_expression_list(l_scanner* stream)
 	}
 }
 
-void l_pretty_expression_list(
-		l_p_expression_list* list,
+void l_pretty_expr_list(
+		l_p_expr_list* list,
 		int depth,
 		FILE* file)
 {
 	for (int i = 0; i < list->expressionc; ++i)
 	{
-		l_pretty_expression(list->expressions[i], depth, file);
+		l_pretty_expr(list->expressions[i], depth, file);
 		if (i == list->expressionc - 1)
 		{
 			fprintf(file, ".\n");

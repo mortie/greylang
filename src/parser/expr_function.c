@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expression_function* l_parse_expression_function(l_scanner* stream)
+l_p_expr_function* l_parse_expr_function(l_scanner* stream)
 {
-	l_p_expression_function* expr = malloc(sizeof(l_p_expression_function));
+	l_p_expr_function* expr = malloc(sizeof(l_p_expr_function));
 
 	// {
 	l_scanner_skip(stream, TOKEN_OPENBRACE, "function");
@@ -29,7 +29,7 @@ l_p_expression_function* l_parse_expression_function(l_scanner* stream)
 	}
 
 	// expression list
-	expr->expr_list = l_parse_expression_list(stream);
+	expr->expr_list = l_parse_expr_list(stream);
 
 	// }
 	l_scanner_skip(stream, TOKEN_CLOSEBRACE, "function");
@@ -37,8 +37,8 @@ l_p_expression_function* l_parse_expression_function(l_scanner* stream)
 	return expr;
 }
 
-void l_pretty_expression_function(
-		l_p_expression_function* expr,
+void l_pretty_expr_function(
+		l_p_expr_function* expr,
 		int depth,
 		FILE* file)
 {
@@ -54,7 +54,7 @@ void l_pretty_expression_function(
 		fprintf(file, ");\n");
 	}
 
-	l_pretty_expression_list(expr->expr_list, depth + 1, file);
+	l_pretty_expr_list(expr->expr_list, depth + 1, file);
 
 	fprintf(file, "%s}", tabs);
 }

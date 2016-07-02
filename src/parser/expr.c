@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expression* l_parse_expression(l_scanner* stream)
+l_p_expr* l_parse_expr(l_scanner* stream)
 {
-	l_p_expression* expr = malloc(sizeof(l_p_expression));
+	l_p_expr* expr = malloc(sizeof(l_p_expr));
 
 	l_token t = l_scanner_peek(stream);
 
@@ -14,7 +14,7 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 	if (t.type == TOKEN_PERIOD)
 	{
 		expr->expression.empty = NULL;
-		expr->type = EXPRESSION_EMPTY;
+		expr->type = EXPR_EMPTY;
 	}
 	else
 	{
@@ -27,8 +27,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
 		{
 			expr->expression.assignment =
-				l_parse_expression_assignment(stream);
-			expr->type = EXPRESSION_ASSIGNMENT;
+				l_parse_expr_assignment(stream);
+			expr->type = EXPR_ASSIGNMENT;
 		}
 
 		/*
@@ -37,8 +37,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		else if (t.type == TOKEN_NAME && next.type == TOKEN_OPENPAREN)
 		{
 			expr->expression.func_call =
-				l_parse_expression_func_call(stream);
-			expr->type = EXPRESSION_FUNC_CALL;
+				l_parse_expr_func_call(stream);
+			expr->type = EXPR_FUNC_CALL;
 		}
 
 		/*
@@ -47,8 +47,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		else if (t.type == TOKEN_OPENBRACE)
 		{
 			expr->expression.function =
-				l_parse_expression_function(stream);
-			expr->type = EXPRESSION_FUNCTION;
+				l_parse_expr_function(stream);
+			expr->type = EXPR_FUNCTION;
 		}
 
 		/*
@@ -57,8 +57,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		else if (t.type == TOKEN_STRING_LITERAL)
 		{
 			expr->expression.string_literal =
-				l_parse_expression_string_literal(stream);
-			expr->type = EXPRESSION_STRING_LITERAL;
+				l_parse_expr_string_literal(stream);
+			expr->type = EXPR_STRING_LITERAL;
 		}
 
 		/*
@@ -67,8 +67,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		else if (t.type == TOKEN_CHAR_LITERAL)
 		{
 			expr->expression.string_literal =
-				l_parse_expression_string_literal(stream);
-			expr->type = EXPRESSION_STRING_LITERAL;
+				l_parse_expr_string_literal(stream);
+			expr->type = EXPR_STRING_LITERAL;
 		}
 
 		/*
@@ -77,8 +77,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		else if (t.type == TOKEN_NUM_LITERAL)
 		{
 			expr->expression.num_literal =
-				l_parse_expression_num_literal(stream);
-			expr->type = EXPRESSION_NUM_LITERAL;
+				l_parse_expr_num_literal(stream);
+			expr->type = EXPR_NUM_LITERAL;
 		}
 
 		/*
@@ -87,8 +87,8 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 		else if (t.type == TOKEN_NAME)
 		{
 			expr->expression.variable =
-				l_parse_expression_variable(stream);
-			expr->type = EXPRESSION_VARIABLE;
+				l_parse_expr_variable(stream);
+			expr->type = EXPR_VARIABLE;
 		}
 
 		/*
@@ -103,49 +103,49 @@ l_p_expression* l_parse_expression(l_scanner* stream)
 	return expr;
 }
 
-void l_pretty_expression(
-		l_p_expression* expr,
+void l_pretty_expr(
+		l_p_expr* expr,
 		int depth,
 		FILE* file)
 {
 	switch (expr->type)
 	{
-	case EXPRESSION_EMPTY:
-		l_pretty_expression_empty(
+	case EXPR_EMPTY:
+		l_pretty_expr_empty(
 			depth, file);
 		break;
-	case EXPRESSION_ASSIGNMENT:
-		l_pretty_expression_assignment(
+	case EXPR_ASSIGNMENT:
+		l_pretty_expr_assignment(
 			expr->expression.assignment,
 			depth, file);
 		break;
-	case EXPRESSION_FUNC_CALL:
-		l_pretty_expression_func_call(
+	case EXPR_FUNC_CALL:
+		l_pretty_expr_func_call(
 			expr->expression.func_call,
 			depth, file);
 		break;
-	case EXPRESSION_FUNCTION:
-		l_pretty_expression_function(
+	case EXPR_FUNCTION:
+		l_pretty_expr_function(
 			expr->expression.function,
 			depth, file);
 		break;
-	case EXPRESSION_NUM_LITERAL:
-		l_pretty_expression_num_literal(
+	case EXPR_NUM_LITERAL:
+		l_pretty_expr_num_literal(
 			expr->expression.num_literal,
 			depth, file);
 		break;
-	case EXPRESSION_STRING_LITERAL:
-		l_pretty_expression_string_literal(
+	case EXPR_STRING_LITERAL:
+		l_pretty_expr_string_literal(
 			expr->expression.string_literal,
 			depth, file);
 		break;
-	case EXPRESSION_CHAR_LITERAL:
-		l_pretty_expression_char_literal(
+	case EXPR_CHAR_LITERAL:
+		l_pretty_expr_char_literal(
 			expr->expression.char_literal,
 			depth, file);
 		break;
-	case EXPRESSION_VARIABLE:
-		l_pretty_expression_variable(
+	case EXPR_VARIABLE:
+		l_pretty_expr_variable(
 			expr->expression.variable,
 			depth, file);
 		break;

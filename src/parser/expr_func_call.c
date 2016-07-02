@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expression_func_call* l_parse_expression_func_call(l_scanner* stream)
+l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream)
 {
-	l_p_expression_func_call* expr = malloc(sizeof(l_p_expression_func_call));
+	l_p_expr_func_call* expr = malloc(sizeof(l_p_expr_func_call));
 
 	// name
 	l_token name = l_scanner_expect(stream, TOKEN_NAME, "func call");
@@ -14,7 +14,7 @@ l_p_expression_func_call* l_parse_expression_func_call(l_scanner* stream)
 	l_scanner_skip(stream, TOKEN_OPENPAREN, "func call");
 
 	// expression list
-	expr->arg_list = l_parse_arg_expression_list(stream);
+	expr->arg_list = l_parse_arg_expr_list(stream);
 
 	// )
 	l_scanner_skip(stream, TOKEN_CLOSEPAREN, "func call");
@@ -22,8 +22,8 @@ l_p_expression_func_call* l_parse_expression_func_call(l_scanner* stream)
 	return expr;
 }
 
-void l_pretty_expression_func_call(
-		l_p_expression_func_call* expr,
+void l_pretty_expr_func_call(
+		l_p_expr_func_call* expr,
 		int depth,
 		FILE* file)
 {
@@ -31,6 +31,6 @@ void l_pretty_expression_func_call(
 	P_TABS(depth, tabs);
 
 	fprintf(file, "%s%s(\n", tabs, expr->name);
-	l_pretty_arg_expression_list(expr->arg_list, depth + 1, file);
+	l_pretty_arg_expr_list(expr->arg_list, depth + 1, file);
 	fprintf(file, "%s)", tabs);
 }

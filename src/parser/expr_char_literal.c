@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expression_char_literal* l_parse_expression_char_literal(l_scanner* stream)
+l_p_expr_char_literal* l_parse_expr_char_literal(l_scanner* stream)
 {
-	l_p_expression_char_literal* expr = malloc(sizeof(l_p_expression_char_literal));
+	l_p_expr_char_literal* expr = malloc(sizeof(l_p_expr_char_literal));
 
 	// char literal
 	l_token c = l_scanner_expect(stream, TOKEN_CHAR_LITERAL, "char literal");
@@ -13,8 +13,8 @@ l_p_expression_char_literal* l_parse_expression_char_literal(l_scanner* stream)
 	return expr;
 }
 
-void l_pretty_expression_char_literal(
-		l_p_expression_char_literal* expr,
+void l_pretty_expr_char_literal(
+		l_p_expr_char_literal* expr,
 		int depth,
 		FILE* file)
 {
