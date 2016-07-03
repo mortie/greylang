@@ -1,4 +1,4 @@
-#!/usr/bin/env lang
+#!/usr/bin/env grey
 
 a = {(n, str);
 	repeat(n, {

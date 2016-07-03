@@ -1,6 +1,6 @@
-# Language
+# The Grey Programming Language
 
-This is my project to create a language.
+This is grey-lang, my project to create a language.
 
 ## Syntax
 
@@ -8,7 +8,7 @@ This is my project to create a language.
 
 	a = {
 		(n, str);
-		repeat(n, { print!(str) })
+		repeat(n, { print!(str) });
 	};
 
 	a(10, "Hello World");
@@ -20,6 +20,10 @@ Expressions are at the heart of the language. The various types are:
 #### Assignment
 
 	foo = [expression]
+
+#### Array Literal
+
+	[ [expression], [expression], [expression] ]
 
 #### String Literal
 

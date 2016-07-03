@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -g -Wall -lm -lreadline
 
-TARGET = lang
+TARGET = grey
 
 build:
 	$(CC) $(CFLAGS) -o $(TARGET) $(shell find src -name '*.c')
