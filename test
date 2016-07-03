@@ -1,9 +1,9 @@
 #!/usr/bin/env lang
 
 a = {(n, str);
-	repeat(n, { print!(
-		..(str, ", iter: ", $1)
-	) });
+	repeat(n, {
+		print!( ..(str, ", iter: ", $1) )
+	});
 };
 
 s = read!("What to print? ");
