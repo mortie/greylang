@@ -20,6 +20,7 @@
 /*
  * Argument Definition
  */
+
 typedef struct l_p_arg_definition
 {
 	char** names;
@@ -36,11 +37,13 @@ void l_pretty_arg_definition(
 /*
  * Expression (temporary, to make types happy)
  */
+
 typedef struct l_p_expr l_p_expr;
 
 /*
  * Expression Types
  */
+
 typedef enum l_p_expr_type
 {
 	EXPR_EMPTY,
@@ -56,6 +59,7 @@ typedef enum l_p_expr_type
 /*
  * Expression List
  */
+
 typedef struct l_p_expr_list
 {
 	l_p_expr** expressions;
@@ -72,6 +76,7 @@ void l_pretty_expr_list(
 /*
  * Argument Expression List
  */
+
 typedef struct l_p_arg_expr_list
 {
 	l_p_expr** expressions;
@@ -88,6 +93,7 @@ void l_pretty_arg_expr_list(
 /*
  * Empty Expression
  */
+
 typedef struct l_p_expr_empty l_p_expr_empty;
 
 void l_pretty_expr_empty(int depth, FILE* file);
@@ -95,6 +101,7 @@ void l_pretty_expr_empty(int depth, FILE* file);
 /*
  * Assignment Expression
  */
+
 typedef struct l_p_expr_assignment
 {
 	char* name;
@@ -111,6 +118,7 @@ void l_pretty_expr_assignment(
 /*
  * Function Call Expression
  */
+
 typedef struct l_p_expr_func_call
 {
 	char* name;
@@ -127,6 +135,7 @@ void l_pretty_expr_func_call(
 /*
  * Function Expression
  */
+
 typedef struct l_p_expr_function
 {
 	l_p_arg_definition* arg_definition;
@@ -143,6 +152,7 @@ void l_pretty_expr_function(
 /*
  * String Literal Expression
  */
+
 typedef struct l_p_expr_string_literal
 {
 	char* string;
@@ -158,6 +168,7 @@ void l_pretty_expr_string_literal(
 /*
  * Char Literal Expression
  */
+
 typedef struct l_p_expr_char_literal
 {
 	char character;
@@ -173,6 +184,7 @@ void l_pretty_expr_char_literal(
 /*
  * Num Literal Expression
  */
+
 typedef struct l_p_expr_num_literal
 {
 	double number;
@@ -188,6 +200,7 @@ void l_pretty_expr_num_literal(
 /*
  * Variable Expression
  */
+
 typedef struct l_p_expr_variable
 {
 	char* name;
@@ -203,6 +216,7 @@ void l_pretty_expr_variable(
 /*
  * Expression (For real this time)
  */
+
 typedef struct l_p_expr
 {
 	union expression

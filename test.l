@@ -1,6 +1,6 @@
 a = {(n, str);
 	repeat(n, {
-		print(str).
+		print!(str).
 	}).
 };
 

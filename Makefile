@@ -1,2 +1,7 @@
+CC = gcc
+CFLAGS = -g -Wall -lm
+
+TARGET = lang
+
 build:
-	gcc -Wall -Wpedantic -g -o lang src/*.c src/parser/*.c
+	$(CC) $(CFLAGS) -o $(TARGET) $(shell find src -name '*.c')
