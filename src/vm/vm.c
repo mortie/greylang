@@ -4,16 +4,18 @@
 
 l_vm* l_vm_create()
 {
+	l_vm_scope* stdlib = l_vm_scope_create(NULL);
+
 	l_vm* vm = malloc(sizeof(l_vm));
-	vm->global = l_vm_scope_create(NULL);
+	vm->global = l_vm_scope_create(stdlib);
 
 #define STD(str, std) \
 	do { \
 		l_vm_var_function* f = l_vm_var_function_create_std( \
-			vm->global, std); \
+			stdlib, std); \
 		l_vm_var* v = l_vm_var_create(VAR_TYPE_FUNCTION); \
 		v->var.function = f; \
-		l_vm_scope_set(vm->global, str, v); \
+		l_vm_scope_define(stdlib, str, v); \
 	} while (0)
 
 	STD("+", STD_FUNC_ADD);
@@ -21,7 +23,8 @@ l_vm* l_vm_create()
 	STD("*", STD_FUNC_MUL);
 	STD("/", STD_FUNC_DIV);
 	STD("^", STD_FUNC_POW);
-	STD("$", STD_FUNC_LOOKUP);
+	STD("$", STD_FUNC_CALLFUNC);
+	STD("$$", STD_FUNC_CALLSETTER);
 	STD("if", STD_FUNC_IF);
 	STD("repeat", STD_FUNC_REPEAT);
 	STD("map", STD_FUNC_MAP);

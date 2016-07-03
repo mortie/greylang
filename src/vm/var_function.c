@@ -51,7 +51,7 @@ l_vm_var* l_vm_var_function_exec(
 
 			for (int i = 0; i < args->len; ++i)
 			{
-				l_vm_scope_set(scope, func->argnames[i], args->vars[i]);
+				l_vm_scope_define(scope, func->argnames[i], args->vars[i]);
 			}
 		}
 
@@ -60,11 +60,10 @@ l_vm_var* l_vm_var_function_exec(
 			char name[16];
 			name[0] = '$';
 			snprintf(name + 1, 15, "%d", i + 1);
-			l_vm_scope_set(scope, name, args->vars[i]);
+			l_vm_scope_define(scope, name, args->vars[i]);
 		}
 
 		l_vm_var* var = l_vm_exec(scope, func->expressions, func->expressionc);
-		l_vm_scope_free(scope);
 		return var;
 	}
 
@@ -82,8 +81,10 @@ l_vm_var* l_vm_var_function_exec(
 		return l_vm_std_div(args);
 	case STD_FUNC_POW:
 		return l_vm_std_pow(args);
-	case STD_FUNC_LOOKUP:
-		return l_vm_std_lookup(args);
+	case STD_FUNC_CALLFUNC:
+		return l_vm_std_callfunc(args);
+	case STD_FUNC_CALLSETTER:
+		return l_vm_std_callsetter(args);
 	case STD_FUNC_IF:
 		return l_vm_std_if(args);
 	case STD_FUNC_REPEAT:

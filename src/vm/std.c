@@ -138,9 +138,13 @@ l_vm_var* l_vm_std_pow(l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_lookup(l_vm_var_array* args)
+l_vm_var* l_vm_std_callfunc(l_vm_var_array* args)
 {
-	expectargc(2, args);
+	if (args->len < 2)
+	{
+		l_vm_error_argnum(2, args->len);
+	}
+
 	l_vm_var* func = args->vars[0];
 	l_vm_var* str = args->vars[1];
 	expecttype(VAR_TYPE_FUNCTION, func);
@@ -149,15 +153,63 @@ l_vm_var* l_vm_std_lookup(l_vm_var_array* args)
 	l_vm_var_function* f = func->var.function;
 	l_vm_var_string* s = str->var.string;
 
+	/*
+	 * Find the correct function
+	 */
 	char* name = malloc(s->len + 2);
-	memcpy(name, s->chars + 1, s->len);
+	memcpy(name + 1, s->chars, s->len);
 	name[s->len + 1] = '\0';
 	name[0] = '$';
 
-	l_vm_var* v = l_vm_scope_lookup(f->scope, name);
+	l_vm_var* rf = l_vm_scope_lookup(f->scope, name);
+	if (rf == NULL)
+		rf = l_vm_var_create(VAR_TYPE_NONE);
 
 	free(name);
-	return v;
+	expecttype(VAR_TYPE_FUNCTION, rf);
+
+	/*
+	 * Call the function
+	 */
+
+	l_vm_var_array* fargs = malloc(sizeof(l_vm_var_array));
+	int fargc = args->len - 2;
+
+	fargs->len = fargc;
+	fargs->vars = (args->vars + 2);
+
+	l_vm_var* res = l_vm_var_function_exec(rf->var.function, fargs);
+
+	free(fargs);
+
+	return res;
+}
+
+l_vm_var* l_vm_std_callsetter(l_vm_var_array* args)
+{
+	if (args->len < 2)
+	{
+		l_vm_error_argnum(2, args->len);
+	}
+
+	expecttype(VAR_TYPE_FUNCTION, args->vars[0]);
+	expecttype(VAR_TYPE_STRING, args->vars[1]);
+
+	l_vm_var_string* nwname = malloc(sizeof(l_vm_var_string));
+
+	l_vm_var_string* name = args->vars[1]->var.string;
+	nwname->len = name->len + 1;
+	nwname->chars = malloc(nwname->len + 2);
+	memmove(nwname->chars + 1, name->chars, name->len + 1);
+	nwname->chars[0] = '$';
+
+	args->vars[1]->var.string = nwname;
+
+	l_vm_var* res = l_vm_std_callfunc(args);
+	free(nwname->chars);
+	free(nwname);
+
+	return res;
 }
 
 l_vm_var* l_vm_std_if(l_vm_var_array* args)
@@ -299,10 +351,11 @@ l_vm_var* l_vm_std_concat(l_vm_var_array* args)
 
 l_vm_var* l_vm_std_print(l_vm_var_array* args)
 {
-	expectargc(1, args);
-	l_vm_var* str = args->vars[0];
-	expecttype(VAR_TYPE_STRING, str);
-	printf("%s\n", str->var.string->chars);
+	for (int i = 0; i < args->len; ++i)
+	{
+		printf("%s", tostring(args->vars[i]));
+	}
+	printf("\n");
 
 	return l_vm_var_create(VAR_TYPE_NONE);
 }

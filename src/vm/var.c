@@ -9,7 +9,7 @@ l_vm_var* l_vm_var_create(l_vm_var_type type)
 	return var;
 }
 
-void l_vm_var_free(l_vm_var* var)
+void l_vm_var_clean(l_vm_var* var)
 {
 	switch (var->type)
 	{
@@ -29,6 +29,10 @@ void l_vm_var_free(l_vm_var* var)
 	case VAR_TYPE_NONE:
 		break;
 	}
+}
 
+void l_vm_var_free(l_vm_var* var)
+{
+	l_vm_var_clean(var);
 	free(var);
 }

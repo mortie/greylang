@@ -2,7 +2,7 @@
 
 a = {(n, str);
 	repeat(n, {
-		print!( ..(str, ", iter: ", $1) )
+		print!( ..(str, ", iter: ", $1) );
 	});
 };
 

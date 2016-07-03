@@ -40,7 +40,8 @@ typedef enum l_vm_std_func
 	STD_FUNC_MUL,
 	STD_FUNC_DIV,
 	STD_FUNC_POW,
-	STD_FUNC_LOOKUP,
+	STD_FUNC_CALLFUNC,
+	STD_FUNC_CALLSETTER,
 	STD_FUNC_IF,
 	STD_FUNC_REPEAT,
 	STD_FUNC_MAP,
@@ -95,6 +96,7 @@ typedef struct l_vm_var
 
 l_vm_var* l_vm_var_create(l_vm_var_type type);
 void l_vm_var_free(l_vm_var* var);
+void l_vm_var_clean(l_vm_var* var);
 
 /*
  * Errors
@@ -108,20 +110,21 @@ void l_vm_error_undefined(char* name);
  * Standard Library
  */
 
-l_vm_var* l_vm_std_add(l_vm_var_array* args);      // +
-l_vm_var* l_vm_std_sub(l_vm_var_array* args);      // -
-l_vm_var* l_vm_std_mul(l_vm_var_array* args);      // *
-l_vm_var* l_vm_std_div(l_vm_var_array* args);      // /
-l_vm_var* l_vm_std_pow(l_vm_var_array* args);      // ^
-l_vm_var* l_vm_std_lookup(l_vm_var_array* args);   // $
-l_vm_var* l_vm_std_if(l_vm_var_array* args);       // if
-l_vm_var* l_vm_std_repeat(l_vm_var_array* args);   // repeat
-l_vm_var* l_vm_std_map(l_vm_var_array* args);      // map
-l_vm_var* l_vm_std_tostring(l_vm_var_array* args); // tostring
-l_vm_var* l_vm_std_tonumber(l_vm_var_array* args); // tonumber
-l_vm_var* l_vm_std_concat(l_vm_var_array* args);   // ..
-l_vm_var* l_vm_std_print(l_vm_var_array* args);    // print!
-l_vm_var* l_vm_std_read(l_vm_var_array* args);     // read!
+l_vm_var* l_vm_std_add(l_vm_var_array* args);        // +
+l_vm_var* l_vm_std_sub(l_vm_var_array* args);        // -
+l_vm_var* l_vm_std_mul(l_vm_var_array* args);        // *
+l_vm_var* l_vm_std_div(l_vm_var_array* args);        // /
+l_vm_var* l_vm_std_pow(l_vm_var_array* args);        // ^
+l_vm_var* l_vm_std_callfunc(l_vm_var_array* args);   // $
+l_vm_var* l_vm_std_callsetter(l_vm_var_array* args); // $$
+l_vm_var* l_vm_std_if(l_vm_var_array* args);         // if
+l_vm_var* l_vm_std_repeat(l_vm_var_array* args);     // repeat
+l_vm_var* l_vm_std_map(l_vm_var_array* args);        // map
+l_vm_var* l_vm_std_tostring(l_vm_var_array* args);   // tostring
+l_vm_var* l_vm_std_tonumber(l_vm_var_array* args);   // tonumber
+l_vm_var* l_vm_std_concat(l_vm_var_array* args);     // ..
+l_vm_var* l_vm_std_print(l_vm_var_array* args);      // print!
+l_vm_var* l_vm_std_read(l_vm_var_array* args);       // read!
 
 /*
  * Scope
@@ -134,12 +137,14 @@ typedef struct l_vm_scope
 	int varc;
 	int vara;
 	struct l_vm_scope* parent;
+	int immutable;
 } l_vm_scope;
 
 l_vm_scope* l_vm_scope_create(l_vm_scope* parent);
-void l_vm_scope_set(l_vm_scope* scope, char* name, l_vm_var* var);
 l_vm_var* l_vm_scope_shallow_lookup(l_vm_scope* scope, char* name);
 l_vm_var* l_vm_scope_lookup(l_vm_scope* scope, char* name);
+void l_vm_scope_define(l_vm_scope* scope, char* name, l_vm_var* var);
+void l_vm_scope_set(l_vm_scope* scope, char* name, l_vm_var* var);
 void l_vm_scope_free(l_vm_scope* scope);
 
 /*
