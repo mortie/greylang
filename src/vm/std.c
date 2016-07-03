@@ -207,6 +207,11 @@ l_vm_var* l_vm_std_read(l_vm_var_array* args)
 		expecttype(VAR_TYPE_STRING, args->vars[0]);
 		prompt = args->vars[0]->var.string->chars;
 	}
+	else
+	{
+		l_vm_error_argnum(1, args->len);
+		return NULL;
+	}
 
 	l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
 	l_vm_var_string* str = malloc(sizeof(l_vm_var_string));
