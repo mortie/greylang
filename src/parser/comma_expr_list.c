@@ -2,10 +2,10 @@
 
 #include <stdlib.h>
 
-l_p_arg_expr_list* l_parse_arg_expr_list(l_scanner* stream)
+l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream)
 {
 	int alloced = 16;
-	l_p_arg_expr_list* list = malloc(sizeof(l_p_arg_expr_list));
+	l_p_comma_expr_list* list = malloc(sizeof(l_p_comma_expr_list));
 	list->expressions = malloc(alloced * sizeof(l_p_expr));
 	list->expressionc = 0;
 
@@ -30,14 +30,14 @@ l_p_arg_expr_list* l_parse_arg_expr_list(l_scanner* stream)
 		list->expressions[list->expressionc - 1] = expr;
 
 		/*
-		 * Continue (comma), stop (close paren), or error
+		 * Continue (comma), stop (close paren or close bracket), or error
 		 */
 		l_token next = l_scanner_peek(stream);
 		if (next.type == TOKEN_COMMA)
 		{
 			l_scanner_skip(stream, TOKEN_COMMA, "arg expression list");
 		}
-		else if (next.type == TOKEN_CLOSEPAREN)
+		else if (next.type == TOKEN_CLOSEPAREN || next.type == TOKEN_CLOSEBRACKET)
 		{
 			return list;
 		}
@@ -45,15 +45,16 @@ l_p_arg_expr_list* l_parse_arg_expr_list(l_scanner* stream)
 		{
 			l_token_type expected[] = {
 				TOKEN_COMMA,
-				TOKEN_CLOSEPAREN
+				TOKEN_CLOSEPAREN,
+				TOKEN_CLOSEBRACKET
 			};
 			l_scanner_unexpecteda(expected, 2, next, "arg expression list");
 		}
 	}
 }
 
-void l_pretty_arg_expr_list(
-		l_p_arg_expr_list* list,
+void l_pretty_comma_expr_list(
+		l_p_comma_expr_list* list,
 		int depth,
 		FILE* file)
 {

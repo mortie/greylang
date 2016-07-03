@@ -50,6 +50,7 @@ typedef enum l_p_expr_type
 	EXPR_ASSIGNMENT,
 	EXPR_FUNC_CALL,
 	EXPR_FUNCTION,
+	EXPR_ARRAY_LITERAL,
 	EXPR_STRING_LITERAL,
 	EXPR_CHAR_LITERAL,
 	EXPR_NUM_LITERAL,
@@ -77,16 +78,16 @@ void l_pretty_expr_list(
  * Argument Expression List
  */
 
-typedef struct l_p_arg_expr_list
+typedef struct l_p_comma_expr_list
 {
 	l_p_expr** expressions;
 	int expressionc;
-} l_p_arg_expr_list;
+} l_p_comma_expr_list;
 
-l_p_arg_expr_list* l_parse_arg_expr_list(l_scanner* stream);
+l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream);
 
-void l_pretty_arg_expr_list(
-		l_p_arg_expr_list* list,
+void l_pretty_comma_expr_list(
+		l_p_comma_expr_list* list,
 		int depth,
 		FILE* file);
 
@@ -122,7 +123,7 @@ void l_pretty_expr_assignment(
 typedef struct l_p_expr_func_call
 {
 	char* name;
-	l_p_arg_expr_list* arg_list;
+	l_p_comma_expr_list* arg_list;
 } l_p_expr_func_call;
 
 l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream);
@@ -146,6 +147,22 @@ l_p_expr_function* l_parse_expr_function(l_scanner* stream);
 
 void l_pretty_expr_function(
 		l_p_expr_function* expr,
+		int depth,
+		FILE* file);
+
+/*
+ * Array Literal Expression
+ */
+
+typedef struct l_p_expr_array_literal
+{
+	l_p_comma_expr_list* expr_list;
+} l_p_expr_array_literal;
+
+l_p_expr_array_literal* l_parse_expr_array_literal(l_scanner* stream);
+
+void l_pretty_expr_array_literal(
+		l_p_expr_array_literal* expr,
 		int depth,
 		FILE* file);
 
@@ -225,6 +242,7 @@ typedef struct l_p_expr
 		l_p_expr_assignment* assignment;
 		l_p_expr_func_call* func_call;
 		l_p_expr_function* function;
+		l_p_expr_array_literal* array_literal;
 		l_p_expr_num_literal* num_literal;
 		l_p_expr_string_literal* string_literal;
 		l_p_expr_char_literal* char_literal;

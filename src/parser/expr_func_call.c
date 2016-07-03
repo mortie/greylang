@@ -14,7 +14,7 @@ l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream)
 	l_scanner_skip(stream, TOKEN_OPENPAREN, "func call");
 
 	// expression list
-	expr->arg_list = l_parse_arg_expr_list(stream);
+	expr->arg_list = l_parse_comma_expr_list(stream);
 
 	// )
 	l_scanner_skip(stream, TOKEN_CLOSEPAREN, "func call");
@@ -31,6 +31,6 @@ void l_pretty_expr_func_call(
 	P_TABS(depth, tabs);
 
 	fprintf(file, "%s%s(\n", tabs, expr->name);
-	l_pretty_arg_expr_list(expr->arg_list, depth + 1, file);
+	l_pretty_comma_expr_list(expr->arg_list, depth + 1, file);
 	fprintf(file, "%s)", tabs);
 }

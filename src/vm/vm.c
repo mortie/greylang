@@ -110,7 +110,7 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 			l_vm_error_type(VAR_TYPE_FUNCTION, func->type);
 		}
 
-		l_p_arg_expr_list* exprs = expr->expression.func_call->arg_list;
+		l_p_comma_expr_list* exprs = expr->expression.func_call->arg_list;
 
 		l_vm_var** argvars = malloc(sizeof(l_vm_var*) * exprs->expressionc);
 		for (int i = 0; i < exprs->expressionc; ++i)
@@ -149,6 +149,25 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		}
 
 		var->var.function = func;
+
+		return var;
+	}
+	case EXPR_ARRAY_LITERAL:
+	{
+		l_vm_var* var = l_vm_var_create(VAR_TYPE_ARRAY);
+
+		l_p_comma_expr_list* exprs = expr->expression.array_literal->expr_list;
+
+		l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
+		arr->vars = malloc(sizeof(l_vm_var*) * exprs->expressionc);
+		arr->len = exprs->expressionc;
+		arr->allocd = exprs->expressionc;
+		for (int i = 0; i < exprs->expressionc; ++i)
+		{
+			arr->vars[i] = exec(scope, exprs->expressions[i]);
+		}
+
+		var->var.array = arr;
 
 		return var;
 	}

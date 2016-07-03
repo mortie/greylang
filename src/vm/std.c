@@ -268,10 +268,12 @@ l_vm_var* l_vm_std_map(l_vm_var_array* args)
 	l_vm_var_array* a = arr->var.array;
 
 	l_vm_var_array* res = malloc(sizeof(l_vm_var_array) * a->len);
+	res->vars = malloc(sizeof(l_vm_var*) * a->len);
 	res->len = a->len;
 	res->allocd = a->len;
 
 	l_vm_var_array* arguments = malloc(sizeof(l_vm_var_array));
+	arguments->vars = malloc(sizeof(l_vm_var*));
 	arguments->len = 1;
 	arguments->allocd = 1;
 
@@ -282,6 +284,7 @@ l_vm_var* l_vm_std_map(l_vm_var_array* args)
 			l_vm_var_function_exec(func->var.function, arguments);
 	}
 
+	free(arguments->vars);
 	free(arguments);
 
 	l_vm_var* v = l_vm_var_create(VAR_TYPE_ARRAY);

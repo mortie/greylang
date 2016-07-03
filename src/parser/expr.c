@@ -54,6 +54,16 @@ l_p_expr* l_parse_expr(l_scanner* stream)
 		}
 
 		/*
+		 * Array Literal
+		 */
+		else if (t.type == TOKEN_OPENBRACKET)
+		{
+			expr->expression.array_literal =
+				l_parse_expr_array_literal(stream);
+			expr->type = EXPR_ARRAY_LITERAL;
+		}
+
+		/*
 		 * String Literal
 		 */
 		else if (t.type == TOKEN_STRING_LITERAL)
@@ -131,6 +141,10 @@ void l_pretty_expr(
 			expr->expression.function,
 			depth, file);
 		break;
+	case EXPR_ARRAY_LITERAL:
+		l_pretty_expr_array_literal(
+			expr->expression.array_literal,
+			depth, file);
 	case EXPR_NUM_LITERAL:
 		l_pretty_expr_num_literal(
 			expr->expression.num_literal,
