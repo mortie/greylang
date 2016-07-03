@@ -122,7 +122,7 @@ l_vm_var* l_vm_std_repeat(l_vm_var_array* args);     // repeat
 l_vm_var* l_vm_std_map(l_vm_var_array* args);        // map
 l_vm_var* l_vm_std_tostring(l_vm_var_array* args);   // tostring
 l_vm_var* l_vm_std_tonumber(l_vm_var_array* args);   // tonumber
-l_vm_var* l_vm_std_concat(l_vm_var_array* args);     // ..
+l_vm_var* l_vm_std_concat(l_vm_var_array* args);     // concat
 l_vm_var* l_vm_std_print(l_vm_var_array* args);      // print!
 l_vm_var* l_vm_std_read(l_vm_var_array* args);       // read!
 
