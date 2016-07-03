@@ -6,9 +6,21 @@
 #include <stdio.h>
 #include <string.h>
 
-int main()
+int main(int argc, char** argv)
 {
-	l_scanner* stream = l_scanner_create(stdin);
+	if (argc != 2)
+	{
+		fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+	}
+
+	FILE* in = fopen(argv[1], "r");
+	if (in == NULL)
+	{
+		perror("hi");
+		exit(1);
+	}
+
+	l_scanner* stream = l_scanner_create(in);
 
 	l_p_expr_list* list = l_parse(stream);
 

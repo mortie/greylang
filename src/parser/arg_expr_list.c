@@ -9,6 +9,9 @@ l_p_arg_expr_list* l_parse_arg_expr_list(l_scanner* stream)
 	list->expressions = malloc(alloced * sizeof(l_p_expr));
 	list->expressionc = 0;
 
+	if (l_scanner_peek(stream).type == TOKEN_CLOSEPAREN)
+		return list;
+
 	while (1)
 	{
 		l_p_expr* expr = l_parse_expr(stream);

@@ -1,0 +1,7 @@
+#!/usr/bin/env lang
+
+in = read!("Type Something: ");
+
+repeat(3, {
+	print!(in).
+}).

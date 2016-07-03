@@ -68,6 +68,8 @@ l_vm_var* l_vm_var_function_exec(
 		return l_vm_std_map(args);
 	case STD_FUNC_PRINT:
 		return l_vm_std_print(args);
+	case STD_FUNC_READ:
+		return l_vm_std_read(args);
 	}
 
 	return l_vm_var_create(VAR_TYPE_NONE);

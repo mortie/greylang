@@ -243,7 +243,9 @@ static l_token gettoken(l_scanner* scanner)
 	/*
 	 * Skip single line comment
 	 */
-	else if (c == '/' && next == '/')
+	else if (
+		(c == '/' && next == '/') ||
+		(c == '#' && character == 1))
 	{
 		char cc = nextchar(scanner);
 		while (cc != EOF && cc != '\n') cc = nextchar(scanner);

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <readline/readline.h>
 
 static void expecttype(l_vm_var_type expected, l_vm_var* var)
 {
@@ -192,4 +193,29 @@ l_vm_var* l_vm_std_print(l_vm_var_array* args)
 	printf("%s\n", str->var.string->chars);
 
 	return l_vm_var_create(VAR_TYPE_NONE);
+}
+
+l_vm_var* l_vm_std_read(l_vm_var_array* args)
+{
+	char* prompt;
+	if (args->len == 0)
+	{
+		prompt = "";
+	}
+	else if (args->len == 1)
+	{
+		expecttype(VAR_TYPE_STRING, args->vars[0]);
+		prompt = args->vars[0]->var.string->chars;
+	}
+
+	l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
+	l_vm_var_string* str = malloc(sizeof(l_vm_var_string));
+
+	char* s = readline(prompt);
+
+	str->chars = s;
+	str->len = strlen(s);
+	var->var.string = str;
+
+	return var;
 }

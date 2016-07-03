@@ -44,7 +44,8 @@ typedef enum l_vm_std_func
 	STD_FUNC_IF,
 	STD_FUNC_REPEAT,
 	STD_FUNC_MAP,
-	STD_FUNC_PRINT
+	STD_FUNC_PRINT,
+	STD_FUNC_READ
 } l_vm_std_func;
 
 typedef struct l_vm_var_function
@@ -112,6 +113,7 @@ l_vm_var* l_vm_std_if(l_vm_var_array* args);     // if
 l_vm_var* l_vm_std_repeat(l_vm_var_array* args); // repeat
 l_vm_var* l_vm_std_map(l_vm_var_array* args);    // map
 l_vm_var* l_vm_std_print(l_vm_var_array* args);  // print!
+l_vm_var* l_vm_std_read(l_vm_var_array* args);   // read!
 
 /*
  * Scope

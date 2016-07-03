@@ -26,6 +26,7 @@ l_vm* l_vm_create()
 	STD("repeat", STD_FUNC_REPEAT);
 	STD("map", STD_FUNC_MAP);
 	STD("print!", STD_FUNC_PRINT);
+	STD("read!", STD_FUNC_READ);
 
 #undef STD
 
