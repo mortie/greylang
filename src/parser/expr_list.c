@@ -27,14 +27,15 @@ l_p_expr_list* l_parse_expr_list(l_scanner* stream)
 		list->expressions[list->expressionc - 1] = expr;
 
 		/*
-		 * Continue (semicolon), stop (period), or error
+		 * Continue (semicolon), stop (close brace or none), or error
 		 */
-		l_token next = l_scanner_next(stream);
+		l_token next = l_scanner_peek(stream);
 		if (next.type == TOKEN_SEMICOLON)
 		{
+			l_scanner_skip(stream, TOKEN_SEMICOLON, "expression list");
 			// Continue parsing expressions
 		}
-		else if (next.type == TOKEN_PERIOD)
+		else if (next.type == TOKEN_CLOSEBRACE || next.type == TOKEN_NONE)
 		{
 			return list;
 		}
@@ -42,9 +43,10 @@ l_p_expr_list* l_parse_expr_list(l_scanner* stream)
 		{
 			l_token_type expected[] = {
 				TOKEN_SEMICOLON,
-				TOKEN_PERIOD
+				TOKEN_CLOSEBRACE,
+				TOKEN_NONE
 			};
-			l_scanner_unexpecteda(expected, 2, next, "expression list");
+			l_scanner_unexpecteda(expected, 3, next, "expression list");
 		}
 	}
 }

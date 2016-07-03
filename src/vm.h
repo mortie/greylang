@@ -54,6 +54,8 @@ typedef struct l_vm_var_function
 	l_p_expr** expressions;
 	int expressionc;
 	l_vm_scope* scope;
+	char** argnames;
+	int argnamec;
 } l_vm_var_function;
 
 l_vm_var_function* l_vm_var_function_create_std(

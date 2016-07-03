@@ -129,6 +129,19 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 
 		func->expressions = expr->expression.function->expr_list->expressions;
 		func->expressionc = expr->expression.function->expr_list->expressionc;
+
+		l_p_arg_definition* argdef = expr->expression.function->arg_definition;
+		if (argdef == NULL)
+		{
+			func->argnames = NULL;
+			func->argnamec = 0;
+		}
+		else
+		{
+			func->argnames = argdef->names;
+			func->argnamec = argdef->namec;
+		}
+
 		var->var.function = func;
 
 		return var;
@@ -174,7 +187,7 @@ l_vm_var* l_vm_exec(l_vm_scope* scope, l_p_expr** expressions, int expressionc)
 {
 	for (int i = 0; i < expressionc; ++i)
 	{
-		if (i == expressionc)
+		if (i == expressionc - 1)
 			return exec(scope, expressions[i]);
 		else
 			exec(scope, expressions[i]);

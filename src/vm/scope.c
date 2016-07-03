@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 l_vm_scope* l_vm_scope_create(l_vm_scope* parent)
 {
@@ -80,12 +81,6 @@ l_vm_var* l_vm_scope_lookup(l_vm_scope* scope, char* name)
 
 void l_vm_scope_free(l_vm_scope* scope)
 {
-	for (int i = 0; i < scope->varc; ++i)
-	{
-		l_vm_var_free(scope->vars[i]);
-		free(scope->names[i]);
-	}
-
 	free(scope->vars);
 	free(scope->names);
 	free(scope);

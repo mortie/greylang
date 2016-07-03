@@ -1,7 +1,8 @@
 #!/usr/bin/env lang
 
-in = read!("Type Something: ");
+a = {
+	(n, str);
+	repeat(n, { print!(str) });
+};
 
-repeat(3, {
-	print!(in).
-}).
+a(10, read!("What to print? "));

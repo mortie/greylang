@@ -16,8 +16,6 @@ char* l_token_type_string(l_token_type type)
 		return "num literal";
 	case TOKEN_NAME:
 		return "name";
-	case TOKEN_PERIOD:
-		return "period '.'";
 	case TOKEN_COMMA:
 		return "comma ','";
 	case TOKEN_SEMICOLON:

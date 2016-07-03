@@ -8,12 +8,10 @@ This is my project to create a language.
 
 	a = {
 		(n, str);
-		repeat(n, {
-			print(str).
-		}).
+		repeat(n, { print!(str) })
 	};
 
-	a(10, "Hello World").
+	a(10, "Hello World");
 
 ### Expressions
 
@@ -74,5 +72,6 @@ this:
 
 	[expression];
 	[expression];
-	[expression].
+	[expression];
 
+Optionally, you may omitt the last semicolon.

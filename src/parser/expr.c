@@ -11,7 +11,9 @@ l_p_expr* l_parse_expr(l_scanner* stream)
 	/*
 	 * Empty
 	 */
-	if (t.type == TOKEN_PERIOD)
+	if (t.type == TOKEN_CLOSEPAREN ||
+			t.type == TOKEN_CLOSEBRACE ||
+			t.type == TOKEN_NONE)
 	{
 		expr->expression.empty = NULL;
 		expr->type = EXPR_EMPTY;
