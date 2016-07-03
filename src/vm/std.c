@@ -21,6 +21,58 @@ static void expectargc(int expected, l_vm_var_array* args)
 	}
 }
 
+static char* tostring(l_vm_var* var)
+{
+	char* str;
+
+	switch (var->type)
+	{
+	case VAR_TYPE_ARRAY:
+		str = "[array]";
+		break;
+	case VAR_TYPE_FUNCTION:
+		str = "[function]";
+		break;
+	case VAR_TYPE_STRING:
+		return var->var.string->chars;
+		break;
+	case VAR_TYPE_CHAR:
+		str = malloc(2);
+		str[0] = var->var.character;
+		str[1] = '\0';
+		break;
+	case VAR_TYPE_NUMBER:
+	{
+		str = malloc(16);
+		double num = var->var.number;
+		if (num == floor(num))
+		{
+			snprintf(str, 16, "%d", (int)num);
+		}
+		else
+		{
+			snprintf(str, 16, "%f", num);
+		}
+		break;
+	}
+	case VAR_TYPE_BOOL:
+		if (var->var.boolean)
+		{
+			str = "[true]";
+		}
+		else
+		{
+			str = "[false]";
+		}
+		break;
+	case VAR_TYPE_NONE:
+		str = "[none]";
+		break;
+	}
+
+	return str;
+}
+
 l_vm_var* l_vm_std_add(l_vm_var_array* args)
 {
 	expectargc(2, args);
@@ -183,6 +235,66 @@ l_vm_var* l_vm_std_map(l_vm_var_array* args)
 	l_vm_var* v = l_vm_var_create(VAR_TYPE_ARRAY);
 	v->var.array = res;
 	return v;
+}
+
+l_vm_var* l_vm_std_tostring(l_vm_var_array* args)
+{
+	expectargc(1, args);
+	l_vm_var* arg = args->vars[0];
+
+	char* str = tostring(arg);
+
+	l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
+	l_vm_var_string* s = malloc(sizeof(l_vm_var_string));
+	s->chars = str;
+	s->len = strlen(str);
+	var->var.string = s;
+
+	return var;
+}
+
+l_vm_var* l_vm_std_tonumber(l_vm_var_array* args)
+{
+	expectargc(1, args);
+	l_vm_var* arg = args->vars[0];
+	expecttype(VAR_TYPE_STRING, arg);
+
+	l_vm_var* var = l_vm_var_create(VAR_TYPE_NUMBER);
+	var->var.number = atof(arg->var.string->chars);
+
+	return var;
+}
+
+l_vm_var* l_vm_std_concat(l_vm_var_array* args)
+{
+	char** strs = malloc(sizeof(char*) * args->len);
+
+	int len = 1;
+	for (int i = 0; i < args->len; ++i)
+	{
+		strs[i] = tostring(args->vars[i]);
+		len += strlen(strs[i]);
+	}
+
+	char* str = malloc(len);
+	int total = 0;
+	for (int i = 0; i < args->len; ++i)
+	{
+		int l = strlen(strs[i]);
+		memcpy(str + total, strs[i], l);
+		total +=  l;
+	}
+
+	str[len - 1] = '\0';
+
+	l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
+	l_vm_var_string* s = malloc(sizeof(l_vm_var_string));
+	s->len = len;
+	s->chars = str;
+	var->var.string = s;
+
+	free(strs);
+	return var;
 }
 
 l_vm_var* l_vm_std_print(l_vm_var_array* args)

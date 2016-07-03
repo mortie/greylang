@@ -59,7 +59,7 @@ l_vm_var* l_vm_var_function_exec(
 		{
 			char name[16];
 			name[0] = '$';
-			snprintf(name + 1, 15, "%d", i);
+			snprintf(name + 1, 15, "%d", i + 1);
 			l_vm_scope_set(scope, name, args->vars[i]);
 		}
 
@@ -90,6 +90,12 @@ l_vm_var* l_vm_var_function_exec(
 		return l_vm_std_repeat(args);
 	case STD_FUNC_MAP:
 		return l_vm_std_map(args);
+	case STD_FUNC_TOSTRING:
+		return l_vm_std_tostring(args);
+	case STD_FUNC_TONUMBER:
+		return l_vm_std_tonumber(args);
+	case STD_FUNC_CONCAT:
+		return l_vm_std_concat(args);
 	case STD_FUNC_PRINT:
 		return l_vm_std_print(args);
 	case STD_FUNC_READ:

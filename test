@@ -1,8 +1,12 @@
 #!/usr/bin/env lang
 
-a = {
-	(n, str);
-	repeat(n, { print!(str) });
+a = {(n, str);
+	repeat(n, { print!(
+		..(str, ", iter: ", $1)
+	) });
 };
 
-a(10, read!("What to print? "));
+s = read!("What to print? ");
+n = tonumber(read!("How many times? "));
+
+a(n, s);

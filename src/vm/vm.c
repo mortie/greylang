@@ -25,6 +25,9 @@ l_vm* l_vm_create()
 	STD("if", STD_FUNC_IF);
 	STD("repeat", STD_FUNC_REPEAT);
 	STD("map", STD_FUNC_MAP);
+	STD("tostring", STD_FUNC_TOSTRING);
+	STD("tonumber", STD_FUNC_TONUMBER);
+	STD("..", STD_FUNC_CONCAT);
 	STD("print!", STD_FUNC_PRINT);
 	STD("read!", STD_FUNC_READ);
 

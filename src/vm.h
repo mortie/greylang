@@ -44,6 +44,9 @@ typedef enum l_vm_std_func
 	STD_FUNC_IF,
 	STD_FUNC_REPEAT,
 	STD_FUNC_MAP,
+	STD_FUNC_TOSTRING,
+	STD_FUNC_TONUMBER,
+	STD_FUNC_CONCAT,
 	STD_FUNC_PRINT,
 	STD_FUNC_READ
 } l_vm_std_func;
@@ -105,17 +108,20 @@ void l_vm_error_undefined(char* name);
  * Standard Library
  */
 
-l_vm_var* l_vm_std_add(l_vm_var_array* args);    // +
-l_vm_var* l_vm_std_sub(l_vm_var_array* args);    // -
-l_vm_var* l_vm_std_mul(l_vm_var_array* args);    // *
-l_vm_var* l_vm_std_div(l_vm_var_array* args);    // /
-l_vm_var* l_vm_std_pow(l_vm_var_array* args);    // ^
-l_vm_var* l_vm_std_lookup(l_vm_var_array* args); // $
-l_vm_var* l_vm_std_if(l_vm_var_array* args);     // if
-l_vm_var* l_vm_std_repeat(l_vm_var_array* args); // repeat
-l_vm_var* l_vm_std_map(l_vm_var_array* args);    // map
-l_vm_var* l_vm_std_print(l_vm_var_array* args);  // print!
-l_vm_var* l_vm_std_read(l_vm_var_array* args);   // read!
+l_vm_var* l_vm_std_add(l_vm_var_array* args);      // +
+l_vm_var* l_vm_std_sub(l_vm_var_array* args);      // -
+l_vm_var* l_vm_std_mul(l_vm_var_array* args);      // *
+l_vm_var* l_vm_std_div(l_vm_var_array* args);      // /
+l_vm_var* l_vm_std_pow(l_vm_var_array* args);      // ^
+l_vm_var* l_vm_std_lookup(l_vm_var_array* args);   // $
+l_vm_var* l_vm_std_if(l_vm_var_array* args);       // if
+l_vm_var* l_vm_std_repeat(l_vm_var_array* args);   // repeat
+l_vm_var* l_vm_std_map(l_vm_var_array* args);      // map
+l_vm_var* l_vm_std_tostring(l_vm_var_array* args); // tostring
+l_vm_var* l_vm_std_tonumber(l_vm_var_array* args); // tonumber
+l_vm_var* l_vm_std_concat(l_vm_var_array* args);   // ..
+l_vm_var* l_vm_std_print(l_vm_var_array* args);    // print!
+l_vm_var* l_vm_std_read(l_vm_var_array* args);     // read!
 
 /*
  * Scope
