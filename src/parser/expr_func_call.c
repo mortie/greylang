@@ -2,13 +2,10 @@
 
 #include <stdlib.h>
 
-l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream)
+l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func)
 {
 	l_p_expr_func_call* expr = malloc(sizeof(l_p_expr_func_call));
-
-	// name
-	l_token name = l_scanner_expect(stream, TOKEN_NAME, "func call");
-	expr->name = name.content;
+	expr->func = func;
 
 	// (
 	l_scanner_skip(stream, TOKEN_OPENPAREN, "func call");
@@ -30,7 +27,8 @@ void l_pretty_expr_func_call(
 	char* tabs;
 	P_TABS(depth, tabs);
 
-	fprintf(file, "%s%s(\n", tabs, expr->name);
+	l_pretty_expr(expr->func, depth, file);
+	fprintf(file, "(\n");
 	l_pretty_comma_expr_list(expr->arg_list, depth + 1, file);
 	fprintf(file, "%s)", tabs);
 }

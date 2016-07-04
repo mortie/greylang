@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-l_p_expr* l_parse_expr(l_scanner* stream)
+static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 {
 	l_p_expr* expr = malloc(sizeof(l_p_expr));
 
@@ -24,23 +24,23 @@ l_p_expr* l_parse_expr(l_scanner* stream)
 		l_token next = l_scanner_peek2(stream);
 
 		/*
+		 * Func Call
+		 */
+		if (prev != NULL && t.type == TOKEN_OPENPAREN)
+		{
+			expr->expression.func_call =
+				l_parse_expr_func_call(stream, prev);
+			expr->type = EXPR_FUNC_CALL;
+		}
+
+		/*
 		 * Assignment
 		 */
-		if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
+		else if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
 		{
 			expr->expression.assignment =
 				l_parse_expr_assignment(stream);
 			expr->type = EXPR_ASSIGNMENT;
-		}
-
-		/*
-		 * Func Call
-		 */
-		else if (t.type == TOKEN_NAME && next.type == TOKEN_OPENPAREN)
-		{
-			expr->expression.func_call =
-				l_parse_expr_func_call(stream);
-			expr->type = EXPR_FUNC_CALL;
 		}
 
 		/*
@@ -112,7 +112,25 @@ l_p_expr* l_parse_expr(l_scanner* stream)
 		}
 	}
 
-	return expr;
+	t = l_scanner_peek(stream);
+	if (
+			t.type == TOKEN_NONE ||
+			t.type == TOKEN_CLOSEPAREN ||
+			t.type == TOKEN_SEMICOLON ||
+			t.type == TOKEN_CLOSEBRACE ||
+			t.type == TOKEN_CLOSEBRACKET)
+	{
+		return expr;
+	}
+	else
+	{
+		return parse_expr(stream, expr);
+	}
+}
+
+l_p_expr* l_parse_expr(l_scanner* stream)
+{
+	return parse_expr(stream, NULL);
 }
 
 void l_pretty_expr(

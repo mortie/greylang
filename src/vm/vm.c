@@ -97,13 +97,7 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 	}
 	case EXPR_FUNC_CALL:
 	{
-		l_vm_var* func = l_vm_scope_lookup(
-			scope, expr->expression.func_call->name);
-
-		if (func == NULL)
-		{
-			l_vm_error_undefined(expr->expression.func_call->name);
-		}
+		l_vm_var* func = exec(scope, expr->expression.func_call->func);
 
 		if (func->type != VAR_TYPE_FUNCTION)
 		{

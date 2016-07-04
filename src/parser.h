@@ -122,11 +122,11 @@ void l_pretty_expr_assignment(
 
 typedef struct l_p_expr_func_call
 {
-	char* name;
+	l_p_expr* func;
 	l_p_comma_expr_list* arg_list;
 } l_p_expr_func_call;
 
-l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream);
+l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func);
 
 void l_pretty_expr_func_call(
 		l_p_expr_func_call* expr,
