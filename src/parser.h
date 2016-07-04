@@ -47,8 +47,9 @@ typedef struct l_p_expr l_p_expr;
 typedef enum l_p_expr_type
 {
 	EXPR_EMPTY,
-	EXPR_ASSIGNMENT,
 	EXPR_FUNC_CALL,
+	EXPR_ARRAY_LOOKUP,
+	EXPR_ASSIGNMENT,
 	EXPR_FUNCTION,
 	EXPR_ARRAY_LITERAL,
 	EXPR_STRING_LITERAL,
@@ -100,23 +101,6 @@ typedef struct l_p_expr_empty l_p_expr_empty;
 void l_pretty_expr_empty(int depth, FILE* file);
 
 /*
- * Assignment Expression
- */
-
-typedef struct l_p_expr_assignment
-{
-	char* name;
-	l_p_expr* expression;
-} l_p_expr_assignment;
-
-l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream);
-
-void l_pretty_expr_assignment(
-		l_p_expr_assignment* expr,
-		int depth,
-		FILE* file);
-
-/*
  * Function Call Expression
  */
 
@@ -130,6 +114,40 @@ l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func);
 
 void l_pretty_expr_func_call(
 		l_p_expr_func_call* expr,
+		int depth,
+		FILE* file);
+
+/*
+ * Array Lookup Expression
+ */
+
+typedef struct l_p_expr_array_lookup
+{
+	l_p_expr* arr;
+	l_p_expr* key;
+} l_p_expr_array_lookup;
+
+l_p_expr_array_lookup* l_parse_expr_array_lookup(l_scanner* stream, l_p_expr* arr);
+
+void l_pretty_expr_array_lookup(
+		l_p_expr_array_lookup* expr,
+		int depth,
+		FILE* file);
+
+/*
+ * Assignment Expression
+ */
+
+typedef struct l_p_expr_assignment
+{
+	char* name;
+	l_p_expr* expression;
+} l_p_expr_assignment;
+
+l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream);
+
+void l_pretty_expr_assignment(
+		l_p_expr_assignment* expr,
 		int depth,
 		FILE* file);
 
@@ -239,8 +257,9 @@ typedef struct l_p_expr
 	union expression
 	{
 		l_p_expr_empty* empty;
-		l_p_expr_assignment* assignment;
 		l_p_expr_func_call* func_call;
+		l_p_expr_array_lookup* array_lookup;
+		l_p_expr_assignment* assignment;
 		l_p_expr_function* function;
 		l_p_expr_array_literal* array_literal;
 		l_p_expr_num_literal* num_literal;

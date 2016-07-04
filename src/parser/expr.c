@@ -34,6 +34,16 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 		}
 
 		/*
+		 * Array Lookup
+		 */
+		else if (prev != NULL && t.type == TOKEN_OPENBRACKET)
+		{
+			expr->expression.array_lookup =
+				l_parse_expr_array_lookup(stream, prev);
+			expr->type = EXPR_ARRAY_LOOKUP;
+		}
+
+		/*
 		 * Assignment
 		 */
 		else if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
@@ -115,8 +125,9 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	t = l_scanner_peek(stream);
 	if (
 			t.type == TOKEN_NONE ||
-			t.type == TOKEN_CLOSEPAREN ||
 			t.type == TOKEN_SEMICOLON ||
+			t.type == TOKEN_COMMA ||
+			t.type == TOKEN_CLOSEPAREN ||
 			t.type == TOKEN_CLOSEBRACE ||
 			t.type == TOKEN_CLOSEBRACKET)
 	{
@@ -152,6 +163,11 @@ void l_pretty_expr(
 	case EXPR_FUNC_CALL:
 		l_pretty_expr_func_call(
 			expr->expression.func_call,
+			depth, file);
+		break;
+	case EXPR_ARRAY_LOOKUP:
+		l_pretty_expr_array_lookup(
+			expr->expression.array_lookup,
 			depth, file);
 		break;
 	case EXPR_FUNCTION:

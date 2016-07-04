@@ -40,8 +40,14 @@ typedef enum l_vm_std_func
 	STD_FUNC_MUL,
 	STD_FUNC_DIV,
 	STD_FUNC_POW,
-	STD_FUNC_CALLFUNC,
-	STD_FUNC_CALLSETTER,
+	STD_FUNC_EQ,
+	STD_FUNC_NEQ,
+	STD_FUNC_GT,
+	STD_FUNC_LT,
+	STD_FUNC_GTEQ,
+	STD_FUNC_LTEQ,
+	STD_FUNC_AND,
+	STD_FUNC_OR,
 	STD_FUNC_IF,
 	STD_FUNC_REPEAT,
 	STD_FUNC_MAP,
@@ -110,21 +116,27 @@ void l_vm_error_undefined(char* name);
  * Standard Library
  */
 
-l_vm_var* l_vm_std_add(l_vm_var_array* args);        // +
-l_vm_var* l_vm_std_sub(l_vm_var_array* args);        // -
-l_vm_var* l_vm_std_mul(l_vm_var_array* args);        // *
-l_vm_var* l_vm_std_div(l_vm_var_array* args);        // /
-l_vm_var* l_vm_std_pow(l_vm_var_array* args);        // ^
-l_vm_var* l_vm_std_callfunc(l_vm_var_array* args);   // $
-l_vm_var* l_vm_std_callsetter(l_vm_var_array* args); // $$
-l_vm_var* l_vm_std_if(l_vm_var_array* args);         // if
-l_vm_var* l_vm_std_repeat(l_vm_var_array* args);     // repeat
-l_vm_var* l_vm_std_map(l_vm_var_array* args);        // map
-l_vm_var* l_vm_std_tostring(l_vm_var_array* args);   // tostring
-l_vm_var* l_vm_std_tonumber(l_vm_var_array* args);   // tonumber
-l_vm_var* l_vm_std_concat(l_vm_var_array* args);     // concat
-l_vm_var* l_vm_std_print(l_vm_var_array* args);      // print!
-l_vm_var* l_vm_std_read(l_vm_var_array* args);       // read!
+l_vm_var* l_vm_std_add(l_vm_var_array* args);      // +
+l_vm_var* l_vm_std_sub(l_vm_var_array* args);      // -
+l_vm_var* l_vm_std_mul(l_vm_var_array* args);      // *
+l_vm_var* l_vm_std_div(l_vm_var_array* args);      // /
+l_vm_var* l_vm_std_pow(l_vm_var_array* args);      // ^
+l_vm_var* l_vm_std_eq(l_vm_var_array* args);       // ==
+l_vm_var* l_vm_std_neq(l_vm_var_array* args);      // !=
+l_vm_var* l_vm_std_gt(l_vm_var_array* args);       // >
+l_vm_var* l_vm_std_lt(l_vm_var_array* args);       // <
+l_vm_var* l_vm_std_gteq(l_vm_var_array* args);     // >=
+l_vm_var* l_vm_std_lteq(l_vm_var_array* args);     // <=
+l_vm_var* l_vm_std_and(l_vm_var_array* args);      // and
+l_vm_var* l_vm_std_or(l_vm_var_array* args);       // or
+l_vm_var* l_vm_std_if(l_vm_var_array* args);       // if
+l_vm_var* l_vm_std_repeat(l_vm_var_array* args);   // repeat
+l_vm_var* l_vm_std_map(l_vm_var_array* args);      // map
+l_vm_var* l_vm_std_tostring(l_vm_var_array* args); // tostring
+l_vm_var* l_vm_std_tonumber(l_vm_var_array* args); // tonumber
+l_vm_var* l_vm_std_concat(l_vm_var_array* args);   // concat
+l_vm_var* l_vm_std_print(l_vm_var_array* args);    // print!
+l_vm_var* l_vm_std_read(l_vm_var_array* args);     // read!
 
 /*
  * Scope

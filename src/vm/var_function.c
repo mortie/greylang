@@ -30,6 +30,18 @@ l_vm_var* l_vm_var_function_exec(
 		l_vm_var_function* func,
 		l_vm_var_array* args)
 {
+	int fakeargs = 0;
+	if (args == NULL)
+	{
+		fakeargs = 1;
+		args = malloc(sizeof(l_vm_var_array));
+		args->vars = NULL;
+		args->len = 0;
+		args->allocd = 0;
+	}
+
+	l_vm_var* ret;
+
 	switch (func->stdfunc)
 	{
 
@@ -63,8 +75,8 @@ l_vm_var* l_vm_var_function_exec(
 			l_vm_scope_define(scope, name, args->vars[i]);
 		}
 
-		l_vm_var* var = l_vm_exec(scope, func->expressions, func->expressionc);
-		return var;
+		ret = l_vm_exec(scope, func->expressions, func->expressionc);
+		break;
 	}
 
 	/*
@@ -72,36 +84,77 @@ l_vm_var* l_vm_var_function_exec(
 	 */
 
 	case STD_FUNC_ADD:
-		return l_vm_std_add(args);
+		ret = l_vm_std_add(args);
+		break;
 	case STD_FUNC_SUB:
-		return l_vm_std_sub(args);
+		ret = l_vm_std_sub(args);
+		break;
 	case STD_FUNC_MUL:
-		return l_vm_std_mul(args);
+		ret = l_vm_std_mul(args);
+		break;
 	case STD_FUNC_DIV:
-		return l_vm_std_div(args);
+		ret = l_vm_std_div(args);
+		break;
 	case STD_FUNC_POW:
-		return l_vm_std_pow(args);
-	case STD_FUNC_CALLFUNC:
-		return l_vm_std_callfunc(args);
-	case STD_FUNC_CALLSETTER:
-		return l_vm_std_callsetter(args);
+		ret = l_vm_std_pow(args);
+		break;
+	case STD_FUNC_EQ:
+		ret = l_vm_std_eq(args);
+		break;
+	case STD_FUNC_NEQ:
+		ret = l_vm_std_neq(args);
+		break;
+	case STD_FUNC_GT:
+		ret = l_vm_std_gt(args);
+		break;
+	case STD_FUNC_LT:
+		ret = l_vm_std_lt(args);
+		break;
+	case STD_FUNC_GTEQ:
+		ret = l_vm_std_gteq(args);
+		break;
+	case STD_FUNC_LTEQ:
+		ret = l_vm_std_lteq(args);
+		break;
+	case STD_FUNC_AND:
+		ret = l_vm_std_and(args);
+		break;
+	case STD_FUNC_OR:
+		ret = l_vm_std_or(args);
+		break;
 	case STD_FUNC_IF:
-		return l_vm_std_if(args);
+		ret = l_vm_std_if(args);
+		break;
 	case STD_FUNC_REPEAT:
-		return l_vm_std_repeat(args);
+		ret = l_vm_std_repeat(args);
+		break;
 	case STD_FUNC_MAP:
-		return l_vm_std_map(args);
+		ret = l_vm_std_map(args);
+		break;
 	case STD_FUNC_TOSTRING:
-		return l_vm_std_tostring(args);
+		ret = l_vm_std_tostring(args);
+		break;
 	case STD_FUNC_TONUMBER:
-		return l_vm_std_tonumber(args);
+		ret = l_vm_std_tonumber(args);
+		break;
 	case STD_FUNC_CONCAT:
-		return l_vm_std_concat(args);
+		ret = l_vm_std_concat(args);
+		break;
 	case STD_FUNC_PRINT:
-		return l_vm_std_print(args);
+		ret = l_vm_std_print(args);
+		break;
 	case STD_FUNC_READ:
-		return l_vm_std_read(args);
+		ret = l_vm_std_read(args);
+		break;
+	default:
+		ret = l_vm_var_create(VAR_TYPE_NONE);
+		break;
 	}
 
-	return l_vm_var_create(VAR_TYPE_NONE);
+	if (fakeargs)
+	{
+		free(args);
+	}
+
+	return ret;
 }

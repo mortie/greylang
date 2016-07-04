@@ -9,7 +9,8 @@ l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream)
 	list->expressions = malloc(alloced * sizeof(l_p_expr));
 	list->expressionc = 0;
 
-	if (l_scanner_peek(stream).type == TOKEN_CLOSEPAREN)
+	l_token t = l_scanner_peek(stream);
+	if (t.type == TOKEN_CLOSEPAREN || t.type == TOKEN_CLOSEBRACKET)
 		return list;
 
 	while (1)

@@ -56,6 +56,7 @@ static char* tostring(l_vm_var* var)
 		break;
 	}
 	case VAR_TYPE_BOOL:
+		printf("%i\n", var->var.boolean);
 		if (var->var.boolean)
 		{
 			str = "[true]";
@@ -71,6 +72,36 @@ static char* tostring(l_vm_var* var)
 	}
 
 	return str;
+}
+
+static int vareq(l_vm_var* var1, l_vm_var* var2)
+{
+	if (var1->type != var2->type)
+	{
+		return 0;
+	}
+
+	switch (var1->type)
+	{
+	case VAR_TYPE_ARRAY:
+		return var1->var.array == var2->var.array;
+	case VAR_TYPE_FUNCTION:
+		return var1->var.function == var2->var.function;
+	case VAR_TYPE_STRING:
+		return strcmp(
+			var1->var.string->chars,
+			var2->var.string->chars) == 0;
+	case VAR_TYPE_CHAR:
+		return var1->var.character == var2->var.character;
+	case VAR_TYPE_NUMBER:
+		return var1->var.number == var2->var.number;
+	case VAR_TYPE_BOOL:
+		return var1->var.boolean == var2->var.boolean;
+	case VAR_TYPE_NONE:
+		return 1;
+	}
+
+	return 0;
 }
 
 l_vm_var* l_vm_std_add(l_vm_var_array* args)
@@ -138,78 +169,163 @@ l_vm_var* l_vm_std_pow(l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_callfunc(l_vm_var_array* args)
+l_vm_var* l_vm_std_eq(l_vm_var_array* args)
 {
 	if (args->len < 2)
+		expectargc(2, args);
+
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 0;
+
+	for (int i = 1; i < args->len; ++i)
 	{
-		l_vm_error_argnum(2, args->len);
+		if (!vareq(args->vars[i-1], args->vars[i]))
+			return v;
 	}
 
-	l_vm_var* func = args->vars[0];
-	l_vm_var* str = args->vars[1];
-	expecttype(VAR_TYPE_FUNCTION, func);
-	expecttype(VAR_TYPE_STRING, str);
-
-	l_vm_var_function* f = func->var.function;
-	l_vm_var_string* s = str->var.string;
-
-	/*
-	 * Find the correct function
-	 */
-	char* name = malloc(s->len + 2);
-	memcpy(name + 1, s->chars, s->len);
-	name[s->len + 1] = '\0';
-	name[0] = '$';
-
-	l_vm_var* rf = l_vm_scope_lookup(f->scope, name);
-	if (rf == NULL)
-		rf = l_vm_var_create(VAR_TYPE_NONE);
-
-	free(name);
-	expecttype(VAR_TYPE_FUNCTION, rf);
-
-	/*
-	 * Call the function
-	 */
-
-	l_vm_var_array* fargs = malloc(sizeof(l_vm_var_array));
-	int fargc = args->len - 2;
-
-	fargs->len = fargc;
-	fargs->vars = (args->vars + 2);
-
-	l_vm_var* res = l_vm_var_function_exec(rf->var.function, fargs);
-
-	free(fargs);
-
-	return res;
+	v->var.boolean = 1;
+	return v;
 }
 
-l_vm_var* l_vm_std_callsetter(l_vm_var_array* args)
+l_vm_var* l_vm_std_neq(l_vm_var_array* args)
+{
+	l_vm_var* v = l_vm_std_eq(args);
+	v->var.boolean = !v->var.boolean;
+	return v;
+}
+
+l_vm_var* l_vm_std_gt(l_vm_var_array* args)
 {
 	if (args->len < 2)
+		expectargc(2, args);
+
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 0;
+
+	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	double prev = args->vars[0]->var.number;
+	for (int i = 1; i < args->len; ++i)
 	{
-		l_vm_error_argnum(2, args->len);
+		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		double d = args->vars[i]->var.number;
+		if (!(prev > d))
+			return v;
+
+		prev = d;
 	}
 
-	expecttype(VAR_TYPE_FUNCTION, args->vars[0]);
-	expecttype(VAR_TYPE_STRING, args->vars[1]);
+	v->var.boolean = 1;
+	return v;
+}
 
-	l_vm_var_string* nwname = malloc(sizeof(l_vm_var_string));
+l_vm_var* l_vm_std_lt(l_vm_var_array* args)
+{
+	if (args->len < 2)
+		expectargc(2, args);
 
-	l_vm_var_string* name = args->vars[1]->var.string;
-	nwname->len = name->len + 1;
-	nwname->chars = malloc(nwname->len + 2);
-	memmove(nwname->chars + 1, name->chars, name->len + 1);
-	nwname->chars[0] = '$';
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 0;
 
-	args->vars[1]->var.string = nwname;
+	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	double prev = args->vars[0]->var.number;
+	for (int i = 1; i < args->len; ++i)
+	{
+		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		double d = args->vars[i]->var.number;
+		if (!(prev < d))
+			return v;
 
-	l_vm_var* res = l_vm_std_callfunc(args);
-	free(nwname->chars);
-	free(nwname);
+		prev = d;
+	}
 
-	return res;
+	v->var.boolean = 1;
+	return v;
+}
+
+l_vm_var* l_vm_std_gteq(l_vm_var_array* args)
+{
+	if (args->len < 2)
+		expectargc(2, args);
+
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 0;
+
+	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	double prev = args->vars[0]->var.number;
+	for (int i = 1; i < args->len; ++i)
+	{
+		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		double d = args->vars[i]->var.number;
+		if (!(prev >= d))
+			return v;
+
+		prev = d;
+	}
+
+	v->var.boolean = 1;
+	return v;
+}
+
+l_vm_var* l_vm_std_lteq(l_vm_var_array* args)
+{
+	if (args->len < 2)
+		expectargc(2, args);
+
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 0;
+
+	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	double prev = args->vars[0]->var.number;
+	for (int i = 1; i < args->len; ++i)
+	{
+		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		double d = args->vars[i]->var.number;
+		if (!(prev <= d))
+			return v;
+
+		prev = d;
+	}
+
+	v->var.boolean = 1;
+	return v;
+}
+
+l_vm_var* l_vm_std_and(l_vm_var_array* args)
+{
+	if (args->len < 2)
+		expectargc(2, args);
+
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 0;
+
+	for (int i = 0; i < args->len; ++i)
+	{
+		expecttype(VAR_TYPE_BOOL, args->vars[i]);
+		if (!args->vars[i]->var.boolean)
+			return v;
+	}
+
+	v->var.boolean = 1;
+	return v;
+}
+
+l_vm_var* l_vm_std_or(l_vm_var_array* args)
+{
+	if (args->len < 2)
+		expectargc(2, args);
+
+	l_vm_var* v = l_vm_var_create(VAR_TYPE_BOOL);
+	v->var.boolean = 1;
+
+	for (int i = 0; i < args->len; ++i)
+	{
+		expecttype(VAR_TYPE_BOOL, args->vars[i]);
+		if (args->vars[i]->var.boolean)
+			return v;
+	}
+
+	v->var.boolean = 0;
+	return v;
 }
 
 l_vm_var* l_vm_std_if(l_vm_var_array* args)

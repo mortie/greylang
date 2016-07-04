@@ -155,7 +155,7 @@ static l_token gettoken(l_scanner* scanner)
 	/*
 	 * Equals
 	 */
-	else if (c == '=')
+	else if (c == '=' && next != '=')
 	{
 		SETTOKEN(TOKEN_EQUALS, "=");
 		nextchar(scanner);
