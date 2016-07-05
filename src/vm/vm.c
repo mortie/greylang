@@ -9,36 +9,36 @@ l_vm* l_vm_create()
 	l_vm* vm = malloc(sizeof(l_vm));
 	vm->global = l_vm_scope_create(stdlib);
 
-#define STD(str, std) \
+#define STD(str, ptr) \
 	do { \
-		l_vm_var_function* f = l_vm_var_function_create_std( \
-			stdlib, std); \
+		l_vm_var_function* f = l_vm_var_function_create(stdlib); \
+		f->fptr = ptr; \
 		l_vm_var* v = l_vm_var_create(VAR_TYPE_FUNCTION); \
 		v->var.function = f; \
 		l_vm_scope_define(stdlib, str, v); \
 	} while (0)
 
-	STD("+", STD_FUNC_ADD);
-	STD("-", STD_FUNC_SUB);
-	STD("*", STD_FUNC_MUL);
-	STD("/", STD_FUNC_DIV);
-	STD("^", STD_FUNC_POW);
-	STD("==", STD_FUNC_EQ);
-	STD("!=", STD_FUNC_NEQ);
-	STD(">", STD_FUNC_GT);
-	STD("<", STD_FUNC_LT);
-	STD(">=", STD_FUNC_GTEQ);
-	STD("<=", STD_FUNC_LTEQ);
-	STD("and", STD_FUNC_AND);
-	STD("or", STD_FUNC_OR);
-	STD("if", STD_FUNC_IF);
-	STD("repeat", STD_FUNC_REPEAT);
-	STD("map", STD_FUNC_MAP);
-	STD("tostring", STD_FUNC_TOSTRING);
-	STD("tonumber", STD_FUNC_TONUMBER);
-	STD("concat", STD_FUNC_CONCAT);
-	STD("print!", STD_FUNC_PRINT);
-	STD("read!", STD_FUNC_READ);
+	STD("+", &l_vm_std_add);
+	STD("-", &l_vm_std_sub);
+	STD("*", &l_vm_std_mul);
+	STD("/", &l_vm_std_div);
+	STD("^", &l_vm_std_pow);
+	STD("==", &l_vm_std_eq);
+	STD("!=", &l_vm_std_neq);
+	STD(">", &l_vm_std_gt);
+	STD("<", &l_vm_std_lt);
+	STD(">=", &l_vm_std_gteq);
+	STD("<=", &l_vm_std_lteq);
+	STD("and", &l_vm_std_and);
+	STD("or", &l_vm_std_or);
+	STD("if", &l_vm_std_if);
+	STD("repeat", &l_vm_std_repeat);
+	STD("map", &l_vm_std_map);
+	STD("tostring", &l_vm_std_tostring);
+	STD("tonumber", &l_vm_std_tonumber);
+	STD("concat", &l_vm_std_concat);
+	STD("print!", &l_vm_std_print);
+	STD("read!", &l_vm_std_read);
 
 #undef STD
 

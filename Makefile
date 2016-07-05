@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -lm -lreadline
+CFLAGS = -g -Wall -lm -lreadline -ldl
 
 TARGET = grey
 

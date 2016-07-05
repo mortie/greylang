@@ -32,45 +32,17 @@ typedef struct l_vm_var_array
 	int allocd;
 } l_vm_var_array;
 
-typedef enum l_vm_std_func
-{
-	STD_FUNC_NONE,
-	STD_FUNC_ADD,
-	STD_FUNC_SUB,
-	STD_FUNC_MUL,
-	STD_FUNC_DIV,
-	STD_FUNC_POW,
-	STD_FUNC_EQ,
-	STD_FUNC_NEQ,
-	STD_FUNC_GT,
-	STD_FUNC_LT,
-	STD_FUNC_GTEQ,
-	STD_FUNC_LTEQ,
-	STD_FUNC_AND,
-	STD_FUNC_OR,
-	STD_FUNC_IF,
-	STD_FUNC_REPEAT,
-	STD_FUNC_MAP,
-	STD_FUNC_TOSTRING,
-	STD_FUNC_TONUMBER,
-	STD_FUNC_CONCAT,
-	STD_FUNC_PRINT,
-	STD_FUNC_READ
-} l_vm_std_func;
-
 typedef struct l_vm_var_function
 {
-	l_vm_std_func stdfunc;
+	l_vm_var* (*fptr)(l_vm_var_array*);
 	l_p_expr** expressions;
+
 	int expressionc;
 	l_vm_scope* scope;
 	char** argnames;
 	int argnamec;
 } l_vm_var_function;
 
-l_vm_var_function* l_vm_var_function_create_std(
-		l_vm_scope* scope,
-		l_vm_std_func stdfunc);
 l_vm_var_function* l_vm_var_function_create(
 		l_vm_scope* scope);
 l_vm_var* l_vm_var_function_exec(
@@ -135,6 +107,7 @@ l_vm_var* l_vm_std_map(l_vm_var_array* args);      // map
 l_vm_var* l_vm_std_tostring(l_vm_var_array* args); // tostring
 l_vm_var* l_vm_std_tonumber(l_vm_var_array* args); // tonumber
 l_vm_var* l_vm_std_concat(l_vm_var_array* args);   // concat
+
 l_vm_var* l_vm_std_print(l_vm_var_array* args);    // print!
 l_vm_var* l_vm_std_read(l_vm_var_array* args);     // read!
 
