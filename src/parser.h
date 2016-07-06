@@ -48,6 +48,7 @@ typedef enum l_p_expr_type
 {
 	EXPR_EMPTY,
 	EXPR_FUNC_CALL,
+	EXPR_OBJECT_LOOKUP,
 	EXPR_ARRAY_LOOKUP,
 	EXPR_ASSIGNMENT,
 	EXPR_FUNCTION,
@@ -114,6 +115,23 @@ l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func);
 
 void l_pretty_expr_func_call(
 		l_p_expr_func_call* expr,
+		int depth,
+		FILE* file);
+
+/*
+ * Object Lookup Expression
+ */
+
+typedef struct l_p_expr_object_lookup
+{
+	l_p_expr* obj;
+	char* key;
+} l_p_expr_object_lookup;
+
+l_p_expr_object_lookup* l_parse_expr_object_lookup(l_scanner* stream, l_p_expr* obj);
+
+void l_pretty_expr_object_lookup(
+		l_p_expr_object_lookup* expr,
 		int depth,
 		FILE* file);
 
@@ -258,6 +276,7 @@ typedef struct l_p_expr
 	{
 		l_p_expr_empty* empty;
 		l_p_expr_func_call* func_call;
+		l_p_expr_object_lookup* object_lookup;
 		l_p_expr_array_lookup* array_lookup;
 		l_p_expr_assignment* assignment;
 		l_p_expr_function* function;

@@ -135,6 +135,15 @@ static l_token gettoken(l_scanner* scanner)
 	}
 
 	/*
+	 * Period
+	 */
+	else if (c == '.')
+	{
+		SETTOKEN(TOKEN_PERIOD, ",");
+		nextchar(scanner);
+	}
+
+	/*
 	 * Comma
 	 */
 	else if (c == ',')

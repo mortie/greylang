@@ -13,6 +13,9 @@ void l_vm_var_clean(l_vm_var* var)
 {
 	switch (var->type)
 	{
+	case VAR_TYPE_OBJECT:
+		free(var->var.object);
+		break;
 	case VAR_TYPE_ARRAY:
 		free(var->var.array);
 		break;
@@ -26,6 +29,7 @@ void l_vm_var_clean(l_vm_var* var)
 	case VAR_TYPE_CHAR:
 	case VAR_TYPE_NUMBER:
 	case VAR_TYPE_BOOL:
+	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		break;
 	}

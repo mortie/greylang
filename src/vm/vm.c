@@ -37,6 +37,9 @@ l_vm* l_vm_create()
 	STD("tostring", &l_vm_std_tostring);
 	STD("tonumber", &l_vm_std_tonumber);
 	STD("concat", &l_vm_std_concat);
+
+	STD("loadc", &l_vm_std_loadc);
+
 	STD("print!", &l_vm_std_print);
 	STD("read!", &l_vm_std_read);
 

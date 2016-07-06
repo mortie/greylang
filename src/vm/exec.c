@@ -43,6 +43,18 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		free(args);
 		return res;
 	}
+	case EXPR_OBJECT_LOOKUP:
+	{
+		l_vm_var* obj = exec(scope, expr->expression.object_lookup->obj);
+		char* key = expr->expression.object_lookup->key;
+
+		if (obj->type != VAR_TYPE_OBJECT)
+		{
+			l_vm_error_type(VAR_TYPE_OBJECT, obj->type);
+		}
+
+		return l_vm_var_object_lookup(obj->var.object, key);
+	}
 	case EXPR_ARRAY_LOOKUP:
 	{
 		l_vm_var* arr = exec(scope, expr->expression.array_lookup->arr);

@@ -1,24 +1,37 @@
 #include "../platform.h"
 
-#include <dlfcn.h>
 #include <stdlib.h>
 
-l_plat_dl l_plat_dl_open(char* fname)
+l_plat_dl* l_plat_dl_open(char* fname)
 {
-	l_plat_dl dl = {
-		.handle = dlopen(fname, RTLD_LAZY)
-	};
-	dl.success = dl.handle != NULL;
+	l_plat_dl* dl = malloc(sizeof(l_plat_dl));
+#ifdef _WIN32
+	dl->handle = LoadLibrary(fname);
+	dl->success = dl->handle != NULL;
+#else
+	dl->handle = dlopen(fname, RTLD_LAZY);
+	dl->success = dl->handle != NULL;
+#endif
 
 	return dl;
 }
 
-void* l_plat_dl_read(l_plat_dl dl, char* symbol)
+void* l_plat_dl_read(l_plat_dl* dl, char* symbol)
 {
-	return dlsym(dl.handle, symbol);
+#ifdef _WIN32
+	return GetProcAddress(dl->handle, symbol);
+#else
+	return dlsym(dl->handle, symbol);
+#endif
 }
 
-void l_plat_dl_close(l_plat_dl dl)
+void l_plat_dl_close(l_plat_dl* dl)
 {
-	dlclose(dl.handle);
+#ifdef _WIN32
+	FreeLibrary(dl->handle);
+#else
+	dlclose(dl->handle);
+#endif
+
+	free(dl);
 }

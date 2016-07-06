@@ -34,6 +34,16 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 		}
 
 		/*
+		 * Object Lookup
+		 */
+		else if (prev != NULL && t.type == TOKEN_PERIOD)
+		{
+			expr->expression.object_lookup =
+				l_parse_expr_object_lookup(stream, prev);
+			expr->type = EXPR_OBJECT_LOOKUP;
+		}
+
+		/*
 		 * Array Lookup
 		 */
 		else if (prev != NULL && t.type == TOKEN_OPENBRACKET)
@@ -163,6 +173,11 @@ void l_pretty_expr(
 	case EXPR_FUNC_CALL:
 		l_pretty_expr_func_call(
 			expr->expression.func_call,
+			depth, file);
+		break;
+	case EXPR_OBJECT_LOOKUP:
+		l_pretty_expr_object_lookup(
+			expr->expression.object_lookup,
 			depth, file);
 		break;
 	case EXPR_ARRAY_LOOKUP:

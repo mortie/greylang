@@ -36,7 +36,7 @@ l_vm_var* l_vm_var_function_exec(
 	// Function from function pointer
 	if (func->fptr != NULL)
 	{
-		ret = (*func->fptr)(args);
+		ret = (*func->fptr)(func->self, args);
 	}
 
 	// Function defined in language
@@ -45,6 +45,7 @@ l_vm_var* l_vm_var_function_exec(
 		l_vm_scope* scope = l_vm_scope_create(func->scope);
 		scope->parent = func->scope;
 
+		// Define variables
 		if (func->argnames != NULL)
 		{
 			if (args->len != func->argnamec)
@@ -58,12 +59,21 @@ l_vm_var* l_vm_var_function_exec(
 			}
 		}
 
+		// Define $n variables
 		for (int i = 0; i < args->len; ++i)
 		{
 			char name[16];
 			name[0] = '$';
 			snprintf(name + 1, 15, "%d", i + 1);
 			l_vm_scope_define(scope, name, args->vars[i]);
+		}
+
+		// Define self
+		if (func->self != NULL)
+		{
+			l_vm_var* self = l_vm_var_create(VAR_TYPE_OBJECT);
+			self->var.object = func->self;
+			l_vm_scope_define(scope, "self", self);
 		}
 
 		ret = l_vm_exec(scope, func->expressions, func->expressionc);
