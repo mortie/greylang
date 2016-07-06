@@ -50,7 +50,7 @@ void l_pretty_expr_function(
 	{
 		fprintf(file, "%s\t(", tabs);
 		l_pretty_arg_definition(expr->arg_definition, 0, file);
-		fprintf(file, ");\n");
+		fprintf(file, ")\n");
 	}
 
 	l_pretty_expr_list(expr->expr_list, depth + 1, file);

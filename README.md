@@ -49,6 +49,10 @@ or
 
 	bar([expression], [expression])
 
+You can also use infix function calls, like so:
+
+	[expression] + [expression]
+
 #### Function Definition
 
 The simplest way to define a function is simply:

@@ -119,6 +119,12 @@ void l_pretty_expr_func_call(
 		FILE* file);
 
 /*
+ * Inline Function Call Expression
+ */
+
+l_p_expr_func_call* l_parse_expr_infix_func_call(l_scanner* stream, l_p_expr* val1);
+
+/*
  * Object Lookup Expression
  */
 

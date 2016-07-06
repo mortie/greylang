@@ -153,6 +153,15 @@ static l_token gettoken(l_scanner* scanner)
 	}
 
 	/*
+	 * Colon
+	 */
+	else if (c == ':')
+	{
+		SETTOKEN(TOKEN_COLON, ":");
+		nextchar(scanner);
+	}
+
+	/*
 	 * Semicolon
 	 */
 	else if (c == ';')
@@ -203,6 +212,15 @@ static l_token gettoken(l_scanner* scanner)
 	else if (c == ']')
 	{
 		SETTOKEN(TOKEN_CLOSEBRACKET, "]");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Hash Brace
+	 */
+	else if (c == '#' && next == '{')
+	{
+		SETTOKEN(TOKEN_HASHBRACE, "#{");
 		nextchar(scanner);
 	}
 

@@ -61,7 +61,7 @@ void l_pretty_expr_list(
 		l_pretty_expr(list->expressions[i], depth, file);
 		if (i == list->expressionc - 1)
 		{
-			fprintf(file, ".\n");
+			fprintf(file, "\n");
 		}
 		else
 		{

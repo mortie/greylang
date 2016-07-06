@@ -34,6 +34,16 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 		}
 
 		/*
+		 * Infix Func Call
+		 */
+		else if (prev != NULL && t.type == TOKEN_NAME)
+		{
+			expr->expression.func_call =
+				l_parse_expr_infix_func_call(stream, prev);
+			expr->type = EXPR_FUNC_CALL;
+		}
+
+		/*
 		 * Object Lookup
 		 */
 		else if (prev != NULL && t.type == TOKEN_PERIOD)
