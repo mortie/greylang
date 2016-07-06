@@ -19,9 +19,8 @@ l_p_expr_function* l_parse_expr_function(l_scanner* stream)
 		// argument list
 		expr->arg_definition = l_parse_arg_definition(stream);
 
-		// );
+		// )
 		l_scanner_skip(stream, TOKEN_CLOSEPAREN, "function");
-		l_scanner_skip(stream, TOKEN_SEMICOLON, "function");
 	}
 	else
 	{

@@ -1,6 +1,6 @@
 #!/usr/bin/env grey
 
-a = {(n, str);
+a = {(n, str)
 	repeat(n, {
 		print!( concat(str, ", iter: ", $1) );
 	});

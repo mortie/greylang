@@ -6,7 +6,7 @@ This is grey-lang, my project to create a language.
 
 ### Example
 
-	a = {(n, str);
+	a = {(n, str)
 		repeat(n, { print!(str) });
 	};
 
@@ -63,7 +63,7 @@ $2, etc.
 Another way to define the function is like this:
 
 	{
-		([argument list]);
+		([argument list])
 		[expression list]
 	}
 
