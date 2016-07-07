@@ -26,6 +26,9 @@ static int repl()
 	while (1)
 	{
 		char* str = readline("> ");
+		if (str[0] != '\0')
+			add_history(str);
+
 		l_scanner* stream = l_scanner_create_str(str);
 		l_vm_var* v = l_vm_run(vm, l_parse(stream));
 
@@ -34,6 +37,7 @@ static int repl()
 			printf("\"%s\"\n", s);
 		else
 			printf("%s\n", s);
+
 
 		free(str);
 	}

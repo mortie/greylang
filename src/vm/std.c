@@ -387,6 +387,47 @@ l_vm_var* l_vm_std_concat(l_vm_var_object* self, l_vm_var_array* args)
 	return var;
 }
 
+l_vm_var* l_vm_std_type(l_vm_var_object* self, l_vm_var_array* args)
+{
+	expectargc(1, args);
+
+	char* str;
+
+	switch (args->vars[0]->type)
+	{
+	case VAR_TYPE_OBJECT:
+		str = "object";
+		break;
+	case VAR_TYPE_ARRAY:
+		str = "array";
+		break;
+	case VAR_TYPE_FUNCTION:
+		str = "function";
+		break;
+	case VAR_TYPE_STRING:
+		str = "string";
+		break;
+	case VAR_TYPE_CHAR:
+		str = "char";
+		break;
+	case VAR_TYPE_NUMBER:
+		str = "number";
+		break;
+	case VAR_TYPE_BOOL:
+		str = "bool";
+		break;
+	case VAR_TYPE_PTR:
+	case VAR_TYPE_NONE:
+		str = "none";
+	}
+
+	l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
+	var->var.string = malloc(sizeof(l_vm_var_string));
+	var->var.string->chars = str;
+	var->var.string->len = strlen(str);
+	return var;
+}
+
 static l_vm_var* loadc_run(l_vm_var_object* self, l_vm_var_array* args)
 {
 	expectargc(2, args);

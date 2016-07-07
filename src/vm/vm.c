@@ -39,12 +39,17 @@ l_vm* l_vm_create()
 	STD("concat", &l_vm_std_concat);
 	STD("..", &l_vm_std_concat);
 
+	STD("type", &l_vm_std_type);
+
 	STD("loadc!", &l_vm_std_loadc);
 
 	STD("print!", &l_vm_std_print);
 	STD("read!", &l_vm_std_read);
 
 #undef STD
+
+	l_vm_var* var_none = l_vm_var_create(VAR_TYPE_NONE);
+	l_vm_scope_define(stdlib, "none", var_none); \
 
 	l_vm_var* var_true = l_vm_var_create(VAR_TYPE_BOOL);
 	var_true->var.boolean = 1;

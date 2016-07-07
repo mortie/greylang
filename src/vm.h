@@ -148,10 +148,13 @@ l_vm_var* l_vm_std_map(l_vm_var_object* self, l_vm_var_array* args);
 l_vm_var* l_vm_std_tostring(l_vm_var_object* self, l_vm_var_array* args);
 // tonumber
 l_vm_var* l_vm_std_tonumber(l_vm_var_object* self, l_vm_var_array* args);
-// concat
+// concat ..
 l_vm_var* l_vm_std_concat(l_vm_var_object* self, l_vm_var_array* args);
 
-// loadc
+// type
+l_vm_var* l_vm_std_type(l_vm_var_object* self, l_vm_var_array* args);
+
+// loadc!
 l_vm_var* l_vm_std_loadc(l_vm_var_object* self, l_vm_var_array* args);
 
 // print!
