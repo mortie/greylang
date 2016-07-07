@@ -5,18 +5,32 @@
 
 #include <stdio.h>
 
+typedef enum l_scanner_type
+{
+	SCANNER_TYPE_FILE,
+	SCANNER_TYPE_STR
+} l_scanner_type;
+
 typedef struct l_scanner
 {
-	FILE* f;
+	union
+	{
+		FILE* f;
+		char* str;
+	} input;
+
 	int character;
 	int line;
 	char curr;
 	char next;
 	l_token nexttoken;
 	l_token nexttoken2;
+
+	l_scanner_type type;
 } l_scanner;
 
 l_scanner* l_scanner_create(FILE* f);
+l_scanner* l_scanner_create_str(char* str);
 l_token l_scanner_next(l_scanner* scanner);
 l_token l_scanner_peek(l_scanner* scanner);
 l_token l_scanner_peek2(l_scanner* scanner);

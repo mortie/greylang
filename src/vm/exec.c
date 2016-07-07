@@ -170,7 +170,7 @@ l_vm_var* l_vm_exec(l_vm_scope* scope, l_p_expr** expressions, int expressionc)
 	return l_vm_var_create(VAR_TYPE_NONE);
 }
 
-void l_vm_run(l_vm* vm, l_p_expr_list* list)
+l_vm_var* l_vm_run(l_vm* vm, l_p_expr_list* list)
 {
-	l_vm_exec(vm->global, list->expressions, list->expressionc);
+	return l_vm_exec(vm->global, list->expressions, list->expressionc);
 }

@@ -23,96 +23,6 @@ static void expectargc(int expected, l_vm_var_array* args)
 	}
 }
 
-static char* tostring(l_vm_var* var)
-{
-	char* str;
-
-	switch (var->type)
-	{
-	case VAR_TYPE_OBJECT:
-		str = "[object]";
-		break;
-	case VAR_TYPE_ARRAY:
-		str = "[array]";
-		break;
-	case VAR_TYPE_FUNCTION:
-		str = "[function]";
-		break;
-	case VAR_TYPE_STRING:
-		return var->var.string->chars;
-		break;
-	case VAR_TYPE_CHAR:
-		str = malloc(2);
-		str[0] = var->var.character;
-		str[1] = '\0';
-		break;
-	case VAR_TYPE_NUMBER:
-	{
-		str = malloc(16);
-		double num = var->var.number;
-		if (num == floor(num))
-		{
-			snprintf(str, 16, "%d", (int)num);
-		}
-		else
-		{
-			snprintf(str, 16, "%f", num);
-		}
-		break;
-	}
-	case VAR_TYPE_BOOL:
-		printf("%i\n", var->var.boolean);
-		if (var->var.boolean)
-		{
-			str = "[true]";
-		}
-		else
-		{
-			str = "[false]";
-		}
-		break;
-	case VAR_TYPE_PTR:
-	case VAR_TYPE_NONE:
-		str = "[none]";
-		break;
-	}
-
-	return str;
-}
-
-static int vareq(l_vm_var* var1, l_vm_var* var2)
-{
-	if (var1->type != var2->type)
-	{
-		return 0;
-	}
-
-	switch (var1->type)
-	{
-	case VAR_TYPE_OBJECT:
-		return var1->var.object == var2->var.object;
-	case VAR_TYPE_ARRAY:
-		return var1->var.array == var2->var.array;
-	case VAR_TYPE_FUNCTION:
-		return var1->var.function == var2->var.function;
-	case VAR_TYPE_STRING:
-		return strcmp(
-			var1->var.string->chars,
-			var2->var.string->chars) == 0;
-	case VAR_TYPE_CHAR:
-		return var1->var.character == var2->var.character;
-	case VAR_TYPE_NUMBER:
-		return var1->var.number == var2->var.number;
-	case VAR_TYPE_BOOL:
-		return var1->var.boolean == var2->var.boolean;
-	case VAR_TYPE_PTR:
-	case VAR_TYPE_NONE:
-		return 1;
-	}
-
-	return 0;
-}
-
 l_vm_var* l_vm_std_add(l_vm_var_object* self, l_vm_var_array* args)
 {
 	expectargc(2, args);
@@ -188,7 +98,7 @@ l_vm_var* l_vm_std_eq(l_vm_var_object* self, l_vm_var_array* args)
 
 	for (int i = 1; i < args->len; ++i)
 	{
-		if (!vareq(args->vars[i-1], args->vars[i]))
+		if (!l_vm_var_eq(args->vars[i-1], args->vars[i]))
 			return v;
 	}
 
@@ -422,7 +332,7 @@ l_vm_var* l_vm_std_tostring(l_vm_var_object* self, l_vm_var_array* args)
 	expectargc(1, args);
 	l_vm_var* arg = args->vars[0];
 
-	char* str = tostring(arg);
+	char* str = l_vm_var_tostring(arg);
 
 	l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
 	l_vm_var_string* s = malloc(sizeof(l_vm_var_string));
@@ -452,7 +362,7 @@ l_vm_var* l_vm_std_concat(l_vm_var_object* self, l_vm_var_array* args)
 	int len = 1;
 	for (int i = 0; i < args->len; ++i)
 	{
-		strs[i] = tostring(args->vars[i]);
+		strs[i] = l_vm_var_tostring(args->vars[i]);
 		len += strlen(strs[i]);
 	}
 
@@ -530,7 +440,7 @@ l_vm_var* l_vm_std_print(l_vm_var_object* self, l_vm_var_array* args)
 {
 	for (int i = 0; i < args->len; ++i)
 	{
-		printf("%s", tostring(args->vars[i]));
+		printf("%s", l_vm_var_tostring(args->vars[i]));
 	}
 	printf("\n");
 

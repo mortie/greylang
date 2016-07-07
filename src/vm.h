@@ -97,6 +97,9 @@ l_vm_var* l_vm_var_create(l_vm_var_type type);
 void l_vm_var_free(l_vm_var* var);
 void l_vm_var_clean(l_vm_var* var);
 
+char* l_vm_var_tostring(l_vm_var* var);
+int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
+
 /*
  * Errors
  */
@@ -188,6 +191,6 @@ typedef struct l_vm
 
 l_vm* l_vm_create();
 l_vm_var* l_vm_exec(l_vm_scope* scope, l_p_expr** expressions, int expressionc);
-void l_vm_run(l_vm* vm, l_p_expr_list* list);
+l_vm_var* l_vm_run(l_vm* vm, l_p_expr_list* list);
 
 #endif

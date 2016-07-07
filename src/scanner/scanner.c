@@ -28,7 +28,19 @@ static char nextchar(l_scanner* scanner)
 
 	char c = scanner->next;
 	scanner->curr = scanner->next;
-	scanner->next = fgetc(scanner->f);
+
+	switch (scanner->type)
+	{
+	case SCANNER_TYPE_FILE:
+		scanner->next = fgetc(scanner->input.f);
+		break;
+	case SCANNER_TYPE_STR:
+		scanner->next = scanner->input.str[scanner->character + 1];
+		if (scanner->next == '\0')
+			scanner->next = EOF;
+		break;
+	}
+
 	scanner->character += 1;
 
 	if (c == '\n')
@@ -137,7 +149,7 @@ static l_token gettoken(l_scanner* scanner)
 	/*
 	 * Period
 	 */
-	else if (c == '.')
+	else if (c == '.' && next != '.')
 	{
 		SETTOKEN(TOKEN_PERIOD, ",");
 		nextchar(scanner);
@@ -336,19 +348,42 @@ static l_token nexttoken(l_scanner* scanner)
 	return token;
 }
 
-l_scanner* l_scanner_create(FILE* f)
+static l_scanner* create()
 {
 	l_scanner* scanner = malloc(sizeof(l_scanner));
-	scanner->f = f;
 	scanner->character = -1;
 	scanner->line = 1;
 	scanner->curr = '\0';
 	scanner->next = '\0';
+
+	return scanner;
+}
+
+static void init(l_scanner* scanner)
+{
 	nextchar(scanner);
 	nextchar(scanner);
 
 	scanner->nexttoken = nexttoken(scanner);
 	scanner->nexttoken2 = nexttoken(scanner);
+}
+
+l_scanner* l_scanner_create(FILE* f)
+{
+	l_scanner* scanner = create();
+	scanner->input.f = f;
+	scanner->type = SCANNER_TYPE_FILE;
+	init(scanner);
+
+	return scanner;
+}
+
+l_scanner* l_scanner_create_str(char* str)
+{
+	l_scanner* scanner = create();
+	scanner->input.str = str;
+	scanner->type = SCANNER_TYPE_STR;
+	init(scanner);
 
 	return scanner;
 }
