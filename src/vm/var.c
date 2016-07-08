@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-l_vm_var* l_vm_var_create(l_vm_var_type type)
+l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type)
 {
 	l_vm_var* var = malloc(sizeof(l_vm_var));
 	var->type = type;

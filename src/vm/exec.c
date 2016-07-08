@@ -2,23 +2,23 @@
 
 #include <stdlib.h>
 
-static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
+static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 {
 	switch (expr->type)
 	{
 	case EXPR_EMPTY:
 	{
-		return l_vm_var_create(VAR_TYPE_NONE);
+		return l_vm_var_create(vm, VAR_TYPE_NONE);
 	}
 	case EXPR_ASSIGNMENT:
 	{
-		l_vm_var* var = exec(scope, expr->expression.assignment->expression);
+		l_vm_var* var = exec(vm, scope, expr->expression.assignment->expression);
 		l_vm_scope_set(scope, expr->expression.assignment->name, var);
 		return var;
 	}
 	case EXPR_FUNC_CALL:
 	{
-		l_vm_var* func = exec(scope, expr->expression.func_call->func);
+		l_vm_var* func = exec(vm, scope, expr->expression.func_call->func);
 
 		if (func->type != VAR_TYPE_FUNCTION)
 		{
@@ -30,7 +30,7 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		l_vm_var** argvars = malloc(sizeof(l_vm_var*) * exprs->expressionc);
 		for (int i = 0; i < exprs->expressionc; ++i)
 		{
-			argvars[i] = exec(scope, exprs->expressions[i]);
+			argvars[i] = exec(vm, scope, exprs->expressions[i]);
 		}
 
 		l_vm_var_array* args = malloc(sizeof(l_vm_var_array));
@@ -38,27 +38,30 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		args->len = exprs->expressionc;
 		args->allocd = exprs->expressionc;
 
-		l_vm_var* res = l_vm_var_function_exec(func->var.function, args);
+		l_vm_var* res = l_vm_var_function_exec(vm, func->var.function, args);
 
 		free(args);
 		return res;
 	}
 	case EXPR_OBJECT_LOOKUP:
 	{
-		l_vm_var* obj = exec(scope, expr->expression.object_lookup->obj);
-		char* key = expr->expression.object_lookup->key;
-
+		l_vm_var* obj = exec(vm, scope, expr->expression.object_lookup->obj);
 		if (obj->type != VAR_TYPE_OBJECT)
 		{
 			l_vm_error_type(VAR_TYPE_OBJECT, obj->type);
 		}
+		char* key = expr->expression.object_lookup->key;
 
-		return l_vm_var_object_lookup(obj->var.object, key);
+		l_vm_var* v = l_vm_var_object_lookup(obj->var.object, key);
+		if (v == NULL)
+			return l_vm_var_create(vm, VAR_TYPE_NONE);
+		else
+			return v;
 	}
 	case EXPR_ARRAY_LOOKUP:
 	{
-		l_vm_var* arr = exec(scope, expr->expression.array_lookup->arr);
-		l_vm_var* key = exec(scope, expr->expression.array_lookup->key);
+		l_vm_var* arr = exec(vm, scope, expr->expression.array_lookup->arr);
+		l_vm_var* key = exec(vm, scope, expr->expression.array_lookup->key);
 
 		if (arr->type != VAR_TYPE_ARRAY)
 		{
@@ -73,13 +76,13 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		int k = (int)key->var.number;
 
 		if (k >= a->len)
-			return l_vm_var_create(VAR_TYPE_NONE);
+			return l_vm_var_create(vm, VAR_TYPE_NONE);
 
 		return a->vars[k];
 	}
 	case EXPR_FUNCTION:
 	{
-		l_vm_var* var = l_vm_var_create(VAR_TYPE_FUNCTION);
+		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_FUNCTION);
 		l_vm_var_function* func = l_vm_var_function_create(scope);
 
 		func->expressions = expr->expression.function->expr_list->expressions;
@@ -103,7 +106,7 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 	}
 	case EXPR_ARRAY_LITERAL:
 	{
-		l_vm_var* var = l_vm_var_create(VAR_TYPE_ARRAY);
+		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_ARRAY);
 
 		l_p_comma_expr_list* exprs = expr->expression.array_literal->expr_list;
 
@@ -113,7 +116,7 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		arr->allocd = exprs->expressionc;
 		for (int i = 0; i < exprs->expressionc; ++i)
 		{
-			arr->vars[i] = exec(scope, exprs->expressions[i]);
+			arr->vars[i] = exec(vm, scope, exprs->expressions[i]);
 		}
 
 		var->var.array = arr;
@@ -122,7 +125,7 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 	}
 	case EXPR_STRING_LITERAL:
 	{
-		l_vm_var* var = l_vm_var_create(VAR_TYPE_STRING);
+		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_STRING);
 		l_vm_var_string* str = malloc(sizeof(l_vm_var_string));
 
 		str->chars = expr->expression.string_literal->string;
@@ -133,13 +136,13 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 	}
 	case EXPR_CHAR_LITERAL:
 	{
-		l_vm_var* var = l_vm_var_create(VAR_TYPE_CHAR);
+		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_CHAR);
 		var->var.character = expr->expression.char_literal->character;
 		return var;
 	}
 	case EXPR_NUM_LITERAL:
 	{
-		l_vm_var* var = l_vm_var_create(VAR_TYPE_NUMBER);
+		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 		var->var.number = expr->expression.num_literal->number;
 		return var;
 	}
@@ -148,29 +151,29 @@ static l_vm_var* exec(l_vm_scope* scope, l_p_expr* expr)
 		l_vm_var* var = l_vm_scope_lookup(
 			scope, expr->expression.variable->name);
 		if (var == NULL)
-			return l_vm_var_create(VAR_TYPE_NONE);
+			return l_vm_var_create(vm, VAR_TYPE_NONE);
 		else
 			return var;
 	}
 	default:
-		return l_vm_var_create(VAR_TYPE_NONE);
+		return l_vm_var_create(vm, VAR_TYPE_NONE);
 	}
 }
 
-l_vm_var* l_vm_exec(l_vm_scope* scope, l_p_expr** expressions, int expressionc)
+l_vm_var* l_vm_exec(l_vm* vm, l_vm_scope* scope, l_p_expr** expressions, int expressionc)
 {
 	for (int i = 0; i < expressionc; ++i)
 	{
 		if (i == expressionc - 1)
-			return exec(scope, expressions[i]);
+			return exec(vm, scope, expressions[i]);
 		else
-			exec(scope, expressions[i]);
+			exec(vm, scope, expressions[i]);
 	}
 
-	return l_vm_var_create(VAR_TYPE_NONE);
+	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
 l_vm_var* l_vm_run(l_vm* vm, l_p_expr_list* list)
 {
-	return l_vm_exec(vm->global, list->expressions, list->expressionc);
+	return l_vm_exec(vm, vm->global, list->expressions, list->expressionc);
 }

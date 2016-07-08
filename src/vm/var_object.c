@@ -54,5 +54,5 @@ l_vm_var* l_vm_var_object_lookup(l_vm_var_object* obj, char* name)
 		}
 	}
 
-	return l_vm_var_create(VAR_TYPE_NONE);
+	return NULL;
 }

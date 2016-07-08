@@ -13,10 +13,14 @@ l_vm* l_vm_create()
 	do { \
 		l_vm_var_function* f = l_vm_var_function_create(stdlib); \
 		f->fptr = ptr; \
-		l_vm_var* v = l_vm_var_create(VAR_TYPE_FUNCTION); \
+		l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_FUNCTION); \
 		v->var.function = f; \
 		l_vm_scope_define(stdlib, str, v); \
 	} while (0)
+
+	/*
+	 * Global Functions
+	 */
 
 	STD("+", &l_vm_std_add);
 	STD("-", &l_vm_std_sub);
@@ -48,16 +52,20 @@ l_vm* l_vm_create()
 
 #undef STD
 
-	l_vm_var* var_none = l_vm_var_create(VAR_TYPE_NONE);
-	l_vm_scope_define(stdlib, "none", var_none); \
+	/*
+	 * Global Variables
+	 */
 
-	l_vm_var* var_true = l_vm_var_create(VAR_TYPE_BOOL);
+	l_vm_var* var_none = l_vm_var_create(vm, VAR_TYPE_NONE);
+	l_vm_scope_define(stdlib, "none", var_none);
+
+	l_vm_var* var_true = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	var_true->var.boolean = 1;
-	l_vm_scope_define(stdlib, "true", var_true); \
+	l_vm_scope_define(stdlib, "true", var_true);
 
-	l_vm_var* var_false = l_vm_var_create(VAR_TYPE_BOOL);
+	l_vm_var* var_false = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	var_false->var.boolean = 0;
-	l_vm_scope_define(stdlib, "false", var_false); \
+	l_vm_scope_define(stdlib, "false", var_false);
 
 	return vm;
 }

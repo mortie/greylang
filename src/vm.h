@@ -4,9 +4,10 @@
 #include "parser.h"
 
 /*
- * Scope and Var (temporary, to make types happy)
+ * Vm, Scope and Var (temporary, to make types happy)
  */
 
+typedef struct l_vm l_vm;
 typedef struct l_vm_scope l_vm_scope;
 typedef struct l_vm_var l_vm_var;
 
@@ -53,18 +54,19 @@ typedef struct l_vm_var_array
 
 typedef struct l_vm_var_function
 {
-	l_vm_var* (*fptr)(l_vm_var_object*, l_vm_var_array*);
+	l_vm_var* (*fptr)(l_vm* vm, l_vm_var*, l_vm_var_array*);
 	l_p_expr** expressions;
 
 	int expressionc;
 	l_vm_scope* scope;
 	char** argnames;
 	int argnamec;
-	l_vm_var_object* self;
+	l_vm_var* self;
 } l_vm_var_function;
 
 l_vm_var_function* l_vm_var_function_create(l_vm_scope* scope);
 l_vm_var* l_vm_var_function_exec(
+		l_vm* vm,
 		l_vm_var_function* func,
 		l_vm_var_array* args);
 
@@ -93,7 +95,7 @@ typedef struct l_vm_var
 	l_vm_var_type type;
 } l_vm_var;
 
-l_vm_var* l_vm_var_create(l_vm_var_type type);
+l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type);
 void l_vm_var_free(l_vm_var* var);
 void l_vm_var_clean(l_vm_var* var);
 
@@ -113,54 +115,54 @@ void l_vm_error_undefined(char* name);
  */
 
 // +
-l_vm_var* l_vm_std_add(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // -
-l_vm_var* l_vm_std_sub(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // *
-l_vm_var* l_vm_std_mul(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // /
-l_vm_var* l_vm_std_div(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // ^
-l_vm_var* l_vm_std_pow(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // ==
-l_vm_var* l_vm_std_eq(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // !=
-l_vm_var* l_vm_std_neq(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_neq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // >
-l_vm_var* l_vm_std_gt(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // <
-l_vm_var* l_vm_std_lt(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // >=
-l_vm_var* l_vm_std_gteq(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // <=
-l_vm_var* l_vm_std_lteq(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // and
-l_vm_var* l_vm_std_and(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // or
-l_vm_var* l_vm_std_or(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // if
-l_vm_var* l_vm_std_if(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // repeat
-l_vm_var* l_vm_std_repeat(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // map
-l_vm_var* l_vm_std_map(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // tostring
-l_vm_var* l_vm_std_tostring(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // tonumber
-l_vm_var* l_vm_std_tonumber(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // concat ..
-l_vm_var* l_vm_std_concat(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 // type
-l_vm_var* l_vm_std_type(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 // loadc!
-l_vm_var* l_vm_std_loadc(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 // print!
-l_vm_var* l_vm_std_print(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // read!
-l_vm_var* l_vm_std_read(l_vm_var_object* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 /*
  * Scope
@@ -193,7 +195,7 @@ typedef struct l_vm
 } l_vm;
 
 l_vm* l_vm_create();
-l_vm_var* l_vm_exec(l_vm_scope* scope, l_p_expr** expressions, int expressionc);
+l_vm_var* l_vm_exec(l_vm* vm, l_vm_scope* scope, l_p_expr** expressions, int expressionc);
 l_vm_var* l_vm_run(l_vm* vm, l_p_expr_list* list);
 
 #endif

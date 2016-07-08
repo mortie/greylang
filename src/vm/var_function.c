@@ -18,6 +18,7 @@ l_vm_var_function* l_vm_var_function_create(
 }
 
 l_vm_var* l_vm_var_function_exec(
+		l_vm* vm,
 		l_vm_var_function* func,
 		l_vm_var_array* args)
 {
@@ -36,7 +37,7 @@ l_vm_var* l_vm_var_function_exec(
 	// Function from function pointer
 	if (func->fptr != NULL)
 	{
-		ret = (*func->fptr)(func->self, args);
+		ret = (*func->fptr)(vm, func->self, args);
 	}
 
 	// Function defined in language
@@ -71,12 +72,12 @@ l_vm_var* l_vm_var_function_exec(
 		// Define self
 		if (func->self != NULL)
 		{
-			l_vm_var* self = l_vm_var_create(VAR_TYPE_OBJECT);
-			self->var.object = func->self;
+			l_vm_var* self = l_vm_var_create(vm, VAR_TYPE_OBJECT);
+			self->var.object = func->self->var.object;
 			l_vm_scope_define(scope, "self", self);
 		}
 
-		ret = l_vm_exec(scope, func->expressions, func->expressionc);
+		ret = l_vm_exec(vm, scope, func->expressions, func->expressionc);
 	}
 
 	if (fakeargs)
