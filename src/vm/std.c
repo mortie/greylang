@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <readline/readline.h>
 
 static void expecttype(l_vm_var_type expected, l_vm_var* var)
 {
@@ -508,7 +507,7 @@ l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_STRING);
 	l_vm_var_string* str = malloc(sizeof(l_vm_var_string));
 
-	char* s = readline(prompt);
+	char* s = l_plat_readline(prompt);
 
 	str->chars = s;
 	str->len = strlen(s);

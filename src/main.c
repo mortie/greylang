@@ -1,12 +1,11 @@
 #include "scanner.h"
 #include "parser.h"
 #include "vm.h"
+#include "platform.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 enum opr_type
 {
@@ -25,9 +24,7 @@ static int repl()
 	l_vm* vm = l_vm_create();
 	while (1)
 	{
-		char* str = readline("> ");
-		if (str[0] != '\0')
-			add_history(str);
+		char* str = l_plat_readline("> ");
 
 		l_scanner* stream = l_scanner_create_str(str);
 		l_vm_var* v = l_vm_run(vm, l_parse(stream));

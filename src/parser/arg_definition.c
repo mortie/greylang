@@ -56,7 +56,7 @@ void l_pretty_arg_definition(
 {
 	for (int i = 0; i < arg_definition->namec; ++i)
 	{
-		fprintf(file, arg_definition->names[i]);
+		fprintf(file, "%s", arg_definition->names[i]);
 		if (i + 1 < arg_definition->namec)
 		{
 			fprintf(file, ", ");
