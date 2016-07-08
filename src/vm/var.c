@@ -7,6 +7,19 @@ l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type)
 {
 	l_vm_var* var = malloc(sizeof(l_vm_var));
 	var->type = type;
+
+	switch (type)
+	{
+	case VAR_TYPE_ARRAY:
+		var->map = l_vm_map_create(vm->proto_array);
+		break;
+	case VAR_TYPE_STRING:
+		var->map = l_vm_map_create(vm->proto_string);
+		break;
+	default:
+		var->map = l_vm_map_create(NULL);
+	}
+
 	return var;
 }
 

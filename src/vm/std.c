@@ -439,7 +439,7 @@ static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	char* symbol = vsymbol->var.string->chars;
 	l_vm_var_array* fargs = vfargs->var.array;
 
-	l_vm_var* vdl = l_vm_var_object_lookup(self->var.object, "dl");
+	l_vm_var* vdl = l_vm_map_lookup(self->map, "dl");
 	l_plat_dl* dl = (l_plat_dl*)vdl->var.ptr;
 
 	l_vm_var* (*fptr)(l_vm_var_array*) = l_plat_dl_read(dl, symbol);
@@ -456,9 +456,7 @@ l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	l_plat_dl* dl = l_plat_dl_open(arg->var.string->chars);
 
 	// Object to return
-	l_vm_var_object* obj = l_vm_var_object_create();
 	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_OBJECT);
-	var->var.object = obj;
 
 	// Pointer to dl
 	l_vm_var* ptr = l_vm_var_create(vm, VAR_TYPE_PTR);
@@ -468,12 +466,12 @@ l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	l_vm_var_function* runf = l_vm_var_function_create(NULL);
 	runf->fptr = &loadc_run;
 	runf->self = l_vm_var_create(vm, VAR_TYPE_OBJECT);
-	runf->self->var.object = obj;
+	runf->self = var;
 	l_vm_var* runv = l_vm_var_create(vm, VAR_TYPE_FUNCTION);
 	runv->var.function = runf;
 
-	l_vm_var_object_set(obj, "dl", ptr);
-	l_vm_var_object_set(obj, "run", runv);
+	l_vm_map_set(var->map, "dl", ptr);
+	l_vm_map_set(var->map, "run", runv);
 
 	return var;
 }
@@ -515,6 +513,60 @@ l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	str->chars = s;
 	str->len = strlen(s);
 	var->var.string = str;
+
+	return var;
+}
+
+l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+{
+	expecttype(VAR_TYPE_STRING, self);
+
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);
+	var->var.number = (double)self->var.string->len;
+	return var;
+}
+
+l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+{
+	expecttype(VAR_TYPE_STRING, self);
+	if (args->len < 1 || args->len < 2)
+	{
+		expectargc(1, args);
+	}
+
+	int start;
+	int end;
+	int slen = self->var.string->len;
+
+	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	start = (int)args->vars[0]->var.number;
+
+	if (args->len == 2)
+	{
+		expecttype(VAR_TYPE_NUMBER, args->vars[1]);
+		end = (int)args->vars[1]->var.number;
+		if (end < 0)
+			end = slen + end - 1;
+		if (end < start)
+			end = start;
+		if (end >= slen)
+			end = slen;
+	}
+	else
+	{
+		end = slen - 1;
+	}
+
+	int len = end - start + 1;
+	printf("%i %i %i\n", start, end, len);
+	char* chars = malloc(len + 1);
+	memcpy(chars, self->var.string->chars + start, len);
+	chars[len + 1] = '\0';
+
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_STRING);
+	var->var.string = malloc(sizeof(l_vm_var_string));
+	var->var.string->chars = chars;
+	var->var.string->len = len;
 
 	return var;
 }

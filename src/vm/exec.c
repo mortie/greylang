@@ -46,17 +46,26 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 	case EXPR_OBJECT_LOOKUP:
 	{
 		l_vm_var* obj = exec(vm, scope, expr->expression.object_lookup->obj);
-		if (obj->type != VAR_TYPE_OBJECT)
-		{
-			l_vm_error_type(VAR_TYPE_OBJECT, obj->type);
-		}
 		char* key = expr->expression.object_lookup->key;
 
-		l_vm_var* v = l_vm_var_object_lookup(obj->var.object, key);
+		l_vm_var* v = l_vm_map_lookup(obj->map, key);
+
 		if (v == NULL)
 			return l_vm_var_create(vm, VAR_TYPE_NONE);
-		else
-			return v;
+
+		if (v->type == VAR_TYPE_FUNCTION)
+		{
+			l_vm_var_function* func = l_vm_var_function_create(v->var.function->scope);
+			func->fptr = v->var.function->fptr;
+			func->expressions = v->var.function->expressions;
+			func->expressionc = v->var.function->expressionc;
+			func->argnames = v->var.function->argnames;
+			func->argnamec = v->var.function->argnamec;
+			func->self = obj;
+			v->var.function = func;
+		}
+
+		return v;
 	}
 	case EXPR_ARRAY_LOOKUP:
 	{

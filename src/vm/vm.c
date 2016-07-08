@@ -51,6 +51,25 @@ l_vm* l_vm_create()
 	STD("read!", &l_vm_std_read);
 
 #undef STD
+#define PROTO(obj, str, ptr) \
+	do { \
+		l_vm_var_function* f = l_vm_var_function_create(NULL); \
+		f->fptr = ptr; \
+		l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_FUNCTION); \
+		v->var.function = f; \
+		l_vm_map_set(obj, str, v); \
+	} while (0)
+
+	l_vm_map* proto_string = l_vm_map_create(NULL);
+	vm->proto_string = proto_string;
+
+	PROTO(proto_string, "len", &l_vm_std_string_len);
+	PROTO(proto_string, "sub", &l_vm_std_string_sub);
+
+	l_vm_map* proto_array = l_vm_map_create(NULL);
+	vm->proto_array = proto_array;
+
+#undef PROTO
 
 	/*
 	 * Global Variables

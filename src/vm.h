@@ -12,6 +12,29 @@ typedef struct l_vm_scope l_vm_scope;
 typedef struct l_vm_var l_vm_var;
 
 /*
+ * Map
+ */
+
+typedef struct l_vm_map
+{
+	char** names;
+	l_vm_var** vars;
+	int len;
+	int allocd;
+	struct l_vm_map* proto;
+} l_vm_map;
+
+l_vm_map* l_vm_map_create(l_vm_map* proto);
+
+void l_vm_map_set(
+		l_vm_map* map,
+		char* name,
+		l_vm_var* var);
+
+l_vm_var* l_vm_map_shallow_lookup(l_vm_map* map, char* name);
+l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name);
+
+/*
  * Variables
  */
 
@@ -28,22 +51,8 @@ typedef enum l_vm_var_type
 	VAR_TYPE_NONE
 } l_vm_var_type;
 
-typedef struct l_vm_var_object
-{
-	char** names;
-	l_vm_var** vars;
-	int len;
-	int allocd;
-} l_vm_var_object;
-
-l_vm_var_object* l_vm_var_object_create();
-
-void l_vm_var_object_set(
-		l_vm_var_object* obj,
-		char* name,
-		l_vm_var* var);
-
-l_vm_var* l_vm_var_object_lookup(l_vm_var_object* obj, char* name);
+// All variables are maps; the object type just doesn't have anything else
+typedef struct l_vm_var_object l_vm_var_object;
 
 typedef struct l_vm_var_array
 {
@@ -55,9 +64,10 @@ typedef struct l_vm_var_array
 typedef struct l_vm_var_function
 {
 	l_vm_var* (*fptr)(l_vm* vm, l_vm_var*, l_vm_var_array*);
-	l_p_expr** expressions;
 
+	l_p_expr** expressions;
 	int expressionc;
+
 	l_vm_scope* scope;
 	char** argnames;
 	int argnamec;
@@ -92,6 +102,7 @@ typedef struct l_vm_var
 		void* ptr;
 		l_vm_var_none* none;
 	} var;
+	l_vm_map* map;
 	l_vm_var_type type;
 } l_vm_var;
 
@@ -164,6 +175,11 @@ l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // read!
 l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
+// string.len
+l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+// string.sub
+l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+
 /*
  * Scope
  */
@@ -192,6 +208,9 @@ void l_vm_scope_free(l_vm_scope* scope);
 typedef struct l_vm
 {
 	l_vm_scope* global;
+
+	l_vm_map* proto_string;
+	l_vm_map* proto_array;
 } l_vm;
 
 l_vm* l_vm_create();

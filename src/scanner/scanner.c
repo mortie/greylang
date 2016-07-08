@@ -126,10 +126,13 @@ static l_token gettoken(l_scanner* scanner)
 	/*
 	 * Number Literal
 	 */
-	else if (c >= '0' && c <= '9')
+	else if (
+			(c >= '0' && c <= '9') ||
+			(c == '-' && next >= '0' && next <= '9'))
 	{
 		int period = 0;
-		char cc = c;
+		STRAPPEND(content, contenta, contentlen, c);
+		char cc = nextchar(scanner);
 		while (
 				cc != EOF && (
 				(cc >= '0' && cc <= '9') ||
