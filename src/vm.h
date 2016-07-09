@@ -47,6 +47,7 @@ typedef enum l_vm_var_type
 	VAR_TYPE_CHAR,
 	VAR_TYPE_NUMBER,
 	VAR_TYPE_BOOL,
+	VAR_TYPE_ERROR,
 	VAR_TYPE_PTR,
 	VAR_TYPE_NONE
 } l_vm_var_type;
@@ -86,6 +87,11 @@ typedef struct l_vm_var_string
 	int len;
 } l_vm_var_string;
 
+typedef struct l_vm_var_error
+{
+	char* msg;
+} l_vm_var_error;
+
 typedef struct l_vm_var_none l_vm_var_none;
 
 typedef struct l_vm_var
@@ -99,6 +105,7 @@ typedef struct l_vm_var
 		char character;
 		double number;
 		int boolean;
+		l_vm_var_error* error;
 		void* ptr;
 		l_vm_var_none* none;
 	} var;
@@ -163,6 +170,9 @@ l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // concat ..
 l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+
+// error
+l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 // type
 l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args);

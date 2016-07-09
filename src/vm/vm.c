@@ -43,6 +43,8 @@ l_vm* l_vm_create()
 	STD("concat", &l_vm_std_concat);
 	STD("..", &l_vm_std_concat);
 
+	STD("error", &l_vm_std_error);
+
 	STD("type", &l_vm_std_type);
 
 	STD("loadc!", &l_vm_std_loadc);

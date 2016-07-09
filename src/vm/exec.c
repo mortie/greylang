@@ -174,9 +174,15 @@ l_vm_var* l_vm_exec(l_vm* vm, l_vm_scope* scope, l_p_expr** expressions, int exp
 	for (int i = 0; i < expressionc; ++i)
 	{
 		if (i == expressionc - 1)
+		{
 			return exec(vm, scope, expressions[i]);
+		}
 		else
-			exec(vm, scope, expressions[i]);
+		{
+			l_vm_var* var = exec(vm, scope, expressions[i]);
+			if (var->type == VAR_TYPE_ERROR)
+				return var;
+		}
 	}
 
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
@@ -184,5 +190,16 @@ l_vm_var* l_vm_exec(l_vm* vm, l_vm_scope* scope, l_p_expr** expressions, int exp
 
 l_vm_var* l_vm_run(l_vm* vm, l_p_expr_list* list)
 {
-	return l_vm_exec(vm, vm->global, list->expressions, list->expressionc);
+	l_vm_var* res = l_vm_exec(
+		vm,
+		vm->global,
+		list->expressions,
+		list->expressionc);
+
+	if (res->type == VAR_TYPE_ERROR)
+	{
+		printf("Error: %s\n", res->var.error->msg);
+	}
+
+	return res;
 }

@@ -40,6 +40,9 @@ void l_vm_var_clean(l_vm_var* var)
 	case VAR_TYPE_STRING:
 		free(var->var.string);
 		break;
+	case VAR_TYPE_ERROR:
+		free(var->var.error);
+		break;
 	case VAR_TYPE_CHAR:
 	case VAR_TYPE_NUMBER:
 	case VAR_TYPE_BOOL:
@@ -57,7 +60,7 @@ void l_vm_var_free(l_vm_var* var)
 
 char* l_vm_var_tostring(l_vm_var* var)
 {
-	char* str;
+	char* str = "";
 
 	switch (var->type)
 	{
@@ -103,6 +106,11 @@ char* l_vm_var_tostring(l_vm_var* var)
 			str = "[false]";
 		}
 		break;
+	case VAR_TYPE_ERROR:
+		str = malloc(7 + strlen(var->var.error->msg) + 1);
+		memcpy(str, "Error: ", 7);
+		memcpy(str+ 7, var->var.error->msg, strlen(var->var.error->msg) + 1);
+		break;
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		str = "[none]";
@@ -137,6 +145,8 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2)
 		return var1->var.number == var2->var.number;
 	case VAR_TYPE_BOOL:
 		return var1->var.boolean == var2->var.boolean;
+	case VAR_TYPE_ERROR:
+		return var1->var.error == var2->var.error;
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		return 1;

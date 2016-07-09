@@ -6,29 +6,30 @@
 #include <stdio.h>
 #include <math.h>
 
-static void expecttype(l_vm_var_type expected, l_vm_var* var)
+static l_vm_var* error(l_vm* vm, char* msg)
 {
-	if (var->type != expected)
-	{
-		l_vm_error_type(expected, var->type);
-	}
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_ERROR);
+	l_vm_var_error* err = malloc(sizeof(l_vm_var_error));
+	err->msg = msg;
+	var->var.error = err;
+	return var;
 }
 
-static void expectargc(int expected, l_vm_var_array* args)
-{
-	if (args->len != expected)
-	{
-		l_vm_error_argnum(expected, args->len);
-	}
-}
+#define expecttype(vm, expected, var) \
+	if (var->type != expected) \
+		return error(vm, "Unexpected type");
+
+#define expectargc(vm, expected, args) \
+	if (args->len != expected) \
+		return error(vm, "Invalid number of arguments");
 
 l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* a = args->vars[0];
 	l_vm_var* b = args->vars[1];
-	expecttype(VAR_TYPE_NUMBER, a);
-	expecttype(VAR_TYPE_NUMBER, b);
+	expecttype(vm, VAR_TYPE_NUMBER, a);
+	expecttype(vm, VAR_TYPE_NUMBER, b);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	v->var.number = a->var.number + b->var.number;
@@ -37,11 +38,11 @@ l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* a = args->vars[0];
 	l_vm_var* b = args->vars[1];
-	expecttype(VAR_TYPE_NUMBER, a);
-	expecttype(VAR_TYPE_NUMBER, b);
+	expecttype(vm, VAR_TYPE_NUMBER, a);
+	expecttype(vm, VAR_TYPE_NUMBER, b);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	v->var.number = a->var.number - b->var.number;
@@ -50,11 +51,11 @@ l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* a = args->vars[0];
 	l_vm_var* b = args->vars[1];
-	expecttype(VAR_TYPE_NUMBER, a);
-	expecttype(VAR_TYPE_NUMBER, b);
+	expecttype(vm, VAR_TYPE_NUMBER, a);
+	expecttype(vm, VAR_TYPE_NUMBER, b);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	v->var.number = a->var.number * b->var.number;
@@ -63,11 +64,11 @@ l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* a = args->vars[0];
 	l_vm_var* b = args->vars[1];
-	expecttype(VAR_TYPE_NUMBER, a);
-	expecttype(VAR_TYPE_NUMBER, b);
+	expecttype(vm, VAR_TYPE_NUMBER, a);
+	expecttype(vm, VAR_TYPE_NUMBER, b);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	v->var.number = a->var.number / b->var.number;
@@ -76,11 +77,11 @@ l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* a = args->vars[0];
 	l_vm_var* b = args->vars[1];
-	expecttype(VAR_TYPE_NUMBER, a);
-	expecttype(VAR_TYPE_NUMBER, b);
+	expecttype(vm, VAR_TYPE_NUMBER, a);
+	expecttype(vm, VAR_TYPE_NUMBER, b);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	v->var.number = pow(a->var.number, b->var.number);
@@ -90,7 +91,7 @@ l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 0;
@@ -115,16 +116,16 @@ l_vm_var* l_vm_std_neq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 0;
 
-	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	expecttype(vm, VAR_TYPE_NUMBER, args->vars[0]);
 	double prev = args->vars[0]->var.number;
 	for (int i = 1; i < args->len; ++i)
 	{
-		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		expecttype(vm, VAR_TYPE_NUMBER, args->vars[i]);
 		double d = args->vars[i]->var.number;
 		if (!(prev > d))
 			return v;
@@ -139,16 +140,16 @@ l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 0;
 
-	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	expecttype(vm, VAR_TYPE_NUMBER, args->vars[0]);
 	double prev = args->vars[0]->var.number;
 	for (int i = 1; i < args->len; ++i)
 	{
-		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		expecttype(vm, VAR_TYPE_NUMBER, args->vars[i]);
 		double d = args->vars[i]->var.number;
 		if (!(prev < d))
 			return v;
@@ -163,16 +164,16 @@ l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 0;
 
-	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	expecttype(vm, VAR_TYPE_NUMBER, args->vars[0]);
 	double prev = args->vars[0]->var.number;
 	for (int i = 1; i < args->len; ++i)
 	{
-		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		expecttype(vm, VAR_TYPE_NUMBER, args->vars[i]);
 		double d = args->vars[i]->var.number;
 		if (!(prev >= d))
 			return v;
@@ -187,16 +188,16 @@ l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 0;
 
-	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	expecttype(vm, VAR_TYPE_NUMBER, args->vars[0]);
 	double prev = args->vars[0]->var.number;
 	for (int i = 1; i < args->len; ++i)
 	{
-		expecttype(VAR_TYPE_NUMBER, args->vars[i]);
+		expecttype(vm, VAR_TYPE_NUMBER, args->vars[i]);
 		double d = args->vars[i]->var.number;
 		if (!(prev <= d))
 			return v;
@@ -211,14 +212,14 @@ l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 0;
 
 	for (int i = 0; i < args->len; ++i)
 	{
-		expecttype(VAR_TYPE_BOOL, args->vars[i]);
+		expecttype(vm, VAR_TYPE_BOOL, args->vars[i]);
 		if (!args->vars[i]->var.boolean)
 			return v;
 	}
@@ -230,14 +231,14 @@ l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	if (args->len < 2)
-		expectargc(2, args);
+		expectargc(vm, 2, args);
 
 	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	v->var.boolean = 1;
 
 	for (int i = 0; i < args->len; ++i)
 	{
-		expecttype(VAR_TYPE_BOOL, args->vars[i]);
+		expecttype(vm, VAR_TYPE_BOOL, args->vars[i]);
 		if (args->vars[i]->var.boolean)
 			return v;
 	}
@@ -248,11 +249,11 @@ l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* cond = args->vars[0];
 	l_vm_var* func = args->vars[1];
-	expecttype(VAR_TYPE_BOOL, cond);
-	expecttype(VAR_TYPE_FUNCTION, func);
+	expecttype(vm, VAR_TYPE_BOOL, cond);
+	expecttype(vm, VAR_TYPE_FUNCTION, func);
 
 	if (cond->var.boolean)
 	{
@@ -264,11 +265,11 @@ l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* num = args->vars[0];
 	l_vm_var* func = args->vars[1];
-	expecttype(VAR_TYPE_NUMBER, num);
-	expecttype(VAR_TYPE_FUNCTION, func);
+	expecttype(vm, VAR_TYPE_NUMBER, num);
+	expecttype(vm, VAR_TYPE_FUNCTION, func);
 
 	l_vm_var* tmp = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
@@ -293,11 +294,11 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* arr = args->vars[0];
 	l_vm_var* func = args->vars[1];
-	expecttype(VAR_TYPE_ARRAY, arr);
-	expecttype(VAR_TYPE_FUNCTION, func);
+	expecttype(vm, VAR_TYPE_ARRAY, arr);
+	expecttype(vm, VAR_TYPE_FUNCTION, func);
 
 	l_vm_var_array* a = arr->var.array;
 
@@ -328,7 +329,7 @@ l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(1, args);
+	expectargc(vm, 1, args);
 	l_vm_var* arg = args->vars[0];
 
 	char* str = l_vm_var_tostring(arg);
@@ -344,9 +345,9 @@ l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(1, args);
+	expectargc(vm, 1, args);
 	l_vm_var* arg = args->vars[0];
-	expecttype(VAR_TYPE_STRING, arg);
+	expecttype(vm, VAR_TYPE_STRING, arg);
 
 	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	var->var.number = atof(arg->var.string->chars);
@@ -386,11 +387,27 @@ l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
+l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+{
+	expectargc(vm, 1, args);
+	expecttype(vm, VAR_TYPE_STRING, args->vars[0]);
+
+	l_vm_var_string* strvar =  args->vars[0]->var.string;
+
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_ERROR);
+	var->var.error = malloc(sizeof(l_vm_var_error));
+	char* msg = malloc(strvar->len + 1);
+	memcpy(msg, strvar->chars, strvar->len + 1);
+	var->var.error->msg = msg;
+
+	return var;
+}
+
 l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(1, args);
+	expectargc(vm, 1, args);
 
-	char* str;
+	char* str = "";
 
 	switch (args->vars[0]->type)
 	{
@@ -415,6 +432,9 @@ l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	case VAR_TYPE_BOOL:
 		str = "bool";
 		break;
+	case VAR_TYPE_ERROR:
+		str = "error";
+		break;
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		str = "none";
@@ -429,11 +449,11 @@ l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(2, args);
+	expectargc(vm, 2, args);
 	l_vm_var* vsymbol = args->vars[0];
 	l_vm_var* vfargs = args->vars[1];
-	expecttype(VAR_TYPE_STRING, vsymbol);
-	expecttype(VAR_TYPE_ARRAY, vfargs);
+	expecttype(vm, VAR_TYPE_STRING, vsymbol);
+	expecttype(vm, VAR_TYPE_ARRAY, vfargs);
 
 	char* symbol = vsymbol->var.string->chars;
 	l_vm_var_array* fargs = vfargs->var.array;
@@ -441,18 +461,22 @@ static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	l_vm_var* vdl = l_vm_map_lookup(self->map, "dl");
 	l_plat_dl* dl = (l_plat_dl*)vdl->var.ptr;
 
-	l_vm_var* (*fptr)(l_vm_var_array*) = l_plat_dl_read(dl, symbol);
+	l_vm_var* (*fptr)(l_vm*, l_vm_var_array*) =
+		l_plat_dl_read(dl, symbol);
 
-	return (*fptr)(fargs);
+	return (*fptr)(vm, fargs);
 }
 
 l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expectargc(1, args);
+	expectargc(vm, 1, args);
 	l_vm_var* arg = args->vars[0];
-	expecttype(VAR_TYPE_STRING, arg);
+	expecttype(vm, VAR_TYPE_STRING, arg);
 
+	// dlopen, and return if error
 	l_plat_dl* dl = l_plat_dl_open(arg->var.string->chars);
+	if (!dl->success)
+		return error(vm, "Couldn't load file");
 
 	// Object to return
 	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_OBJECT);
@@ -495,7 +519,7 @@ l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	}
 	else if (args->len == 1)
 	{
-		expecttype(VAR_TYPE_STRING, args->vars[0]);
+		expecttype(vm, VAR_TYPE_STRING, args->vars[0]);
 		prompt = args->vars[0]->var.string->chars;
 	}
 	else
@@ -518,7 +542,7 @@ l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expecttype(VAR_TYPE_STRING, self);
+	expecttype(vm, VAR_TYPE_STRING, self);
 
 	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	var->var.number = (double)self->var.string->len;
@@ -527,22 +551,22 @@ l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 
 l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
-	expecttype(VAR_TYPE_STRING, self);
+	expecttype(vm, VAR_TYPE_STRING, self);
 	if (args->len < 1 || args->len < 2)
 	{
-		expectargc(1, args);
+		expectargc(vm, 1, args);
 	}
 
 	int start;
 	int end;
 	int slen = self->var.string->len;
 
-	expecttype(VAR_TYPE_NUMBER, args->vars[0]);
+	expecttype(vm, VAR_TYPE_NUMBER, args->vars[0]);
 	start = (int)args->vars[0]->var.number;
 
 	if (args->len == 2)
 	{
-		expecttype(VAR_TYPE_NUMBER, args->vars[1]);
+		expecttype(vm, VAR_TYPE_NUMBER, args->vars[1]);
 		end = (int)args->vars[1]->var.number;
 		if (end < 0)
 			end = slen + end - 1;

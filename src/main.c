@@ -32,9 +32,8 @@ static int repl()
 		char* s = l_vm_var_tostring(v);
 		if (v->type == VAR_TYPE_STRING)
 			printf("\"%s\"\n", s);
-		else
+		else if (v->type != VAR_TYPE_ERROR)
 			printf("%s\n", s);
-
 
 		free(str);
 	}
