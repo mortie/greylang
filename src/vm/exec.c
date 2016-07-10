@@ -22,7 +22,7 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		if (func->type != VAR_TYPE_FUNCTION)
 		{
-			l_vm_error_type(VAR_TYPE_FUNCTION, func->type);
+			return l_vm_error_type(vm, VAR_TYPE_FUNCTION, func->type);
 		}
 
 		l_p_comma_expr_list* exprs = expr->expression.func_call->arg_list;
@@ -74,11 +74,11 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		if (arr->type != VAR_TYPE_ARRAY)
 		{
-			l_vm_error_type(VAR_TYPE_ARRAY, arr->type);
+			return l_vm_error_type(vm, VAR_TYPE_ARRAY, arr->type);
 		}
 		if (key->type != VAR_TYPE_NUMBER)
 		{
-			l_vm_error_type(VAR_TYPE_NUMBER, key->type);
+			return l_vm_error_type(vm, VAR_TYPE_NUMBER, key->type);
 		}
 
 		l_vm_var_array* a = arr->var.array;

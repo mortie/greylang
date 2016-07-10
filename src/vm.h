@@ -92,6 +92,10 @@ typedef struct l_vm_var_error
 	char* msg;
 } l_vm_var_error;
 
+l_vm_var* l_vm_error(l_vm* vm, char* str);
+l_vm_var* l_vm_error_type(l_vm* vm, l_vm_var_type expected, l_vm_var_type got);
+l_vm_var* l_vm_error_argc(l_vm* vm, int expected, int got);
+
 typedef struct l_vm_var_none l_vm_var_none;
 
 typedef struct l_vm_var
@@ -119,14 +123,6 @@ void l_vm_var_clean(l_vm_var* var);
 
 char* l_vm_var_tostring(l_vm_var* var);
 int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
-
-/*
- * Errors
- */
-
-void l_vm_error_type(l_vm_var_type expected, l_vm_var_type got);
-void l_vm_error_argnum(int expected, int got);
-void l_vm_error_undefined(char* name);
 
 /*
  * Standard Library

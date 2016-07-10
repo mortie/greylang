@@ -51,7 +51,7 @@ l_vm_var* l_vm_var_function_exec(
 		{
 			if (args->len != func->argnamec)
 			{
-				l_vm_error_argnum(func->argnamec, args->len);
+				return l_vm_error_argc(vm, func->argnamec, args->len);
 			}
 
 			for (int i = 0; i < args->len; ++i)
