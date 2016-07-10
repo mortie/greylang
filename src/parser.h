@@ -54,7 +54,6 @@ typedef enum l_p_expr_type
 	EXPR_FUNCTION,
 	EXPR_ARRAY_LITERAL,
 	EXPR_STRING_LITERAL,
-	EXPR_CHAR_LITERAL,
 	EXPR_NUM_LITERAL,
 	EXPR_VARIABLE
 } l_p_expr_type;
@@ -225,22 +224,6 @@ void l_pretty_expr_string_literal(
 		FILE* file);
 
 /*
- * Char Literal Expression
- */
-
-typedef struct l_p_expr_char_literal
-{
-	char character;
-} l_p_expr_char_literal;
-
-l_p_expr_char_literal* l_parse_expr_char_literal(l_scanner* stream);
-
-void l_pretty_expr_char_literal(
-		l_p_expr_char_literal* expr,
-		int depth,
-		FILE* file);
-
-/*
  * Num Literal Expression
  */
 
@@ -289,7 +272,6 @@ typedef struct l_p_expr
 		l_p_expr_array_literal* array_literal;
 		l_p_expr_num_literal* num_literal;
 		l_p_expr_string_literal* string_literal;
-		l_p_expr_char_literal* char_literal;
 		l_p_expr_variable* variable;
 	} expression;
 	int line;

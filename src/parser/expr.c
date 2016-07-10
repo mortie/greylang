@@ -105,16 +105,6 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 		}
 
 		/*
-		 * Char Literal
-		 */
-		else if (t.type == TOKEN_CHAR_LITERAL)
-		{
-			expr->expression.string_literal =
-				l_parse_expr_string_literal(stream);
-			expr->type = EXPR_STRING_LITERAL;
-		}
-
-		/*
 		 * Number Literal
 		 */
 		else if (t.type == TOKEN_NUM_LITERAL)
@@ -213,11 +203,6 @@ void l_pretty_expr(
 	case EXPR_STRING_LITERAL:
 		l_pretty_expr_string_literal(
 			expr->expression.string_literal,
-			depth, file);
-		break;
-	case EXPR_CHAR_LITERAL:
-		l_pretty_expr_char_literal(
-			expr->expression.char_literal,
 			depth, file);
 		break;
 	case EXPR_VARIABLE:

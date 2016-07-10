@@ -14,8 +14,6 @@ static char* typestr(l_vm_var_type type)
 		return "function";
 	case VAR_TYPE_STRING:
 		return "string";
-	case VAR_TYPE_CHAR:
-		return "char";
 	case VAR_TYPE_NUMBER:
 		return "number";
 	case VAR_TYPE_BOOL:

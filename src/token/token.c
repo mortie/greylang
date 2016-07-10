@@ -10,8 +10,6 @@ char* l_token_type_string(l_token_type type)
 		return "error";
 	case TOKEN_STRING_LITERAL:
 		return "string literal";
-	case TOKEN_CHAR_LITERAL:
-		return "char literal";
 	case TOKEN_NUM_LITERAL:
 		return "num literal";
 	case TOKEN_NAME:

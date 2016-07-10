@@ -146,12 +146,6 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		return var;
 	}
-	case EXPR_CHAR_LITERAL:
-	{
-		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_CHAR);
-		var->var.character = expr->expression.char_literal->character;
-		return var;
-	}
 	case EXPR_NUM_LITERAL:
 	{
 		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);

@@ -80,6 +80,7 @@ static l_token gettoken(l_scanner* scanner)
 	if (c == '"')
 	{
 		int closed = 1;
+		char prev = c;
 		char cc = nextchar(scanner);
 		while (cc != '"')
 		{
@@ -88,7 +89,35 @@ static l_token gettoken(l_scanner* scanner)
 				closed = 0;
 				break;
 			}
-			STRAPPEND(content, contenta, contentlen, cc);
+			if (prev == '\\')
+			{
+				if (cc == '\\')
+				{
+					STRAPPEND(content, contenta, contentlen, cc);
+					cc = '\0'; // Make \\\\ result in \\ instead of \\\ .
+				}
+				else if (cc == 'a')
+					cc = '\a';
+				else if (cc == 'b')
+					cc = '\b';
+				else if (cc == 'f')
+					cc = '\f';
+				else if (cc == 'n')
+					cc = '\n';
+				else if (cc == 'r')
+					cc = '\r';
+				else if (cc == 't')
+					cc = '\t';
+				else if (cc == 'v')
+					cc = '\v';
+			}
+
+			if (cc != '\\' && cc != '\0')
+			{
+				STRAPPEND(content, contenta, contentlen, cc);
+			}
+
+			prev = cc;
 			cc = nextchar(scanner);
 		}
 		nextchar(scanner);
@@ -100,26 +129,6 @@ static l_token gettoken(l_scanner* scanner)
 		else
 		{
 			SETTOKEN(TOKEN_ERROR, "String literal not closed");
-		}
-	}
-
-	/*
-	 * Char Literal
-	 */
-	else if (c == '\'')
-	{
-		char* str = malloc(1);
-		str[0] = nextchar(scanner);
-		char end = nextchar(scanner);
-		nextchar(scanner);
-
-		if (str[0] != EOF && end == '\'')
-		{
-			SETTOKEN(TOKEN_CHAR_LITERAL, str);
-		}
-		else
-		{
-			SETTOKEN(TOKEN_ERROR, "Char literal not closed");
 		}
 	}
 

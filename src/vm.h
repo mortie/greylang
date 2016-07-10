@@ -44,7 +44,6 @@ typedef enum l_vm_var_type
 	VAR_TYPE_ARRAY,
 	VAR_TYPE_FUNCTION,
 	VAR_TYPE_STRING,
-	VAR_TYPE_CHAR,
 	VAR_TYPE_NUMBER,
 	VAR_TYPE_BOOL,
 	VAR_TYPE_ERROR,
@@ -107,7 +106,6 @@ typedef struct l_vm_var
 		l_vm_var_array* array;
 		l_vm_var_function* function;
 		l_vm_var_string* string;
-		char character;
 		double number;
 		int boolean;
 		l_vm_var_error* error;

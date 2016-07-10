@@ -43,7 +43,6 @@ void l_vm_var_clean(l_vm_var* var)
 	case VAR_TYPE_ERROR:
 		free(var->var.error);
 		break;
-	case VAR_TYPE_CHAR:
 	case VAR_TYPE_NUMBER:
 	case VAR_TYPE_BOOL:
 	case VAR_TYPE_PTR:
@@ -75,11 +74,6 @@ char* l_vm_var_tostring(l_vm_var* var)
 		break;
 	case VAR_TYPE_STRING:
 		return var->var.string->chars;
-		break;
-	case VAR_TYPE_CHAR:
-		str = malloc(2);
-		str[0] = var->var.character;
-		str[1] = '\0';
 		break;
 	case VAR_TYPE_NUMBER:
 	{
@@ -148,8 +142,6 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2)
 		return strcmp(
 			var1->var.string->chars,
 			var2->var.string->chars) == 0;
-	case VAR_TYPE_CHAR:
-		return var1->var.character == var2->var.character;
 	case VAR_TYPE_NUMBER:
 		return var1->var.number == var2->var.number;
 	case VAR_TYPE_BOOL:

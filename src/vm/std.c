@@ -424,9 +424,6 @@ l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	case VAR_TYPE_STRING:
 		str = "string";
 		break;
-	case VAR_TYPE_CHAR:
-		str = "char";
-		break;
 	case VAR_TYPE_NUMBER:
 		str = "number";
 		break;
