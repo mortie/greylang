@@ -107,10 +107,19 @@ char* l_vm_var_tostring(l_vm_var* var)
 		}
 		break;
 	case VAR_TYPE_ERROR:
-		str = malloc(7 + strlen(var->var.error->msg) + 1);
-		memcpy(str, "Error: ", 7);
-		memcpy(str+ 7, var->var.error->msg, strlen(var->var.error->msg) + 1);
+	{
+		l_vm_var_error* err = var->var.error;
+
+		char* format = "Error: Line %i: %s";
+		char* msg = err->msg;
+
+		// Assuming no more than 99999999 lines
+		int len = strlen(format) + strlen(msg) + 8;
+
+		str = malloc(len);
+		snprintf(str, len, format, err->line, err->msg);
 		break;
+	}
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		str = "[none]";

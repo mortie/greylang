@@ -4,6 +4,8 @@
 
 static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 {
+	vm->currLine = expr->line;
+	
 	switch (expr->type)
 	{
 	case EXPR_EMPTY:
@@ -86,6 +88,7 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		if (k >= a->len)
 			return l_vm_var_create(vm, VAR_TYPE_NONE);
+		printf("arr index %i\n", k);
 
 		return a->vars[k];
 	}
@@ -197,9 +200,7 @@ l_vm_var* l_vm_run(l_vm* vm, l_p_expr_list* list)
 		list->expressionc);
 
 	if (res->type == VAR_TYPE_ERROR)
-	{
-		printf("Error: %s\n", res->var.error->msg);
-	}
+		puts(l_vm_var_tostring(res));
 
 	return res;
 }

@@ -9,7 +9,7 @@
 	do { \
 		if (len == 0) { name = malloc(32); a = 32; } \
 		len += 1; \
-		if (len > a) \
+		if (a < len) \
 		{ \
 			a *= 2; \
 			name = realloc(name, a); \
@@ -316,7 +316,7 @@ static l_token gettoken(l_scanner* scanner)
 		while (cc != EOF && !isspace(cc) &&
 				(cc != '(' && cc != ')') &&
 				(cc != '[' && cc != ']') &&
-				(cc != ';' && cc != ','))
+				(cc != ';' && cc != ',' && cc != '.'))
 		{
 			STRAPPEND(content, contentlen, contenta, cc);
 			cc = nextchar(scanner);

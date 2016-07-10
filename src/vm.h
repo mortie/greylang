@@ -90,6 +90,7 @@ typedef struct l_vm_var_string
 typedef struct l_vm_var_error
 {
 	char* msg;
+	int line;
 } l_vm_var_error;
 
 l_vm_var* l_vm_error(l_vm* vm, char* str);
@@ -181,6 +182,13 @@ l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // read!
 l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
+// array.len
+l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+// array.push
+l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+// array.pop
+l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+
 // string.len
 l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 // string.sub
@@ -215,8 +223,10 @@ typedef struct l_vm
 {
 	l_vm_scope* global;
 
-	l_vm_map* proto_string;
 	l_vm_map* proto_array;
+	l_vm_map* proto_string;
+
+	int currLine;
 } l_vm;
 
 l_vm* l_vm_create();

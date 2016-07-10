@@ -34,6 +34,7 @@ l_vm_var_error* l_vm_var_error_create(l_vm* vm)
 {
 	l_vm_var_error* err = malloc(sizeof(l_vm_var_error));
 	err->msg = NULL;
+	err->line = vm->currLine;
 	return err;
 }
 
@@ -46,6 +47,7 @@ l_vm_var* l_vm_error(l_vm* vm, char* msg)
 	int len = strlen(msg);
 	err->msg = malloc(len);
 	memcpy(err->msg, msg, len);
+	err->line = vm->currLine;
 	return var;
 }
 

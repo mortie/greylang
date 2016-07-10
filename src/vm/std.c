@@ -398,12 +398,7 @@ l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	EXPECTTYPE(vm, VAR_TYPE_STRING, args->vars[0]);
 
 	l_vm_var_string* strvar =  args->vars[0]->var.string;
-
-	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_ERROR);
-	var->var.error = malloc(sizeof(l_vm_var_error));
-	char* msg = malloc(strvar->len + 1);
-	memcpy(msg, strvar->chars, strvar->len + 1);
-	var->var.error->msg = msg;
+	l_vm_var* var = l_vm_error(vm, strvar->chars);
 
 	return var;
 }
@@ -547,9 +542,58 @@ l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
+l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+{
+	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
+	EXPECTARGC(vm, 0, args);
+
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);
+	var->var.number = (double)self->var.array->len;
+	return var;
+}
+
+l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+{
+	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
+	EXPECTARGC(vm, 1, args);
+
+	l_vm_var_array* arr = self->var.array;
+	if (arr->allocd == 0)
+	{
+		arr->allocd = 8;
+		arr->vars = malloc(sizeof(l_vm_var*) * arr->allocd);
+	}
+	arr->len += 1;
+	if (arr->allocd < arr->len)
+	{
+		arr->allocd *= 2;
+		arr->vars = realloc(arr->vars, sizeof(l_vm_var) * arr->allocd);
+	}
+	arr->vars[arr->len - 1] = args->vars[0];
+
+	return l_vm_var_create(vm, VAR_TYPE_NONE);
+}
+
+l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+{
+	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
+	EXPECTARGC(vm, 0, args);
+
+	l_vm_var_array* arr = self->var.array;
+
+	if (arr->len == 0)
+		return l_vm_var_create(vm, VAR_TYPE_NONE);
+
+	l_vm_var* var = arr->vars[0];
+	arr->len -= 1;
+
+	return var;
+}
+
 l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 {
 	EXPECTTYPE(vm, VAR_TYPE_STRING, self);
+	EXPECTARGC(vm, 0, args);
 
 	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	var->var.number = (double)self->var.string->len;

@@ -292,6 +292,7 @@ typedef struct l_p_expr
 		l_p_expr_char_literal* char_literal;
 		l_p_expr_variable* variable;
 	} expression;
+	int line;
 	l_p_expr_type type;
 } l_p_expr;
 

@@ -7,6 +7,7 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	l_p_expr* expr = malloc(sizeof(l_p_expr));
 
 	l_token t = l_scanner_peek(stream);
+	expr->line = t.line;
 
 	/*
 	 * Empty

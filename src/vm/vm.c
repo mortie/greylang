@@ -7,6 +7,7 @@ l_vm* l_vm_create()
 	l_vm_scope* stdlib = l_vm_scope_create(NULL);
 
 	l_vm* vm = malloc(sizeof(l_vm));
+	vm->currLine = 0;
 	vm->global = l_vm_scope_create(stdlib);
 
 #define STD(str, ptr) \
@@ -62,14 +63,18 @@ l_vm* l_vm_create()
 		l_vm_map_set(obj, str, v); \
 	} while (0)
 
+	l_vm_map* proto_array = l_vm_map_create(NULL);
+	vm->proto_array = proto_array;
+
+	PROTO(proto_array, "push", &l_vm_std_array_push);
+	PROTO(proto_array, "pop", &l_vm_std_array_pop);
+	PROTO(proto_array, "len", &l_vm_std_array_len);
+
 	l_vm_map* proto_string = l_vm_map_create(NULL);
 	vm->proto_string = proto_string;
 
 	PROTO(proto_string, "len", &l_vm_std_string_len);
 	PROTO(proto_string, "sub", &l_vm_std_string_sub);
-
-	l_vm_map* proto_array = l_vm_map_create(NULL);
-	vm->proto_array = proto_array;
 
 #undef PROTO
 
