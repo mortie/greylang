@@ -9,138 +9,135 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	l_token t = l_scanner_peek(stream);
 	expr->line = t.line;
 
-	/*
-	 * Empty
-	 */
-	if (t.type == TOKEN_CLOSEPAREN ||
-			t.type == TOKEN_CLOSEBRACE ||
-			t.type == TOKEN_NONE)
+	// If there's a previous expression, and it's not expected, throw an error
+	if (prev != NULL && !(
+			(t.type == TOKEN_OPENPAREN) ||
+			(t.type == TOKEN_NAME) ||
+			(t.type == TOKEN_PERIOD) ||
+			(t.type == TOKEN_OPENBRACKET)))
 	{
-		expr->expression.empty = NULL;
-		expr->type = EXPR_EMPTY;
+		l_scanner_unexpecteda(NULL, 0, t, "expression");
 	}
+
+	t = l_scanner_peek(stream);
+	l_token next = l_scanner_peek2(stream);
+
+	/*
+	 * Func Call
+	 */
+	if (prev != NULL && t.type == TOKEN_OPENPAREN)
+	{
+		expr->expression.func_call =
+			l_parse_expr_func_call(stream, prev);
+		expr->type = EXPR_FUNC_CALL;
+	}
+
+	/*
+	 * Infix Func Call
+	 */
+	else if (prev != NULL && t.type == TOKEN_NAME)
+	{
+		expr->expression.func_call =
+			l_parse_expr_infix_func_call(stream, prev);
+		expr->type = EXPR_FUNC_CALL;
+	}
+
+	/*
+	 * Object Lookup
+	 */
+	else if (prev != NULL && t.type == TOKEN_PERIOD)
+	{
+		expr->expression.object_lookup =
+			l_parse_expr_object_lookup(stream, prev);
+		expr->type = EXPR_OBJECT_LOOKUP;
+	}
+
+	/*
+	 * Array Lookup
+	 */
+	else if (prev != NULL && t.type == TOKEN_OPENBRACKET)
+	{
+		expr->expression.array_lookup =
+			l_parse_expr_array_lookup(stream, prev);
+		expr->type = EXPR_ARRAY_LOOKUP;
+	}
+
+	/*
+	 * Assignment
+	 */
+	else if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
+	{
+		expr->expression.assignment =
+			l_parse_expr_assignment(stream);
+		expr->type = EXPR_ASSIGNMENT;
+	}
+
+	/*
+	 * Function
+	 */
+	else if (t.type == TOKEN_OPENBRACE)
+	{
+		expr->expression.function =
+			l_parse_expr_function(stream);
+		expr->type = EXPR_FUNCTION;
+	}
+
+	/*
+	 * Object Literal
+	 */
+	else if (t.type == TOKEN_HASHBRACE)
+	{
+		expr->expression.object_literal =
+			l_parse_expr_object_literal(stream);
+		expr->type = EXPR_OBJECT_LITERAL;
+	}
+
+	/*
+	 * Array Literal
+	 */
+	else if (t.type == TOKEN_OPENBRACKET)
+	{
+		expr->expression.array_literal =
+			l_parse_expr_array_literal(stream);
+		expr->type = EXPR_ARRAY_LITERAL;
+	}
+
+	/*
+	 * String Literal
+	 */
+	else if (t.type == TOKEN_STRING_LITERAL)
+	{
+		expr->expression.string_literal =
+			l_parse_expr_string_literal(stream);
+		expr->type = EXPR_STRING_LITERAL;
+	}
+
+	/*
+	 * Number Literal
+	 */
+	else if (t.type == TOKEN_NUM_LITERAL)
+	{
+		expr->expression.num_literal =
+			l_parse_expr_num_literal(stream);
+		expr->type = EXPR_NUM_LITERAL;
+	}
+
+	/*
+	 * Variable
+	 */
+	else if (t.type == TOKEN_NAME)
+	{
+		expr->expression.variable =
+			l_parse_expr_variable(stream);
+		expr->type = EXPR_VARIABLE;
+	}
+
+	/*
+	 * I dunno
+	 */
 	else
 	{
-		t = l_scanner_peek(stream);
-		l_token next = l_scanner_peek2(stream);
-
-		/*
-		 * Func Call
-		 */
-		if (prev != NULL && t.type == TOKEN_OPENPAREN)
-		{
-			expr->expression.func_call =
-				l_parse_expr_func_call(stream, prev);
-			expr->type = EXPR_FUNC_CALL;
-		}
-
-		/*
-		 * Infix Func Call
-		 */
-		else if (prev != NULL && t.type == TOKEN_NAME)
-		{
-			expr->expression.func_call =
-				l_parse_expr_infix_func_call(stream, prev);
-			expr->type = EXPR_FUNC_CALL;
-		}
-
-		/*
-		 * Object Lookup
-		 */
-		else if (prev != NULL && t.type == TOKEN_PERIOD)
-		{
-			expr->expression.object_lookup =
-				l_parse_expr_object_lookup(stream, prev);
-			expr->type = EXPR_OBJECT_LOOKUP;
-		}
-
-		/*
-		 * Array Lookup
-		 */
-		else if (prev != NULL && t.type == TOKEN_OPENBRACKET)
-		{
-			expr->expression.array_lookup =
-				l_parse_expr_array_lookup(stream, prev);
-			expr->type = EXPR_ARRAY_LOOKUP;
-		}
-
-		/*
-		 * Assignment
-		 */
-		else if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
-		{
-			expr->expression.assignment =
-				l_parse_expr_assignment(stream);
-			expr->type = EXPR_ASSIGNMENT;
-		}
-
-		/*
-		 * Function
-		 */
-		else if (t.type == TOKEN_OPENBRACE)
-		{
-			expr->expression.function =
-				l_parse_expr_function(stream);
-			expr->type = EXPR_FUNCTION;
-		}
-
-		/*
-		 * Object Literal
-		 */
-		else if (t.type == TOKEN_HASHBRACE)
-		{
-			expr->expression.object_literal =
-				l_parse_expr_object_literal(stream);
-			expr->type = EXPR_OBJECT_LITERAL;
-		}
-
-		/*
-		 * Array Literal
-		 */
-		else if (t.type == TOKEN_OPENBRACKET)
-		{
-			expr->expression.array_literal =
-				l_parse_expr_array_literal(stream);
-			expr->type = EXPR_ARRAY_LITERAL;
-		}
-
-		/*
-		 * String Literal
-		 */
-		else if (t.type == TOKEN_STRING_LITERAL)
-		{
-			expr->expression.string_literal =
-				l_parse_expr_string_literal(stream);
-			expr->type = EXPR_STRING_LITERAL;
-		}
-
-		/*
-		 * Number Literal
-		 */
-		else if (t.type == TOKEN_NUM_LITERAL)
-		{
-			expr->expression.num_literal =
-				l_parse_expr_num_literal(stream);
-			expr->type = EXPR_NUM_LITERAL;
-		}
-
-		/*
-		 * Variable
-		 */
-		else if (t.type == TOKEN_NAME)
-		{
-			expr->expression.variable =
-				l_parse_expr_variable(stream);
-			expr->type = EXPR_VARIABLE;
-		}
-
-		/*
-		 * I dunno
-		 */
-		else
-		{
-			l_scanner_unexpecteda(NULL, 0, t, "expression");
-		}
+		l_scanner_unexpecteda(NULL, 0, t, "expression");
 	}
 
 	t = l_scanner_peek(stream);

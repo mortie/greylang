@@ -26,20 +26,21 @@ l_p_expr_list* l_parse_expr_list(l_scanner* stream)
 		}
 		list->expressions[list->expressionc - 1] = expr;
 
-		/*
-		 * Continue (semicolon), stop (close brace or none), or error
-		 */
+		// Skip semicolon if it exists
 		l_token next = l_scanner_peek(stream);
+		l_token n = next;
 		if (next.type == TOKEN_SEMICOLON)
 		{
 			l_scanner_skip(stream, TOKEN_SEMICOLON, "expression list");
-			// Continue parsing expressions
+			next = l_scanner_peek(stream);
 		}
-		else if (next.type == TOKEN_CLOSEBRACE || next.type == TOKEN_NONE)
-		{
+
+		// Return if there's a none or a close brace
+		if (next.type == TOKEN_CLOSEBRACE || next.type == TOKEN_NONE)
 			return list;
-		}
-		else
+
+		// No semicolon and no close brace or none isn't accepted
+		if (n.type != TOKEN_SEMICOLON)
 		{
 			l_token_type expected[] = {
 				TOKEN_SEMICOLON,

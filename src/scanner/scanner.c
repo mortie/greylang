@@ -333,6 +333,9 @@ static l_token gettoken(l_scanner* scanner)
 			// .. should be legal in a name, but . should not
 			if (cc == '.' && prev != '.' && scanner->next != '.')
 				break;
+			// == should be legal in a name, but = should not
+			if (cc == '=' && prev != '=' && scanner->next != '=')
+				break;
 
 			STRAPPEND(content, contentlen, contenta, cc);
 			prev = cc;
