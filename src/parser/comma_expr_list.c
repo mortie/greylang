@@ -62,13 +62,7 @@ void l_pretty_comma_expr_list(
 	for (int i = 0; i < list->expressionc; ++i)
 	{
 		l_pretty_expr(list->expressions[i], depth, file);
-		if (i == list->expressionc - 1)
-		{
-			fprintf(file, "\n");
-		}
-		else
-		{
-			fprintf(file, ",\n");
-		}
+		if (i != list->expressionc - 1)
+			fprintf(file, ", ");
 	}
 }

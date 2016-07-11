@@ -85,6 +85,16 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 		}
 
 		/*
+		 * Object Literal
+		 */
+		else if (t.type == TOKEN_HASHBRACE)
+		{
+			expr->expression.object_literal =
+				l_parse_expr_object_literal(stream);
+			expr->type = EXPR_OBJECT_LITERAL;
+		}
+
+		/*
 		 * Array Literal
 		 */
 		else if (t.type == TOKEN_OPENBRACKET)
@@ -189,6 +199,11 @@ void l_pretty_expr(
 	case EXPR_FUNCTION:
 		l_pretty_expr_function(
 			expr->expression.function,
+			depth, file);
+		break;
+	case EXPR_OBJECT_LITERAL:
+		l_pretty_expr_object_literal(
+			expr->expression.object_literal,
 			depth, file);
 		break;
 	case EXPR_ARRAY_LITERAL:

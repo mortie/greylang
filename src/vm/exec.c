@@ -116,6 +116,21 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		return var;
 	}
+	case EXPR_OBJECT_LITERAL:
+	{
+		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_OBJECT);
+
+		for (int i = 0; i < expr->expression.object_literal->exprc; ++i)
+		{
+			char* name = expr->expression.object_literal->names[i];
+			l_vm_var* val = exec(vm, scope,
+				expr->expression.object_literal->exprs[i]);
+
+			l_vm_map_set(var->map, name, val);
+		}
+
+		return var;
+	}
 	case EXPR_ARRAY_LITERAL:
 	{
 		l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_ARRAY);

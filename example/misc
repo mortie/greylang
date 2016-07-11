@@ -2,11 +2,11 @@
 
 a = {(n, str)
 	repeat(n, {
-		print!( concat(str, ", iter: ", $1) );
+		print(str .. ", iter: " .. $1);
 	});
 };
 
-s = read!("What to print? ");
-n = tonumber(read!("How many times? "));
+s = read("What to print? ");
+n = tonumber(read("How many times? "));
 
 a(n, s);

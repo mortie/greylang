@@ -45,13 +45,12 @@ l_vm* l_vm_create()
 	STD("..", &l_vm_std_concat);
 
 	STD("error", &l_vm_std_error);
-
 	STD("type", &l_vm_std_type);
 
-	STD("loadc!", &l_vm_std_loadc);
+	STD("loadc", &l_vm_std_loadc);
 
-	STD("print!", &l_vm_std_print);
-	STD("read!", &l_vm_std_read);
+	STD("print", &l_vm_std_print);
+	STD("read", &l_vm_std_read);
 
 #undef STD
 #define PROTO(obj, str, ptr) \

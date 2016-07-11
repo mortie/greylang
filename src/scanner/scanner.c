@@ -246,6 +246,7 @@ static l_token gettoken(l_scanner* scanner)
 	{
 		SETTOKEN(TOKEN_HASHBRACE, "#{");
 		nextchar(scanner);
+		nextchar(scanner);
 	}
 
 	/*
@@ -321,13 +322,20 @@ static l_token gettoken(l_scanner* scanner)
 	 */
 	else
 	{
+		char prev = '\0';
 		char cc = c;
 		while (cc != EOF && !isspace(cc) &&
 				(cc != '(' && cc != ')') &&
 				(cc != '[' && cc != ']') &&
-				(cc != ';' && cc != ',' && cc != '.'))
+				(cc != ';' && cc != ':') &&
+				(cc != ','))
 		{
+			// .. should be legal in a name, but . should not
+			if (cc == '.' && prev != '.' && scanner->next != '.')
+				break;
+
 			STRAPPEND(content, contentlen, contenta, cc);
+			prev = cc;
 			cc = nextchar(scanner);
 		}
 

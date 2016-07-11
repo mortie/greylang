@@ -56,8 +56,12 @@ void l_pretty_expr_list(
 		int depth,
 		FILE* file)
 {
+	char* tabs;
+	P_TABS(depth, tabs);
+
 	for (int i = 0; i < list->expressionc; ++i)
 	{
+		fprintf(file, "%s", tabs);
 		l_pretty_expr(list->expressions[i], depth, file);
 		if (i == list->expressionc - 1)
 		{

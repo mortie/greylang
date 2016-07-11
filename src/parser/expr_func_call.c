@@ -28,7 +28,7 @@ void l_pretty_expr_func_call(
 	P_TABS(depth, tabs);
 
 	l_pretty_expr(expr->func, depth, file);
-	fprintf(file, "(\n");
-	l_pretty_comma_expr_list(expr->arg_list, depth + 1, file);
-	fprintf(file, "%s)", tabs);
+	fprintf(file, "(");
+	l_pretty_comma_expr_list(expr->arg_list, depth, file);
+	fprintf(file, ")");
 }

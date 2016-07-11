@@ -24,9 +24,6 @@ void l_pretty_expr_array_lookup(
 		int depth,
 		FILE* file)
 {
-	char* tabs;
-	P_TABS(depth, tabs);
-
 	l_pretty_expr(expr->arr, depth, file);
 	fprintf(file, "[");
 	l_pretty_expr(expr->key, 0, file);

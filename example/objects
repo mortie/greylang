@@ -1,0 +1,19 @@
+#!/usr/bin/env grey
+
+// Simple object
+obj = #{
+	foo: "bar",
+	baz: 100
+};
+
+print(obj.foo); // Prints "bar"
+
+// Functions in objects have a 'self' variable
+obj2 = #{
+	foo: "bar",
+	func: {
+		print(self.foo);
+	}
+};
+
+obj2.func(); // Prints "bar"

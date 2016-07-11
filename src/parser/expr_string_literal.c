@@ -18,7 +18,5 @@ void l_pretty_expr_string_literal(
 		int depth,
 		FILE* file)
 {
-	char* tabs;
-	P_TABS(depth, tabs);
-	fprintf(file, "%s\"%s\"", tabs, expr->string);
+	fprintf(file, "\"%s\"", expr->string);
 }

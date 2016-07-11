@@ -44,14 +44,15 @@ void l_pretty_expr_function(
 	char* tabs;
 	P_TABS(depth, tabs);
 
-	fprintf(file, "%s{\n", tabs);
+	fprintf(file, "{");
 
 	if (expr->arg_definition != NULL)
 	{
-		fprintf(file, "%s\t(", tabs);
+		fprintf(file, "(");
 		l_pretty_arg_definition(expr->arg_definition, 0, file);
-		fprintf(file, ")\n");
+		fprintf(file, ")");
 	}
+	fprintf(file, "\n");
 
 	l_pretty_expr_list(expr->expr_list, depth + 1, file);
 

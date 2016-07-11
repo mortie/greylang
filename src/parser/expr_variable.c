@@ -17,7 +17,5 @@ void l_pretty_expr_variable(
 		int depth,
 		FILE* file)
 {
-	char* tabs;
-	P_TABS(depth, tabs);
-	fprintf(file, "%s%s", tabs, expr->name);
+	fprintf(file, "%s", expr->name);
 }

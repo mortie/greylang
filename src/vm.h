@@ -168,16 +168,15 @@ l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 // error
 l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
-
 // type
 l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
-// loadc!
+// loadc
 l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
-// print!
+// print
 l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
-// read!
+// read
 l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
 
 // array.len

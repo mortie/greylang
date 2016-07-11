@@ -24,8 +24,6 @@ void l_pretty_expr_assignment(
 		int depth,
 		FILE* file)
 {
-	char* tabs;
-	P_TABS(depth, tabs);
-	fprintf(file, "%s%s = ", tabs, expr->name);
-	l_pretty_expr(expr->expression, 0, file);
+	fprintf(file, "%s = ", expr->name);
+	l_pretty_expr(expr->expression, depth, file);
 }

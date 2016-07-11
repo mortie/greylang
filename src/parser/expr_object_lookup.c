@@ -22,9 +22,6 @@ void l_pretty_expr_object_lookup(
 		int depth,
 		FILE* file)
 {
-	char* tabs;
-	P_TABS(depth, tabs);
-
 	l_pretty_expr(expr->obj, depth, file);
 	fprintf(file, ".%s", expr->key);
 }

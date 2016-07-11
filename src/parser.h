@@ -52,6 +52,7 @@ typedef enum l_p_expr_type
 	EXPR_ARRAY_LOOKUP,
 	EXPR_ASSIGNMENT,
 	EXPR_FUNCTION,
+	EXPR_OBJECT_LITERAL,
 	EXPR_ARRAY_LITERAL,
 	EXPR_STRING_LITERAL,
 	EXPR_NUM_LITERAL,
@@ -192,6 +193,24 @@ void l_pretty_expr_function(
 		FILE* file);
 
 /*
+ * Object Literal Expression
+ */
+
+typedef struct l_p_expr_object_literal
+{
+	char** names;
+	l_p_expr** exprs;
+	int exprc;
+} l_p_expr_object_literal;
+
+l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream);
+
+void l_pretty_expr_object_literal(
+		l_p_expr_object_literal* expr,
+		int depth,
+		FILE* file);
+
+/*
  * Array Literal Expression
  */
 
@@ -269,6 +288,7 @@ typedef struct l_p_expr
 		l_p_expr_array_lookup* array_lookup;
 		l_p_expr_assignment* assignment;
 		l_p_expr_function* function;
+		l_p_expr_object_literal* object_literal;
 		l_p_expr_array_literal* array_literal;
 		l_p_expr_num_literal* num_literal;
 		l_p_expr_string_literal* string_literal;

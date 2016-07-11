@@ -9,7 +9,6 @@
 
 enum opr_type
 {
-	OPR_REPL,
 	OPR_EXEC,
 	OPR_PRETTY
 };
@@ -64,7 +63,10 @@ static int pretty(FILE* f)
 
 int main(int argc, char** argv)
 {
-	enum opr_type opr = OPR_REPL;
+	if (argc == 1)
+		return repl();
+
+	enum opr_type opr = OPR_EXEC;
 	char* file = NULL;
 
 	int errors = 0;
@@ -74,7 +76,6 @@ int main(int argc, char** argv)
 
 		if (strcmp(arg, "-") == 0)
 		{
-			opr = OPR_EXEC;
 			file = "-";
 		}
 		else if (arg[0] == '-')
@@ -93,46 +94,38 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			opr = OPR_EXEC;
 			file = arg;
 		}
 	}
 
-	if (opr == OPR_REPL)
+	if (file == NULL) errors = 1;
+
+	if (errors)
 	{
-		return repl();
+		usage(argv[0]);
+		return 1;
+	}
+
+	// Get file
+	FILE* f;
+	if (strcmp(file, "-") == 0)
+	{
+		f = stdin;
 	}
 	else
 	{
-		if (file == NULL) errors = 1;
-
-		if (errors)
-		{
-			usage(argv[0]);
-			return 1;
-		}
-
-		// Get file
-		FILE* f;
-		if (strcmp(file, "-") == 0)
-		{
-			f = stdin;
-		}
-		else
-		{
-			f = fopen(file, "r");
-		}
-
-		// Error if file is invalid
-		if (f == NULL)
-		{
-			perror("hello");
-			exit(1);
-		}
-
-		if (opr == OPR_EXEC)
-			return exec(f);
-		else if (opr == OPR_PRETTY)
-			return pretty(f);
+		f = fopen(file, "r");
 	}
+
+	// Error if file is invalid
+	if (f == NULL)
+	{
+		perror("hello");
+		exit(1);
+	}
+
+	if (opr == OPR_EXEC)
+		return exec(f);
+	else if (opr == OPR_PRETTY)
+		return pretty(f);
 }

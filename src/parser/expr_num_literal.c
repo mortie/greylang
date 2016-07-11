@@ -17,7 +17,5 @@ void l_pretty_expr_num_literal(
 		int depth,
 		FILE* file)
 {
-	char* tabs;
-	P_TABS(depth, tabs);
-	fprintf(file, "%s%f", tabs, expr->number);
+	fprintf(file, "%f", expr->number);
 }

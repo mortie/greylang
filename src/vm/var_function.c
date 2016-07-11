@@ -13,6 +13,7 @@ l_vm_var_function* l_vm_var_function_create(
 	func->scope = scope;
 	func->argnames = NULL;
 	func->argnamec = 0;
+	func->self = NULL;
 
 	return func;
 }
@@ -72,9 +73,7 @@ l_vm_var* l_vm_var_function_exec(
 		// Define self
 		if (func->self != NULL)
 		{
-			l_vm_var* self = l_vm_var_create(vm, VAR_TYPE_OBJECT);
-			self->var.object = func->self->var.object;
-			l_vm_scope_define(scope, "self", self);
+			l_vm_scope_define(scope, "self", func->self);
 		}
 
 		ret = l_vm_exec(vm, scope, func->expressions, func->expressionc);

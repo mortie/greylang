@@ -7,7 +7,7 @@ This is grey-lang, my project to create a language.
 ### Example
 
 	a = {(n, str)
-		repeat(n, { print!(str) });
+		repeat(n, { print(str) });
 	};
 
 	a(10, "Hello World");
