@@ -2,19 +2,18 @@
 
 #include <stdlib.h>
 
-l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream)
+l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream, l_p_expr* key)
 {
 	l_p_expr_assignment* expr = malloc(sizeof(l_p_expr_assignment));
 
-	// name
-	l_token name = l_scanner_expect(stream, TOKEN_NAME, "assignment");
-	expr->name = name.content;
+	// key
+	expr->key = key;
 
 	// =
 	l_scanner_skip(stream, TOKEN_EQUALS, "assignment");
 
-	// expression
-	expr->expression = l_parse_expr(stream);
+	// val
+	expr->val = l_parse_expr(stream);
 
 	return expr;
 }
@@ -24,6 +23,7 @@ void l_pretty_expr_assignment(
 		int depth,
 		FILE* file)
 {
-	fprintf(file, "%s = ", expr->name);
-	l_pretty_expr(expr->expression, depth, file);
+	l_pretty_expr(expr->key, depth, file);
+	fprintf(file, " = ");
+	l_pretty_expr(expr->val, depth, file);
 }

@@ -86,14 +86,56 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		if (k >= a->len)
 			return l_vm_var_create(vm, VAR_TYPE_NONE);
-		printf("arr index %i\n", k);
 
 		return a->vars[k];
 	}
 	case EXPR_ASSIGNMENT:
 	{
-		l_vm_var* var = exec(vm, scope, expr->expression.assignment->expression);
-		l_vm_scope_set(scope, expr->expression.assignment->name, var);
+		l_vm_var* var = exec(vm, scope, expr->expression.assignment->val);
+
+		l_p_expr* key = expr->expression.assignment->key;
+		switch (key->type)
+		{
+		case EXPR_OBJECT_LOOKUP:
+		{
+			l_vm_var* obj = exec(vm, scope, key->expression.object_lookup->obj);
+			char* okey = key->expression.object_lookup->key;
+			l_vm_map_set(obj->map, okey, var);
+
+			break;
+		}
+		case EXPR_ARRAY_LOOKUP:
+		{
+			l_vm_var* arr = exec(vm, scope, key->expression.array_lookup->arr);
+			l_vm_var* akey = exec(vm, scope, key->expression.array_lookup->key);
+
+			if (arr->type != VAR_TYPE_ARRAY)
+			{
+				return l_vm_error_type(vm, VAR_TYPE_ARRAY, arr->type);
+			}
+			if (akey->type != VAR_TYPE_NUMBER)
+			{
+				return l_vm_error_type(vm, VAR_TYPE_NUMBER, akey->type);
+			}
+
+			l_vm_var_array* a = arr->var.array;
+			int k = (int)akey->var.number;
+			l_vm_var_array_resize(vm, a, k + 1);
+
+			a->vars[k] = var;
+
+			break;
+		}
+		case EXPR_VARIABLE:
+		{
+			l_vm_scope_set(scope, key->expression.variable->name, var);
+
+			break;
+		}
+		default:
+			return l_vm_error(vm, "Invalid assignment");
+		}
+
 		return var;
 	}
 	case EXPR_FUNCTION:

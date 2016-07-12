@@ -182,11 +182,11 @@ void l_pretty_expr_array_lookup(
 
 typedef struct l_p_expr_assignment
 {
-	char* name;
-	l_p_expr* expression;
+	l_p_expr* key;
+	l_p_expr* val;
 } l_p_expr_assignment;
 
-l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream);
+l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream, l_p_expr* key);
 
 void l_pretty_expr_assignment(
 		l_p_expr_assignment* expr,

@@ -13,13 +13,14 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	if (prev != NULL && !(
 			(t.type == TOKEN_NAME) ||
 			(t.type == TOKEN_PERIOD) ||
+			(t.type == TOKEN_EQUALS) ||
+			(t.type == TOKEN_OPENPAREN) ||
 			(t.type == TOKEN_OPENBRACKET)))
 	{
 		l_scanner_unexpecteda(NULL, 0, t, "expression");
 	}
 
 	t = l_scanner_peek(stream);
-	l_token next = l_scanner_peek2(stream);
 
 	/*
 	 * Expression Group
@@ -75,10 +76,10 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	/*
 	 * Assignment
 	 */
-	else if (t.type == TOKEN_NAME && next.type == TOKEN_EQUALS)
+	else if (prev != NULL && t.type == TOKEN_EQUALS)
 	{
 		expr->expression.assignment =
-			l_parse_expr_assignment(stream);
+			l_parse_expr_assignment(stream, prev);
 		expr->type = EXPR_ASSIGNMENT;
 	}
 

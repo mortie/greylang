@@ -61,6 +61,8 @@ typedef struct l_vm_var_array
 	int allocd;
 } l_vm_var_array;
 
+void l_vm_var_array_resize(l_vm* vm, l_vm_var_array* arr, int nwsize);
+
 typedef struct l_vm_var_function
 {
 	l_vm_var* (*fptr)(l_vm* vm, l_vm_var*, l_vm_var_array*);
