@@ -11,7 +11,6 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 
 	// If there's a previous expression, and it's not expected, throw an error
 	if (prev != NULL && !(
-			(t.type == TOKEN_OPENPAREN) ||
 			(t.type == TOKEN_NAME) ||
 			(t.type == TOKEN_PERIOD) ||
 			(t.type == TOKEN_OPENBRACKET)))
@@ -23,9 +22,20 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	l_token next = l_scanner_peek2(stream);
 
 	/*
+	 * Expression Group
+	 */
+
+	if (prev == NULL && t.type == TOKEN_OPENPAREN)
+	{
+		expr->expression.expr_group =
+			l_parse_expr_group(stream);
+		expr->type = EXPR_GROUP;
+	}
+
+	/*
 	 * Func Call
 	 */
-	if (prev != NULL && t.type == TOKEN_OPENPAREN)
+	else if (prev != NULL && t.type == TOKEN_OPENPAREN)
 	{
 		expr->expression.func_call =
 			l_parse_expr_func_call(stream, prev);
@@ -173,9 +183,9 @@ void l_pretty_expr(
 		l_pretty_expr_empty(
 			depth, file);
 		break;
-	case EXPR_ASSIGNMENT:
-		l_pretty_expr_assignment(
-			expr->expression.assignment,
+	case EXPR_GROUP:
+		l_pretty_expr_group(
+			expr->expression.expr_group,
 			depth, file);
 		break;
 	case EXPR_FUNC_CALL:
@@ -191,6 +201,11 @@ void l_pretty_expr(
 	case EXPR_ARRAY_LOOKUP:
 		l_pretty_expr_array_lookup(
 			expr->expression.array_lookup,
+			depth, file);
+		break;
+	case EXPR_ASSIGNMENT:
+		l_pretty_expr_assignment(
+			expr->expression.assignment,
 			depth, file);
 		break;
 	case EXPR_FUNCTION:

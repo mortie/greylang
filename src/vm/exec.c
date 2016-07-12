@@ -5,18 +5,16 @@
 static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 {
 	vm->currLine = expr->line;
-	
+
 	switch (expr->type)
 	{
 	case EXPR_EMPTY:
 	{
 		return l_vm_var_create(vm, VAR_TYPE_NONE);
 	}
-	case EXPR_ASSIGNMENT:
+	case EXPR_GROUP:
 	{
-		l_vm_var* var = exec(vm, scope, expr->expression.assignment->expression);
-		l_vm_scope_set(scope, expr->expression.assignment->name, var);
-		return var;
+		return exec(vm, scope, expr->expression.expr_group->expr);
 	}
 	case EXPR_FUNC_CALL:
 	{
@@ -91,6 +89,12 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 		printf("arr index %i\n", k);
 
 		return a->vars[k];
+	}
+	case EXPR_ASSIGNMENT:
+	{
+		l_vm_var* var = exec(vm, scope, expr->expression.assignment->expression);
+		l_vm_scope_set(scope, expr->expression.assignment->name, var);
+		return var;
 	}
 	case EXPR_FUNCTION:
 	{

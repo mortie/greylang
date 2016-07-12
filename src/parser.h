@@ -47,6 +47,7 @@ typedef struct l_p_expr l_p_expr;
 typedef enum l_p_expr_type
 {
 	EXPR_EMPTY,
+	EXPR_GROUP,
 	EXPR_FUNC_CALL,
 	EXPR_OBJECT_LOOKUP,
 	EXPR_ARRAY_LOOKUP,
@@ -100,6 +101,23 @@ void l_pretty_comma_expr_list(
 typedef struct l_p_expr_empty l_p_expr_empty;
 
 void l_pretty_expr_empty(int depth, FILE* file);
+
+/*
+ * Expression Group Expression
+ */
+
+typedef struct l_p_expr_group
+{
+	l_p_expr* expr;
+} l_p_expr_group;
+
+l_p_expr_group* l_parse_expr_group(l_scanner* stream);
+
+void l_pretty_expr_group(
+		l_p_expr_group* expr,
+		int depth,
+		FILE* file);
+
 
 /*
  * Function Call Expression
@@ -283,6 +301,7 @@ typedef struct l_p_expr
 	union expression
 	{
 		l_p_expr_empty* empty;
+		l_p_expr_group* expr_group;
 		l_p_expr_func_call* func_call;
 		l_p_expr_object_lookup* object_lookup;
 		l_p_expr_array_lookup* array_lookup;
