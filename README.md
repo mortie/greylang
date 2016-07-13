@@ -21,7 +21,7 @@ contents of `str` when called.
 
 	%of = {(x, y)
 		y * (x / 100)
-	}
+	};
 
 	print(10 %of 250) // Prints 25
 
