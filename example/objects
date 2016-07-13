@@ -17,3 +17,7 @@ obj2 = #{
 };
 
 obj2.func(); // Prints "bar"
+
+// We can modify objects:
+obj2.foo = "baz";
+obj2.func() // Prints "baz"
