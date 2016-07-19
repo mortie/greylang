@@ -29,5 +29,5 @@ but looks a lot better.
 
 # Docs
 
-* [https://github.com/mortie/greylang/blob/master/syntax.md](Syntax Overview)
-* [https://github.com/mortie/greylang/blob/master/stdlib.md](Standard Library)
+* [Syntax Overview](https://github.com/mortie/greylang/blob/master/syntax.md)
+* [Standard Library](https://github.com/mortie/greylang/blob/master/stdlib.md)
