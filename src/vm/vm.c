@@ -35,7 +35,8 @@ l_vm* l_vm_create()
 	STD(">=", &l_vm_std_gteq);
 	STD("<=", &l_vm_std_lteq);
 	STD("and", &l_vm_std_and);
-	STD("or", &l_vm_std_or);
+	STD("&&", &l_vm_std_and);
+	STD("||", &l_vm_std_or);
 	STD("if", &l_vm_std_if);
 	STD("repeat", &l_vm_std_repeat);
 	STD("map", &l_vm_std_map);
@@ -65,9 +66,9 @@ l_vm* l_vm_create()
 	l_vm_map* proto_array = l_vm_map_create(NULL);
 	vm->proto_array = proto_array;
 
+	PROTO(proto_array, "len", &l_vm_std_array_len);
 	PROTO(proto_array, "push", &l_vm_std_array_push);
 	PROTO(proto_array, "pop", &l_vm_std_array_pop);
-	PROTO(proto_array, "len", &l_vm_std_array_len);
 
 	l_vm_map* proto_string = l_vm_map_create(NULL);
 	vm->proto_string = proto_string;
