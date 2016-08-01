@@ -65,7 +65,7 @@ void l_vm_var_array_resize(l_vm* vm, l_vm_var_array* arr, int nwsize);
 
 typedef struct l_vm_var_function
 {
-	l_vm_var* (*fptr)(l_vm* vm, l_vm_var*, l_vm_var_array*);
+	l_vm_var* (*fptr)(l_vm* vm, l_vm_var*, l_vm_var_array*, int infix);
 
 	l_p_expr** expressions;
 	int expressionc;
@@ -80,7 +80,8 @@ l_vm_var_function* l_vm_var_function_create(l_vm_scope* scope);
 l_vm_var* l_vm_var_function_exec(
 		l_vm* vm,
 		l_vm_var_function* func,
-		l_vm_var_array* args);
+		l_vm_var_array* args,
+		int infix);
 
 typedef struct l_vm_var_string
 {
@@ -130,68 +131,68 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
  */
 
 // +
-l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // -
-l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // *
-l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // /
-l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // ^
-l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // ==
-l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // !=
-l_vm_var* l_vm_std_neq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_neq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // >
-l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // <
-l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // >=
-l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // <=
-l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // and
-l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // or
-l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // if
-l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // repeat
-l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // map
-l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // tostring
-l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // tonumber
-l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // concat ..
-l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // error
-l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // type
-l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // loadc
-l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // print
-l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // read
-l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // array.len
-l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // array.push
-l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // array.pop
-l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // string.len
-l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // string.sub
-l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args);
+l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 /*
  * Scope

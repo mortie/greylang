@@ -60,7 +60,9 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 		args->len = exprs->expressionc;
 		args->allocd = exprs->expressionc;
 
-		l_vm_var* res = l_vm_var_function_exec(vm, func->var.function, args);
+		int infix = expr->expression.func_call->infix;
+
+		l_vm_var* res = l_vm_var_function_exec(vm, func->var.function, args, infix);
 
 		free(args);
 		return res;

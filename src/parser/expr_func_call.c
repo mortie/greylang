@@ -5,6 +5,7 @@
 l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func)
 {
 	l_p_expr_func_call* expr = malloc(sizeof(l_p_expr_func_call));
+	expr->infix = 0;
 	expr->func = func;
 
 	// (

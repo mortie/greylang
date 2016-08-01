@@ -10,22 +10,29 @@
 	do { \
 		if (var->type == VAR_TYPE_ERROR) \
 			return var; \
-	} while(0);
+	} while(0)
 
 #define EXPECTTYPE(vm, expected, var) \
 	do { \
 		RETIFERR(var); \
 		if (var->type != expected) \
 			return l_vm_error_type(vm, expected, var->type); \
-	} while(0);
+	} while(0)
 
 #define EXPECTARGC(vm, expected, args) \
 	do { \
 		if (args->len != expected) \
 			return l_vm_error_argc(vm, expected, args->len); \
-	} while(0);
+	} while(0)
 
-l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+#define SWAP(a, b) \
+	do { \
+		l_vm_var* tmp = b; \
+		b = a; \
+		a = tmp; \
+	} while(0)
+
+l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* a = args->vars[0];
@@ -38,7 +45,7 @@ l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* a = args->vars[0];
@@ -51,7 +58,7 @@ l_vm_var* l_vm_std_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* a = args->vars[0];
@@ -64,7 +71,7 @@ l_vm_var* l_vm_std_mul(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* a = args->vars[0];
@@ -77,7 +84,7 @@ l_vm_var* l_vm_std_div(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* a = args->vars[0];
@@ -90,7 +97,7 @@ l_vm_var* l_vm_std_pow(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -109,14 +116,14 @@ l_vm_var* l_vm_std_eq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_neq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_neq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
-	l_vm_var* v = l_vm_std_eq(vm, self, args);
+	l_vm_var* v = l_vm_std_eq(vm, self, args, infix);
 	v->var.boolean = !v->var.boolean;
 	return v;
 }
 
-l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -140,7 +147,7 @@ l_vm_var* l_vm_std_gt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -164,7 +171,7 @@ l_vm_var* l_vm_std_lt(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -188,7 +195,7 @@ l_vm_var* l_vm_std_gteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -212,7 +219,7 @@ l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -231,7 +238,7 @@ l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	if (args->len < 2)
 		EXPECTARGC(vm, 2, args);
@@ -250,27 +257,31 @@ l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* cond = args->vars[0];
 	l_vm_var* func = args->vars[1];
+	if (infix)
+		SWAP(cond, func);
 	EXPECTTYPE(vm, VAR_TYPE_BOOL, cond);
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
 
 	if (cond->var.boolean)
 	{
-		l_vm_var_function_exec(vm, func->var.function, NULL);
+		l_vm_var_function_exec(vm, func->var.function, NULL, 0);
 	}
 
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
-l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* num = args->vars[0];
 	l_vm_var* func = args->vars[1];
+	if (infix)
+		SWAP(num, func);
 	EXPECTTYPE(vm, VAR_TYPE_NUMBER, num);
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
 
@@ -285,7 +296,7 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	for (int i = 0; i < n; ++i)
 	{
 		tmp->var.number = (double)i;
-		l_vm_var_function_exec(vm, func->var.function, arr);
+		l_vm_var_function_exec(vm, func->var.function, arr, 0);
 	}
 
 	free(arr->vars);
@@ -295,7 +306,7 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
-l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* arr = args->vars[0];
@@ -319,7 +330,7 @@ l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	{
 		arguments->vars[0] = a->vars[i];
 		res->vars[i] =
-			l_vm_var_function_exec(vm, func->var.function, arguments);
+			l_vm_var_function_exec(vm, func->var.function, arguments, 0);
 	}
 
 	free(arguments->vars);
@@ -330,7 +341,7 @@ l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return v;
 }
 
-l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 1, args);
 	l_vm_var* arg = args->vars[0];
@@ -347,7 +358,7 @@ l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 1, args);
 	l_vm_var* arg = args->vars[0];
@@ -359,7 +370,7 @@ l_vm_var* l_vm_std_tonumber(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	char** strs = malloc(sizeof(char*) * args->len);
 
@@ -392,7 +403,7 @@ l_vm_var* l_vm_std_concat(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 1, args);
 	EXPECTTYPE(vm, VAR_TYPE_STRING, args->vars[0]);
@@ -403,7 +414,7 @@ l_vm_var* l_vm_std_error(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 1, args);
 	RETIFERR(args->vars[0]);
@@ -445,7 +456,7 @@ l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
 	l_vm_var* vsymbol = args->vars[0];
@@ -465,7 +476,7 @@ static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return (*fptr)(vm, fargs);
 }
 
-l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 1, args);
 	l_vm_var* arg = args->vars[0];
@@ -497,7 +508,7 @@ l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	for (int i = 0; i < args->len; ++i)
 	{
@@ -509,7 +520,7 @@ l_vm_var* l_vm_std_print(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
-l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	char* prompt;
 	if (args->len == 0)
@@ -539,7 +550,7 @@ l_vm_var* l_vm_std_read(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
 	EXPECTARGC(vm, 0, args);
@@ -549,7 +560,7 @@ l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
 	EXPECTARGC(vm, 1, args);
@@ -571,7 +582,7 @@ l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
-l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
 	EXPECTARGC(vm, 0, args);
@@ -587,7 +598,7 @@ l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTTYPE(vm, VAR_TYPE_STRING, self);
 	EXPECTARGC(vm, 0, args);
@@ -597,7 +608,7 @@ l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
 	return var;
 }
 
-l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args)
+l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTTYPE(vm, VAR_TYPE_STRING, self);
 	if (args->len < 1 || args->len < 2)

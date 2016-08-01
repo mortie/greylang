@@ -21,7 +21,8 @@ l_vm_var_function* l_vm_var_function_create(
 l_vm_var* l_vm_var_function_exec(
 		l_vm* vm,
 		l_vm_var_function* func,
-		l_vm_var_array* args)
+		l_vm_var_array* args,
+		int infix)
 {
 	int fakeargs = 0;
 	if (args == NULL)
@@ -38,7 +39,7 @@ l_vm_var* l_vm_var_function_exec(
 	// Function from function pointer
 	if (func->fptr != NULL)
 	{
-		ret = (*func->fptr)(vm, func->self, args);
+		ret = (*func->fptr)(vm, func->self, args, infix);
 	}
 
 	// Function defined in language

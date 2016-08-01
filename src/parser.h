@@ -127,6 +127,7 @@ typedef struct l_p_expr_func_call
 {
 	l_p_expr* func;
 	l_p_comma_expr_list* arg_list;
+	int infix;
 } l_p_expr_func_call;
 
 l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func);

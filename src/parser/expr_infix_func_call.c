@@ -5,6 +5,7 @@
 l_p_expr_func_call* l_parse_expr_infix_func_call(l_scanner* stream, l_p_expr* val1)
 {
 	l_p_expr_func_call* expr = malloc(sizeof(l_p_expr_func_call));
+	expr->infix = 1;
 
 	expr->arg_list = malloc(sizeof(l_p_comma_expr_list));
 	expr->arg_list->expressionc = 2;
