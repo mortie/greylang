@@ -2,6 +2,7 @@ CC = gcc
 CFLAGS = -Wall -lm -lreadline -ldl
 CFLAGS-BLD = -O3
 CFLAGS-DBG = -g -DDEBUG
+PREFIX = /usr/local/bin
 
 TARGET = grey
 
@@ -12,7 +13,7 @@ debug:
 	$(CC) $(CFLAGS) $(CFLAGS-DBG) -o $(TARGET) $(shell find src -name '*.c')
 
 install:
-	mv $(TARGET) /usr/local/bin/$(TARGET)
+	mv $(TARGET) $(PREFIX)/$(TARGET)
 
-uninstall:
-	rm /usr/local/bin/$(TARGET)
+clean:
+	rm $(TARGET)

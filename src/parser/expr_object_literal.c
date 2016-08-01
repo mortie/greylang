@@ -18,7 +18,16 @@ l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
 	while (t.type != TOKEN_CLOSEBRACE)
 	{
 		// name
-		l_token name = l_scanner_expect(stream, TOKEN_NAME, "object literal");
+		l_token namet = l_scanner_next(stream);
+		if (namet.type != TOKEN_NAME && namet.type != TOKEN_STRING_LITERAL)
+		{
+			l_token_type expected[] = {
+				TOKEN_NAME,
+				TOKEN_STRING_LITERAL
+			};
+			l_scanner_unexpecteda(expected, 2, namet, "object literal");
+		}
+		char* name = namet.content;
 
 		// :
 		l_scanner_skip(stream, TOKEN_COLON, "object literal");
@@ -39,7 +48,7 @@ l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
 			expr->names = realloc(expr->names, sizeof(char*) * allocd);
 			expr->exprs = realloc(expr->names, sizeof(l_p_expr*) * allocd);
 		}
-		expr->names[expr->exprc - 1] = name.content;
+		expr->names[expr->exprc - 1] = name;
 		expr->exprs[expr->exprc - 1] = val;
 
 		t = l_scanner_peek(stream);

@@ -2,6 +2,28 @@
 
 #include <stdlib.h>
 
+static l_vm_var* object_lookup(l_vm* vm, l_vm_var* obj, char* key)
+{
+	l_vm_var* v = l_vm_map_lookup(obj->map, key);
+
+	if (v == NULL)
+		return l_vm_var_create(vm, VAR_TYPE_NONE);
+
+	if (v->type == VAR_TYPE_FUNCTION)
+	{
+		l_vm_var_function* func = l_vm_var_function_create(v->var.function->scope);
+		func->fptr = v->var.function->fptr;
+		func->expressions = v->var.function->expressions;
+		func->expressionc = v->var.function->expressionc;
+		func->argnames = v->var.function->argnames;
+		func->argnamec = v->var.function->argnamec;
+		func->self = obj;
+		v->var.function = func;
+	}
+
+	return v;
+}
+
 static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 {
 	vm->currLine = expr->line;
@@ -48,46 +70,35 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 		l_vm_var* obj = exec(vm, scope, expr->expression.object_lookup->obj);
 		char* key = expr->expression.object_lookup->key;
 
-		l_vm_var* v = l_vm_map_lookup(obj->map, key);
-
-		if (v == NULL)
-			return l_vm_var_create(vm, VAR_TYPE_NONE);
-
-		if (v->type == VAR_TYPE_FUNCTION)
-		{
-			l_vm_var_function* func = l_vm_var_function_create(v->var.function->scope);
-			func->fptr = v->var.function->fptr;
-			func->expressions = v->var.function->expressions;
-			func->expressionc = v->var.function->expressionc;
-			func->argnames = v->var.function->argnames;
-			func->argnamec = v->var.function->argnamec;
-			func->self = obj;
-			v->var.function = func;
-		}
-
-		return v;
+		return object_lookup(vm, obj, key);
 	}
 	case EXPR_ARRAY_LOOKUP:
 	{
 		l_vm_var* arr = exec(vm, scope, expr->expression.array_lookup->arr);
 		l_vm_var* key = exec(vm, scope, expr->expression.array_lookup->key);
 
-		if (arr->type != VAR_TYPE_ARRAY)
+		if (arr->type == VAR_TYPE_ARRAY && key->type == VAR_TYPE_NUMBER)
 		{
-			return l_vm_error_type(vm, VAR_TYPE_ARRAY, arr->type);
+			l_vm_var_array* a = arr->var.array;
+			int k = (int)key->var.number;
+
+			if (k >= a->len)
+				return l_vm_var_create(vm, VAR_TYPE_NONE);
+
+			l_vm_var* var = a->vars[k];
+			if (var == NULL)
+				return l_vm_var_create(vm, VAR_TYPE_NONE);
+			else
+				return var;
 		}
-		if (key->type != VAR_TYPE_NUMBER)
+		else if (key->type == VAR_TYPE_STRING)
 		{
-			return l_vm_error_type(vm, VAR_TYPE_NUMBER, key->type);
+			return object_lookup(vm, arr, key->var.string->chars);
 		}
-
-		l_vm_var_array* a = arr->var.array;
-		int k = (int)key->var.number;
-
-		if (k >= a->len)
-			return l_vm_var_create(vm, VAR_TYPE_NONE);
-
-		return a->vars[k];
+		else
+		{
+			return l_vm_error(vm, "Invalid array lookup");
+		}
 	}
 	case EXPR_ASSIGNMENT:
 	{
@@ -109,20 +120,22 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 			l_vm_var* arr = exec(vm, scope, key->expression.array_lookup->arr);
 			l_vm_var* akey = exec(vm, scope, key->expression.array_lookup->key);
 
-			if (arr->type != VAR_TYPE_ARRAY)
+			if (arr->type == VAR_TYPE_ARRAY && akey->type == VAR_TYPE_NUMBER)
 			{
-				return l_vm_error_type(vm, VAR_TYPE_ARRAY, arr->type);
+				l_vm_var_array* a = arr->var.array;
+				int k = (int)akey->var.number;
+				l_vm_var_array_resize(vm, a, k + 1);
+
+				a->vars[k] = var;
 			}
-			if (akey->type != VAR_TYPE_NUMBER)
+			else if (akey->type == VAR_TYPE_STRING)
 			{
-				return l_vm_error_type(vm, VAR_TYPE_NUMBER, akey->type);
+				l_vm_map_set(arr->map, akey->var.string->chars, var);
 			}
-
-			l_vm_var_array* a = arr->var.array;
-			int k = (int)akey->var.number;
-			l_vm_var_array_resize(vm, a, k + 1);
-
-			a->vars[k] = var;
+			else
+			{
+				return l_vm_error(vm, "Invalid assignment");
+			}
 
 			break;
 		}
