@@ -269,7 +269,8 @@ l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 
 	if (cond->var.boolean)
 	{
-		l_vm_var_function_exec(vm, func->var.function, NULL, 0);
+		l_vm_var* v = l_vm_var_function_exec(vm, func->var.function, NULL, 0);
+		RETIFERR(v);
 	}
 
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
@@ -296,7 +297,9 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int in
 	for (int i = 0; i < n; ++i)
 	{
 		tmp->var.number = (double)i;
-		l_vm_var_function_exec(vm, func->var.function, arr, 0);
+
+		l_vm_var* v = l_vm_var_function_exec(vm, func->var.function, arr, 0);
+		RETIFERR(v);
 	}
 
 	free(arr->vars);
@@ -306,39 +309,28 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int in
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
-l_vm_var* l_vm_std_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+l_vm_var* l_vm_std_while(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);
-	l_vm_var* arr = args->vars[0];
+	l_vm_var* cond = args->vars[0];
 	l_vm_var* func = args->vars[1];
-	EXPECTTYPE(vm, VAR_TYPE_ARRAY, arr);
+	if (infix)
+		SWAP(cond, func);
+	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, cond);
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
 
-	l_vm_var_array* a = arr->var.array;
-
-	l_vm_var_array* res = malloc(sizeof(l_vm_var_array) * a->len);
-	res->vars = malloc(sizeof(l_vm_var*) * a->len);
-	res->len = a->len;
-	res->allocd = a->len;
-
-	l_vm_var_array* arguments = malloc(sizeof(l_vm_var_array));
-	arguments->vars = malloc(sizeof(l_vm_var*));
-	arguments->len = 1;
-	arguments->allocd = 1;
-
-	for (int i = 0; i < a->len; ++i)
+	while (1)
 	{
-		arguments->vars[0] = a->vars[i];
-		res->vars[i] =
-			l_vm_var_function_exec(vm, func->var.function, arguments, 0);
+		l_vm_var* res = l_vm_var_function_exec(vm, cond->var.function, NULL, 0);
+		RETIFERR(res);
+		if (res->type != VAR_TYPE_BOOL || !res->var.boolean)
+			break;
+
+		l_vm_var* v = l_vm_var_function_exec(vm, func->var.function, NULL, 0);
+		RETIFERR(v);
 	}
 
-	free(arguments->vars);
-	free(arguments);
-
-	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_ARRAY);
-	v->var.array = res;
-	return v;
+	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
 
 l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
@@ -596,6 +588,41 @@ l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int
 	arr->len -= 1;
 
 	return var;
+}
+
+l_vm_var* l_vm_std_array_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	EXPECTTYPE(vm, VAR_TYPE_ARRAY, self);
+	EXPECTARGC(vm, 1, args);
+
+	l_vm_var* func = args->vars[0];
+	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
+
+	l_vm_var_array* a = self->var.array;
+
+	l_vm_var_array* res = malloc(sizeof(l_vm_var_array) * a->len);
+	res->vars = malloc(sizeof(l_vm_var*) * a->len);
+	res->len = a->len;
+	res->allocd = a->len;
+
+	l_vm_var_array* arguments = malloc(sizeof(l_vm_var_array));
+	arguments->vars = malloc(sizeof(l_vm_var*));
+	arguments->len = 1;
+	arguments->allocd = 1;
+
+	for (int i = 0; i < a->len; ++i)
+	{
+		arguments->vars[0] = a->vars[i];
+		res->vars[i] =
+			l_vm_var_function_exec(vm, func->var.function, arguments, 0);
+	}
+
+	free(arguments->vars);
+	free(arguments);
+
+	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_ARRAY);
+	v->var.array = res;
+	return v;
 }
 
 l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)

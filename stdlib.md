@@ -34,16 +34,18 @@ languages, so they're even more important than in other languages.
 
 ## Flow Control
 
+Flow control functions' arguments are reversed if they're called as infix
+functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
+
 * `if(condition, function)`:
 	* Run function if condition returns true.
 	* `if(1 == 1, { print("Hello World") });`
 * `repeat(count, function)`:
 	* Run function `count` times.
 	* `repeat(10, { print("Hello World") });`
-* `map(array, function)`:
-	* Run function for every variable in the array.
-	* `map([1, 2, 3], print)`
-* TODO: More flow control.
+* `while(function, function)`:
+	* Run the second function as long as the first function returns true.
+	* `i = 0; while({ i < 10 }, { print("Hello World"); i = i + 1 })`
 
 ## Arithmatic
 
@@ -98,6 +100,8 @@ Like arithmatic, all logic is done using regular functions.
 	* Add a variable to the end of the array.
 * `array.pop()`:
 	* Remove and return the last element of the aray.
+* `aray.map(function)`:
+	* Run function for every variable in the array.
 
 ### String Methods
 
