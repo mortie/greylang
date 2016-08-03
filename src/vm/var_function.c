@@ -98,3 +98,21 @@ l_vm_var* l_vm_var_function_exec(
 
 	return ret;
 }
+
+l_vm_var* l_vm_var_function_set_self(
+		l_vm* vm,
+		l_vm_var_function* func,
+		l_vm_var* obj)
+{
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_FUNCTION);
+	l_vm_var_function* varf = l_vm_var_function_create(func->scope);
+	varf->fptr = func->fptr;
+	varf->expressions = func->expressions;
+	varf->expressionc = func->expressionc;
+	varf->argnames = func->argnames;
+	varf->argnamec = func->argnamec;
+	varf->self = obj;
+	var->var.function = varf;
+
+	return var;
+}

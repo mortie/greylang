@@ -154,3 +154,11 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2)
 
 	return 0;
 }
+
+l_vm_var* l_vm_var_copy(l_vm* vm, l_vm_var* var)
+{
+	l_vm_var* nw = l_vm_var_create(vm, var->type);
+	nw->map = var->map;
+	nw->var = var->var;
+	return nw;
+}

@@ -8,15 +8,15 @@
 
 #define RETIFERR(var) \
 	do { \
-		if (var->type == VAR_TYPE_ERROR) \
+		if (var != NULL && var->type == VAR_TYPE_ERROR) \
 			return var; \
 	} while(0)
 
 #define EXPECTTYPE(vm, expected, var) \
 	do { \
 		RETIFERR(var); \
-		if (var->type != expected) \
-			return l_vm_error_type(vm, expected, var->type); \
+		if (var == NULL || var->type != expected) \
+			return l_vm_error_type(vm, expected, VAR_TYPE_NONE); \
 	} while(0)
 
 #define EXPECTARGC(vm, expected, args) \
@@ -288,7 +288,7 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int in
 
 	l_vm_var* tmp = l_vm_var_create(vm, VAR_TYPE_NUMBER);
 	l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
-	arr->vars = malloc(sizeof(l_vm_var));
+	arr->vars = malloc(sizeof(l_vm_var*));
 	arr->len = 1;
 	arr->allocd = 1;
 	arr->vars[0] = tmp;
@@ -328,6 +328,55 @@ l_vm_var* l_vm_std_while(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int inf
 
 		l_vm_var* v = l_vm_var_function_exec(vm, func->var.function, NULL, 0);
 		RETIFERR(v);
+	}
+
+	return l_vm_var_create(vm, VAR_TYPE_NONE);
+}
+
+l_vm_var* l_vm_std_for(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	EXPECTARGC(vm, 2, args);
+	l_vm_var* iterable = args->vars[0];
+	l_vm_var* func = args->vars[1];
+	if (infix)
+		SWAP(iterable, func);
+	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
+
+	// Call iter() function, put result in 'iter'
+	l_vm_var* iterv = l_vm_map_lookup(iterable->map, "iter");
+	if (iterv == NULL || iterv->type != VAR_TYPE_FUNCTION)
+		return l_vm_error(vm, "Invalid iterator");
+	iterv = l_vm_var_function_set_self(
+		vm, iterv->var.function, iterable);
+	l_vm_var* iter = l_vm_var_function_exec(vm, iterv->var.function, NULL, 0);
+
+	// Get iter.next
+	l_vm_var* nextv = l_vm_map_lookup(iter->map, "next");
+	if (iterv == NULL || iterv->type != VAR_TYPE_FUNCTION)
+		return l_vm_error(vm, "Invalid iterator");
+	nextv = l_vm_var_function_set_self(
+		vm, nextv->var.function, iter);
+	l_vm_var_function* nextf = nextv->var.function;
+
+	while (1)
+	{
+		l_vm_var* val = l_vm_var_function_exec(vm, nextf, NULL, 0);
+		RETIFERR(val);
+
+		if (val->type == VAR_TYPE_NONE)
+			break;
+
+		l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
+		arr->vars = malloc(sizeof(l_vm_var*));
+		arr->len = 1;
+		arr->allocd = 1;
+		arr->vars[0] = val;
+
+		l_vm_var* v = l_vm_var_function_exec(vm, func->var.function, arr, 0);
+		RETIFERR(v);
+
+		free(arr->vars);
+		free(arr);
 	}
 
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
@@ -459,7 +508,7 @@ static l_vm_var* loadc_run(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int i
 	char* symbol = vsymbol->var.string->chars;
 	l_vm_var_array* fargs = vfargs->var.array;
 
-	l_vm_var* vdl = l_vm_map_lookup(self->map, "dl");
+	l_vm_var* vdl = l_vm_map_shallow_lookup_internal(self->map, "dl");
 	l_plat_dl* dl = (l_plat_dl*)vdl->var.ptr;
 
 	l_vm_var* (*fptr)(l_vm*, l_vm_var_array*) =
@@ -486,15 +535,14 @@ l_vm_var* l_vm_std_loadc(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int inf
 	l_vm_var* ptr = l_vm_var_create(vm, VAR_TYPE_PTR);
 	ptr->var.ptr = (void*)dl;
 
-	// Run function
+	// run function
 	l_vm_var_function* runf = l_vm_var_function_create(NULL);
 	runf->fptr = &loadc_run;
-	runf->self = l_vm_var_create(vm, VAR_TYPE_OBJECT);
 	runf->self = var;
 	l_vm_var* runv = l_vm_var_create(vm, VAR_TYPE_FUNCTION);
 	runv->var.function = runf;
 
-	l_vm_map_set(var->map, "dl", ptr);
+	l_vm_map_set_internal(var->map, "dl", ptr);
 	l_vm_map_set(var->map, "run", runv);
 
 	return var;
@@ -625,6 +673,55 @@ l_vm_var* l_vm_std_array_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int
 	return v;
 }
 
+static l_vm_var* array_iter_next(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	l_vm_var* arrv = l_vm_map_shallow_lookup_internal(self->map, "arr");
+	l_vm_var_array* arr = arrv->var.array;
+
+	l_vm_var* indexv = l_vm_map_shallow_lookup_internal(self->map, "index");
+	int index = (int)indexv->var.number;
+
+	l_vm_var* next = NULL;
+	while (index < arr->len)
+	{
+		next = arr->vars[index++];
+		if (next != NULL && next->type != VAR_TYPE_NONE)
+			break;
+	}
+
+	indexv->var.number = (double)index;
+
+	if (next == NULL)
+		return l_vm_var_create(vm, VAR_TYPE_NONE);
+	else
+		return next;
+}
+
+l_vm_var* l_vm_std_array_iter(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_OBJECT);
+
+	// next function
+	l_vm_var_function* nextf = l_vm_var_function_create(NULL);
+	nextf->fptr = &array_iter_next;
+	l_vm_var* nextv = l_vm_var_create(vm, VAR_TYPE_FUNCTION);
+	nextv->var.function = nextf;
+
+	// Pointer to array
+	l_vm_var* ptr = l_vm_var_create(vm, VAR_TYPE_PTR);
+	ptr->var.ptr = (void*)self->var.array;
+
+	// Current index
+	l_vm_var* index = l_vm_var_create(vm, VAR_TYPE_NUMBER);
+	index->var.number = 0;
+
+	l_vm_map_set(var->map, "next", nextv);
+	l_vm_map_set_internal(var->map, "arr", ptr);
+	l_vm_map_set_internal(var->map, "index", index);
+
+	return var;
+}
+
 l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTTYPE(vm, VAR_TYPE_STRING, self);
@@ -675,6 +772,57 @@ l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, in
 	var->var.string = malloc(sizeof(l_vm_var_string));
 	var->var.string->chars = chars;
 	var->var.string->len = len;
+
+	return var;
+}
+
+static l_vm_var* string_iter_next(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	l_vm_var* strv = l_vm_map_shallow_lookup_internal(self->map, "str");
+	l_vm_var_string* str = strv->var.string;
+
+	l_vm_var* indexv = l_vm_map_shallow_lookup_internal(self->map, "index");
+	int index = (int)indexv->var.number;
+
+	if (index >= str->len)
+		return l_vm_var_create(vm, VAR_TYPE_NONE);
+
+	char* chars = malloc(2);
+	chars[0] = str->chars[index++];
+	chars[1] = '\0';
+
+	indexv->var.number = (double)index;
+
+	l_vm_var_string* next = malloc(sizeof(l_vm_var_string));
+	next->chars = chars;
+	next->len = 1;
+	l_vm_var* nextv = l_vm_var_create(vm, VAR_TYPE_STRING);
+	nextv->var.string = next;
+
+	return nextv;
+}
+
+l_vm_var* l_vm_std_string_iter(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	l_vm_var* var = l_vm_var_create(vm, VAR_TYPE_OBJECT);
+
+	// next function
+	l_vm_var_function* nextf = l_vm_var_function_create(NULL);
+	nextf->fptr = &string_iter_next;
+	l_vm_var* nextv = l_vm_var_create(vm, VAR_TYPE_FUNCTION);
+	nextv->var.function = nextf;
+
+	// Pointer to string
+	l_vm_var* ptr = l_vm_var_create(vm, VAR_TYPE_PTR);
+	ptr->var.ptr = (void*)self->var.string;
+
+	// Current index
+	l_vm_var* index = l_vm_var_create(vm, VAR_TYPE_NUMBER);
+	index->var.number = 0;
+
+	l_vm_map_set(var->map, "next", nextv);
+	l_vm_map_set_internal(var->map, "str", ptr);
+	l_vm_map_set_internal(var->map, "index", index);
 
 	return var;
 }

@@ -37,9 +37,12 @@ l_vm* l_vm_create()
 	STD("and", &l_vm_std_and);
 	STD("&&", &l_vm_std_and);
 	STD("||", &l_vm_std_or);
+
 	STD("if", &l_vm_std_if);
 	STD("repeat", &l_vm_std_repeat);
 	STD("while", &l_vm_std_while);
+	STD("for", &l_vm_std_for);
+
 	STD("tostring", &l_vm_std_tostring);
 	STD("tonumber", &l_vm_std_tonumber);
 	STD("concat", &l_vm_std_concat);
@@ -70,12 +73,14 @@ l_vm* l_vm_create()
 	PROTO(proto_array, "push", &l_vm_std_array_push);
 	PROTO(proto_array, "pop", &l_vm_std_array_pop);
 	PROTO(proto_array, "map", &l_vm_std_array_map);
+	PROTO(proto_array, "iter", &l_vm_std_array_iter);
 
 	l_vm_map* proto_string = l_vm_map_create(NULL);
 	vm->proto_string = proto_string;
 
 	PROTO(proto_string, "len", &l_vm_std_string_len);
 	PROTO(proto_string, "sub", &l_vm_std_string_sub);
+	PROTO(proto_string, "iter", &l_vm_std_string_iter);
 
 #undef PROTO
 

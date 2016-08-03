@@ -10,16 +10,7 @@ static l_vm_var* object_lookup(l_vm* vm, l_vm_var* obj, char* key)
 		return l_vm_var_create(vm, VAR_TYPE_NONE);
 
 	if (v->type == VAR_TYPE_FUNCTION)
-	{
-		l_vm_var_function* func = l_vm_var_function_create(v->var.function->scope);
-		func->fptr = v->var.function->fptr;
-		func->expressions = v->var.function->expressions;
-		func->expressionc = v->var.function->expressionc;
-		func->argnames = v->var.function->argnames;
-		func->argnamec = v->var.function->argnamec;
-		func->self = obj;
-		v->var.function = func;
-	}
+		v = l_vm_var_function_set_self(vm, v->var.function, obj);
 
 	return v;
 }
@@ -113,7 +104,7 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 		{
 			l_vm_var* obj = exec(vm, scope, key->expression.object_lookup->obj);
 			char* okey = key->expression.object_lookup->key;
-			l_vm_map_set(obj->map, okey, var);
+			l_vm_map_set(obj->map, okey, l_vm_var_copy(vm, var));
 
 			break;
 		}
@@ -128,11 +119,12 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 				int k = (int)akey->var.number;
 				l_vm_var_array_resize(vm, a, k + 1);
 
-				a->vars[k] = var;
+				a->vars[k] = l_vm_var_copy(vm, var);
 			}
 			else if (akey->type == VAR_TYPE_STRING)
 			{
-				l_vm_map_set(arr->map, akey->var.string->chars, var);
+				l_vm_map_set(
+					arr->map, akey->var.string->chars, l_vm_var_copy(vm, var));
 			}
 			else
 			{
@@ -143,7 +135,8 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 		}
 		case EXPR_VARIABLE:
 		{
-			l_vm_scope_set(scope, key->expression.variable->name, var);
+			l_vm_scope_set(
+				scope, key->expression.variable->name, l_vm_var_copy(vm, var));
 
 			break;
 		}

@@ -6,6 +6,7 @@ l_vm_map* l_vm_map_create(l_vm_map* proto)
 {
 	l_vm_map* map = malloc(sizeof(l_vm_map));
 
+	map->internal = NULL;
 	map->allocd = 8;
 	map->names = malloc(sizeof(char*) * map->allocd);
 	map->vars = malloc(sizeof(l_vm_var) * map->allocd);
@@ -45,6 +46,17 @@ void l_vm_map_set(
 	map->names[map->len - 1] = n;
 }
 
+void l_vm_map_set_internal(
+		l_vm_map* map,
+		char* name,
+		l_vm_var* var)
+{
+	if (map->internal == NULL)
+		map->internal = l_vm_map_create(NULL);
+
+	l_vm_map_set(map->internal, name, var);
+}
+
 l_vm_var* l_vm_map_shallow_lookup(l_vm_map* map, char* name)
 {
 	for (int i = 0; i < map->len; ++i)
@@ -56,6 +68,14 @@ l_vm_var* l_vm_map_shallow_lookup(l_vm_map* map, char* name)
 	}
 
 	return NULL;
+}
+
+l_vm_var* l_vm_map_shallow_lookup_internal(l_vm_map* map, char* name)
+{
+	if (map->internal == NULL)
+		return NULL;
+
+	return l_vm_map_shallow_lookup(map->internal, name);
 }
 
 l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name)

@@ -17,6 +17,7 @@ typedef struct l_vm_var l_vm_var;
 
 typedef struct l_vm_map
 {
+	struct l_vm_map* internal;
 	char** names;
 	l_vm_var** vars;
 	int len;
@@ -31,7 +32,13 @@ void l_vm_map_set(
 		char* name,
 		l_vm_var* var);
 
+void l_vm_map_set_internal(
+		l_vm_map* map,
+		char* name,
+		l_vm_var* var);
+
 l_vm_var* l_vm_map_shallow_lookup(l_vm_map* map, char* name);
+l_vm_var* l_vm_map_shallow_lookup_internal(l_vm_map* map, char* name);
 l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name);
 
 /*
@@ -83,6 +90,11 @@ l_vm_var* l_vm_var_function_exec(
 		l_vm_var_array* args,
 		int infix);
 
+l_vm_var* l_vm_var_function_set_self(
+		l_vm* vm,
+		l_vm_var_function* func,
+		l_vm_var* obj);
+
 typedef struct l_vm_var_string
 {
 	char* chars;
@@ -122,6 +134,7 @@ typedef struct l_vm_var
 l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type);
 void l_vm_var_free(l_vm_var* var);
 void l_vm_var_clean(l_vm_var* var);
+l_vm_var* l_vm_var_copy(l_vm* vm, l_vm_var* var);
 
 char* l_vm_var_tostring(l_vm_var* var);
 int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
@@ -156,12 +169,16 @@ l_vm_var* l_vm_std_lteq(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infi
 l_vm_var* l_vm_std_and(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // or
 l_vm_var* l_vm_std_or(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
+
 // if
 l_vm_var* l_vm_std_if(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // repeat
 l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // while
 l_vm_var* l_vm_std_while(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
+// for
+l_vm_var* l_vm_std_for(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
+
 // tostring
 l_vm_var* l_vm_std_tostring(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // tonumber
@@ -188,13 +205,17 @@ l_vm_var* l_vm_std_array_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int
 l_vm_var* l_vm_std_array_push(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // array.pop
 l_vm_var* l_vm_std_array_pop(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
-// arrapmap
+// array.map
 l_vm_var* l_vm_std_array_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
+// array.iter
+l_vm_var* l_vm_std_array_iter(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // string.len
 l_vm_var* l_vm_std_string_len(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 // string.sub
 l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
+// string.iter
+l_vm_var* l_vm_std_string_iter(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 /*
  * Scope
