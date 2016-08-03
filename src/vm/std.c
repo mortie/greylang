@@ -667,7 +667,6 @@ l_vm_var* l_vm_std_string_sub(l_vm* vm, l_vm_var* self, l_vm_var_array* args, in
 	}
 
 	int len = end - start + 1;
-	printf("%i %i %i\n", start, end, len);
 	char* chars = malloc(len + 1);
 	memcpy(chars, self->var.string->chars + start, len);
 	chars[len + 1] = '\0';

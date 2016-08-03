@@ -90,7 +90,6 @@ char* l_vm_var_tostring(l_vm_var* var)
 		break;
 	}
 	case VAR_TYPE_BOOL:
-		printf("%i\n", var->var.boolean);
 		if (var->var.boolean)
 		{
 			str = "[true]";

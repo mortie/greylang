@@ -77,6 +77,17 @@ l_vm_var* l_vm_var_function_exec(
 			l_vm_scope_define(scope, "self", func->self);
 		}
 
+		// Define infix?
+		{
+			l_vm_var* isInfix = l_vm_var_create(vm, VAR_TYPE_BOOL);
+			if (infix)
+				isInfix->var.boolean = 1;
+			else
+				isInfix->var.boolean = 0;
+
+			l_vm_scope_define(scope, "infix?", isInfix);
+		}
+
 		ret = l_vm_exec(vm, scope, func->expressions, func->expressionc);
 	}
 

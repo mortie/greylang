@@ -327,6 +327,7 @@ static l_token gettoken(l_scanner* scanner)
 		while (cc != EOF && !isspace(cc) &&
 				(cc != '(' && cc != ')') &&
 				(cc != '[' && cc != ']') &&
+				(cc != '{' && cc != '}') &&
 				(cc != ';' && cc != ':') &&
 				(cc != ','))
 		{
