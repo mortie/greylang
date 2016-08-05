@@ -23,6 +23,7 @@ typedef struct l_vm_map
 	int len;
 	int allocd;
 	struct l_vm_map* proto;
+	int gc_marked;
 } l_vm_map;
 
 l_vm_map* l_vm_map_create(l_vm_map* proto);
@@ -40,6 +41,7 @@ void l_vm_map_set_internal(
 l_vm_var* l_vm_map_shallow_lookup(l_vm_map* map, char* name);
 l_vm_var* l_vm_map_shallow_lookup_internal(l_vm_map* map, char* name);
 l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name);
+void l_vm_map_free(l_vm_map* map);
 
 /*
  * Variables
@@ -66,9 +68,12 @@ typedef struct l_vm_var_array
 	l_vm_var** vars;
 	int len;
 	int allocd;
+	int gc_marked;
 } l_vm_var_array;
 
+l_vm_var_array* l_vm_var_array_create();
 void l_vm_var_array_resize(l_vm* vm, l_vm_var_array* arr, int nwsize);
+void l_vm_var_array_free(l_vm_var_array* arr);
 
 typedef struct l_vm_var_function
 {
@@ -81,6 +86,7 @@ typedef struct l_vm_var_function
 	char** argnames;
 	int argnamec;
 	l_vm_var* self;
+	int gc_marked;
 } l_vm_var_function;
 
 l_vm_var_function* l_vm_var_function_create(l_vm_scope* scope);
@@ -95,21 +101,28 @@ l_vm_var* l_vm_var_function_set_self(
 		l_vm_var_function* func,
 		l_vm_var* obj);
 
+void l_vm_var_function_free(l_vm_var_function* func);
+
 typedef struct l_vm_var_string
 {
 	char* chars;
 	int len;
+	// No gc_marked because immutable
 } l_vm_var_string;
+
+void l_vm_var_string_free(l_vm_var_string* str);
 
 typedef struct l_vm_var_error
 {
 	char* msg;
 	int line;
+	int gc_marked;
 } l_vm_var_error;
 
 l_vm_var* l_vm_error(l_vm* vm, char* str);
 l_vm_var* l_vm_error_type(l_vm* vm, l_vm_var_type expected, l_vm_var_type got);
 l_vm_var* l_vm_error_argc(l_vm* vm, int expected, int got);
+void l_vm_var_error_free(l_vm_var_error* err);
 
 typedef struct l_vm_var_none l_vm_var_none;
 
@@ -129,11 +142,10 @@ typedef struct l_vm_var
 	} var;
 	l_vm_map* map;
 	l_vm_var_type type;
+	int gc_marked;
 } l_vm_var;
 
 l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type);
-void l_vm_var_free(l_vm_var* var);
-void l_vm_var_clean(l_vm_var* var);
 l_vm_var* l_vm_var_copy(l_vm* vm, l_vm_var* var);
 
 char* l_vm_var_tostring(l_vm_var* var);
@@ -223,12 +235,12 @@ l_vm_var* l_vm_std_string_iter(l_vm* vm, l_vm_var* self, l_vm_var_array* args, i
 
 typedef struct l_vm_scope
 {
-	char** names;
-	l_vm_var** vars;
-	int varc;
-	int vara;
+	l_vm_map* map;
 	struct l_vm_scope* parent;
 	int immutable;
+	l_vm_scope** childs;
+	int childc;
+	int childa;
 } l_vm_scope;
 
 l_vm_scope* l_vm_scope_create(l_vm_scope* parent);
@@ -237,6 +249,12 @@ l_vm_var* l_vm_scope_lookup(l_vm_scope* scope, char* name);
 void l_vm_scope_define(l_vm_scope* scope, char* name, l_vm_var* var);
 void l_vm_scope_set(l_vm_scope* scope, char* name, l_vm_var* var);
 void l_vm_scope_free(l_vm_scope* scope);
+
+/*
+ * GC
+ */
+
+void l_vm_gc(l_vm* vm);
 
 /*
  * VM
@@ -248,6 +266,10 @@ typedef struct l_vm
 
 	l_vm_map* proto_array;
 	l_vm_map* proto_string;
+
+	l_vm_var** vars;
+	int varc;
+	int vara;
 
 	int currLine;
 } l_vm;
