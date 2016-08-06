@@ -23,10 +23,21 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	t = l_scanner_peek(stream);
 
 	/*
+	 * Empty
+	 */
+	if (prev == NULL && (
+			t.type == TOKEN_CLOSEBRACE ||
+			t.type == TOKEN_CLOSEPAREN ||
+			t.type == TOKEN_SEMICOLON ||
+			t.type == TOKEN_NONE))
+	{
+		expr->type = EXPR_EMPTY;
+	}
+
+	/*
 	 * Expression Group
 	 */
-
-	if (prev == NULL && t.type == TOKEN_OPENPAREN)
+	else if (prev == NULL && t.type == TOKEN_OPENPAREN)
 	{
 		expr->expression.expr_group =
 			l_parse_expr_group(stream);
