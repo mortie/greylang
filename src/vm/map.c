@@ -91,13 +91,3 @@ l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name)
 
 	return NULL;
 }
-
-void l_vm_map_free(l_vm_map* map)
-{
-	if (map->internal != NULL)
-		l_vm_map_free(map->internal);
-
-	free(map->names);
-	free(map->vars);
-	free(map);
-}

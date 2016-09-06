@@ -46,7 +46,7 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 			argvars[i] = exec(vm, scope, exprs->expressions[i]);
 		}
 
-		l_vm_var_array* args = l_vm_var_array_create();
+		l_vm_var_array* args = malloc(sizeof(l_vm_var_array));
 		args->vars = argvars;
 		args->len = exprs->expressionc;
 		args->allocd = exprs->expressionc;
@@ -191,7 +191,7 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 
 		l_p_comma_expr_list* exprs = expr->expression.array_literal->expr_list;
 
-		l_vm_var_array* arr = l_vm_var_array_create();
+		l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
 		arr->vars = malloc(sizeof(l_vm_var*) * exprs->expressionc);
 		arr->len = exprs->expressionc;
 		arr->allocd = exprs->expressionc;
@@ -239,11 +239,16 @@ l_vm_var* l_vm_exec(l_vm* vm, l_vm_scope* scope, l_p_expr** expressions, int exp
 {
 	for (int i = 0; i < expressionc; ++i)
 	{
-		l_vm_var* var = exec(vm, scope, expressions[i]);
-		// GC shouldn't happen here probably
-		l_vm_gc(vm);
-		if (i == expressionc - 1 || var->type == VAR_TYPE_ERROR)
-			return var;
+		if (i == expressionc - 1)
+		{
+			return exec(vm, scope, expressions[i]);
+		}
+		else
+		{
+			l_vm_var* var = exec(vm, scope, expressions[i]);
+			if (var->type == VAR_TYPE_ERROR)
+				return var;
+		}
 	}
 
 	return l_vm_var_create(vm, VAR_TYPE_NONE);

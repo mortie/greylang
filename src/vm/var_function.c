@@ -28,7 +28,10 @@ l_vm_var* l_vm_var_function_exec(
 	if (args == NULL)
 	{
 		fakeargs = 1;
-		args = l_vm_var_array_create();
+		args = malloc(sizeof(l_vm_var_array));
+		args->vars = NULL;
+		args->len = 0;
+		args->allocd = 0;
 	}
 
 	l_vm_var* ret;
@@ -112,10 +115,4 @@ l_vm_var* l_vm_var_function_set_self(
 	var->var.function = varf;
 
 	return var;
-}
-
-void l_vm_var_function_free(l_vm_var_function* func)
-{
-	free(func->argnames);
-	free(func);
 }

@@ -33,7 +33,6 @@ l_vm_var_error* l_vm_var_error_create(l_vm* vm)
 	l_vm_var_error* err = malloc(sizeof(l_vm_var_error));
 	err->msg = NULL;
 	err->line = vm->currLine;
-	err->gc_marked = 0;
 	return err;
 }
 
@@ -70,10 +69,4 @@ l_vm_var* l_vm_error_argc(l_vm* vm, int expected, int got)
 	snprintf(msg, len, format, expected, got);
 
 	return l_vm_error(vm, msg);
-}
-
-void l_vm_var_error_free(l_vm_var_error* err)
-{
-	free(err->msg);
-	free(err);
 }

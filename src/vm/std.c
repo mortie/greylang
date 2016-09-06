@@ -287,7 +287,7 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int in
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
 
 	l_vm_var* tmp = l_vm_var_create(vm, VAR_TYPE_NUMBER);
-	l_vm_var_array* arr = l_vm_var_array_create();
+	l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
 	arr->vars = malloc(sizeof(l_vm_var*));
 	arr->len = 1;
 	arr->allocd = 1;
@@ -304,6 +304,7 @@ l_vm_var* l_vm_std_repeat(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int in
 
 	free(arr->vars);
 	free(arr);
+	l_vm_var_free(tmp);
 
 	return l_vm_var_create(vm, VAR_TYPE_NONE);
 }
@@ -365,7 +366,7 @@ l_vm_var* l_vm_std_for(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix
 		if (val->type == VAR_TYPE_NONE)
 			break;
 
-		l_vm_var_array* arr = l_vm_var_array_create();
+		l_vm_var_array* arr = malloc(sizeof(l_vm_var_array));
 		arr->vars = malloc(sizeof(l_vm_var*));
 		arr->len = 1;
 		arr->allocd = 1;
@@ -647,12 +648,12 @@ l_vm_var* l_vm_std_array_map(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int
 
 	l_vm_var_array* a = self->var.array;
 
-	l_vm_var_array* res = l_vm_var_array_create();
+	l_vm_var_array* res = malloc(sizeof(l_vm_var_array) * a->len);
 	res->vars = malloc(sizeof(l_vm_var*) * a->len);
 	res->len = a->len;
 	res->allocd = a->len;
 
-	l_vm_var_array* arguments = l_vm_var_array_create();
+	l_vm_var_array* arguments = malloc(sizeof(l_vm_var_array));
 	arguments->vars = malloc(sizeof(l_vm_var*));
 	arguments->len = 1;
 	arguments->allocd = 1;
