@@ -19,7 +19,8 @@ Cat = new(Animal, #{
 
 // myDog gets its talk property from Animal, and its sound property from Dog
 myDog = new(Dog);
-myDog.talk();
+myDog.talk(); // "I say Woof"
 
+// myCat gets its talk property from Animal, and its sound property from Cat
 myCat = new(Cat);
-myCat.talk();
+myCat.talk(); // "I say Meow"
