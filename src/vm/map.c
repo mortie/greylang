@@ -91,3 +91,13 @@ l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name)
 
 	return NULL;
 }
+
+void l_vm_map_free(l_vm_map* map) {
+	l_vm_map_free(map->internal);
+	for (int i = 0; i < map->len; ++i) {
+		l_vm_var_free(map->vars[i]);
+		free(map->names[i]);
+	}
+	free(map->names);
+	free(map->vars);
+}

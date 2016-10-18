@@ -23,6 +23,8 @@ l_vm* l_vm_create()
 	 * Global Functions
 	 */
 
+	STD("new", &l_vm_std_new);
+
 	STD("+", &l_vm_std_add);
 	STD("-", &l_vm_std_sub);
 	STD("*", &l_vm_std_mul);

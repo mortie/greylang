@@ -32,6 +32,24 @@
 		a = tmp; \
 	} while(0)
 
+l_vm_var* l_vm_std_new(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	if (args->len < 1)
+		return l_vm_error_argc(vm, 1, args->len);
+
+	l_vm_var* proto = args->vars[0];
+	l_vm_var* obj;
+
+	if (args->len >= 2)
+		obj = args->vars[1];
+	else
+		obj = l_vm_var_create(vm, VAR_TYPE_OBJECT);
+
+	obj->map->proto = proto->map;
+
+	return obj;
+}
+
 l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
 {
 	EXPECTARGC(vm, 2, args);

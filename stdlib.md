@@ -47,6 +47,11 @@ functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 	* Run the second function as long as the first function returns true.
 	* `i = 0; while({ i < 10 }, { print("Hello World"); i = i + 1 })`
 
+## General
+
+* `new(object[, object])`
+	* Look at `examples/classes.grey`.
+
 ## Arithmatic
 
 All arithmatic is done using functions which are generally called as infix

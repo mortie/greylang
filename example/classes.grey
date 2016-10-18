@@ -1,0 +1,25 @@
+#!/usr/bin/env grey
+
+// Classes don't really exist, we have prototypes
+Animal = #{
+	sound: "generic",
+	talk: {
+		print("I say ", self.sound)
+	}
+};
+
+// Dog looks like #{ sound: "woof" }, with Animal as its prototype
+Dog = new(Animal, #{
+	sound: "Woof"
+});
+
+Cat = new(Animal, #{
+	sound: "Meow"
+});
+
+// myDog gets its talk property from Animal, and its sound property from Dog
+myDog = new(Dog);
+myDog.talk();
+
+myCat = new(Cat);
+myCat.talk();

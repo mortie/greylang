@@ -40,6 +40,7 @@ void l_vm_map_set_internal(
 l_vm_var* l_vm_map_shallow_lookup(l_vm_map* map, char* name);
 l_vm_var* l_vm_map_shallow_lookup_internal(l_vm_map* map, char* name);
 l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name);
+void l_vm_map_free(l_vm_map* map);
 
 /*
  * Variables
@@ -129,12 +130,12 @@ typedef struct l_vm_var
 	} var;
 	l_vm_map* map;
 	l_vm_var_type type;
+	int refs;
 } l_vm_var;
 
 l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type);
 void l_vm_var_free(l_vm_var* var);
 void l_vm_var_clean(l_vm_var* var);
-l_vm_var* l_vm_var_copy(l_vm* vm, l_vm_var* var);
 
 char* l_vm_var_tostring(l_vm_var* var);
 int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
@@ -142,6 +143,9 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
 /*
  * Standard Library
  */
+
+// new
+l_vm_var* l_vm_std_new(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // +
 l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
