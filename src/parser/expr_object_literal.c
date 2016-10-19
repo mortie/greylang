@@ -12,7 +12,7 @@ l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
 	expr->exprc = 0;
 
 	// #{
-	l_scanner_skip(stream, TOKEN_HASHBRACE, "object literal");
+	l_scanner_skip(stream, TOKEN_OPENBRACE, "object literal");
 
 	l_token t = l_scanner_peek(stream);
 	while (t.type != TOKEN_CLOSEBRACE)

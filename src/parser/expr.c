@@ -95,23 +95,35 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	}
 
 	/*
-	 * Function
+	 * Object Literal or function
 	 */
 	else if (t.type == TOKEN_OPENBRACE)
 	{
-		expr->expression.function =
-			l_parse_expr_function(stream);
-		expr->type = EXPR_FUNCTION;
-	}
+		l_token next = l_scanner_peek2(stream);
+		l_token next2 = l_scanner_peek3(stream);
 
-	/*
-	 * Object Literal
-	 */
-	else if (t.type == TOKEN_HASHBRACE)
-	{
-		expr->expression.object_literal =
-			l_parse_expr_object_literal(stream);
-		expr->type = EXPR_OBJECT_LITERAL;
+		/*
+		 * Object literal
+		 * { <name> <colon>
+		 */
+		if (next.type == TOKEN_CLOSEBRACE || (
+				next.type == TOKEN_NAME &&
+				next2.type == TOKEN_COLON))
+		{
+			expr->expression.object_literal =
+				l_parse_expr_object_literal(stream);
+			expr->type = EXPR_OBJECT_LITERAL;
+		}
+
+		/*
+		 * Function
+		 */
+		else
+		{
+			expr->expression.function =
+				l_parse_expr_function(stream);
+			expr->type = EXPR_FUNCTION;
+		}
 	}
 
 	/*

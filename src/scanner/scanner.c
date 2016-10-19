@@ -240,16 +240,6 @@ static l_token gettoken(l_scanner* scanner)
 	}
 
 	/*
-	 * Hash Brace
-	 */
-	else if (c == '#' && next == '{')
-	{
-		SETTOKEN(TOKEN_HASHBRACE, "#{");
-		nextchar(scanner);
-		nextchar(scanner);
-	}
-
-	/*
 	 * Open Brace
 	 */
 	else if (c == '{')
@@ -395,6 +385,7 @@ static void init(l_scanner* scanner)
 
 	scanner->nexttoken = nexttoken(scanner);
 	scanner->nexttoken2 = nexttoken(scanner);
+	scanner->nexttoken3 = nexttoken(scanner);
 }
 
 l_scanner* l_scanner_create(FILE* f)
@@ -423,7 +414,8 @@ l_token l_scanner_next(l_scanner* scanner)
 
 	l_token next = scanner->nexttoken;
 	scanner->nexttoken = scanner->nexttoken2;
-	scanner->nexttoken2 = token;
+	scanner->nexttoken2 = scanner->nexttoken3;
+	scanner->nexttoken3 = token;
 
 	return next;
 }
@@ -436,6 +428,11 @@ l_token l_scanner_peek(l_scanner* scanner)
 l_token l_scanner_peek2(l_scanner* scanner)
 {
 	return scanner->nexttoken2;
+}
+
+l_token l_scanner_peek3(l_scanner* scanner)
+{
+	return scanner->nexttoken3;
 }
 
 void l_scanner_unexpecteda(

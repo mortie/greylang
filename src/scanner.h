@@ -25,6 +25,7 @@ typedef struct l_scanner
 	char next;
 	l_token nexttoken;
 	l_token nexttoken2;
+	l_token nexttoken3;
 
 	l_scanner_type type;
 } l_scanner;
@@ -34,6 +35,7 @@ l_scanner* l_scanner_create_str(char* str);
 l_token l_scanner_next(l_scanner* scanner);
 l_token l_scanner_peek(l_scanner* scanner);
 l_token l_scanner_peek2(l_scanner* scanner);
+l_token l_scanner_peek3(l_scanner* scanner);
 void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token, char* section);
 void l_scanner_unexpected(l_token_type expected, l_token token, char* section);
 void l_scanner_skip(l_scanner* scanner, l_token_type type, char* section);

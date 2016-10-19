@@ -1,19 +1,20 @@
 #!/usr/bin/env grey
 
 // Classes don't really exist, we have prototypes
-Animal = #{
+Animal = {
 	sound: "generic",
 	talk: {
 		print("I say ", self.sound)
 	}
 };
 
-// Dog looks like #{ sound: "woof" }, with Animal as its prototype
-Dog = new(Animal, #{
+// Dog looks like { sound: "Woof" }, with Animal as its prototype
+Dog = new(Animal, {
 	sound: "Woof"
 });
 
-Cat = new(Animal, #{
+// Cat looks like { sound: "Meow" }, with Animal as its prototype
+Cat = new(Animal, {
 	sound: "Meow"
 });
 

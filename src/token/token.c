@@ -32,8 +32,6 @@ char* l_token_type_string(l_token_type type)
 		return "open bracket '['";
 	case TOKEN_CLOSEBRACKET:
 		return "close bracket ']'";
-	case TOKEN_HASHBRACE:
-		return "hash brace '#{'";
 	case TOKEN_OPENBRACE:
 		return "open brace '{'";
 	case TOKEN_CLOSEBRACE:
