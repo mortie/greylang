@@ -6,14 +6,18 @@ PREFIX = /usr/local/bin
 
 TARGET = grey
 
-build:
-	$(CC) $(CFLAGS) $(CFLAGS-BLD) -o $(TARGET) $(shell find src -name '*.c')
+build: preprocess
+	$(CC) -o $(TARGET) $(shell find src -name '*.c') $(CFLAGS) $(CFLAGS-BLD)
 
-debug:
-	$(CC) $(CFLAGS) $(CFLAGS-DBG) -o $(TARGET) $(shell find src -name '*.c')
+debug: preprocess
+	$(CC) -o $(TARGET) $(shell find src -name '*.c') $(CFLAGS) $(CFLAGS-DBG)
+
+preprocess:
+	$(shell sh preprocess.sh)
 
 install:
 	mv $(TARGET) $(PREFIX)/$(TARGET)
 
 clean:
 	rm $(TARGET)
+	rm "stdlib.out"

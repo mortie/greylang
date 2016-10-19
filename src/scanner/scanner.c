@@ -46,7 +46,6 @@ static char nextchar(l_scanner* scanner)
 	if (c == '\n')
 	{
 		scanner->line += 1;
-		scanner->character = 0;
 	}
 
 	return c;

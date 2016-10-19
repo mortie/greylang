@@ -1,5 +1,7 @@
 #include "../vm.h"
 
+#include "../stdlib.h"
+
 #include <stdlib.h>
 
 l_vm* l_vm_create()
@@ -100,6 +102,13 @@ l_vm* l_vm_create()
 	l_vm_var* var_false = l_vm_var_create(vm, VAR_TYPE_BOOL);
 	var_false->var.boolean = 0;
 	l_vm_scope_define(stdlib, "false", var_false);
+
+	/*
+	 * Load Standard Library
+	 */
+
+	l_scanner* stream = l_scanner_create_str(l_stdlib_str);
+	l_vm_run(vm, l_parse(stream));
 
 	return vm;
 }
