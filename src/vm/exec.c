@@ -105,7 +105,6 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 			l_vm_var* obj = exec(vm, scope, key->expression.object_lookup->obj);
 			char* okey = key->expression.object_lookup->key;
 			l_vm_map_set(obj->map, okey, var);
-			var->refs += 1;
 
 			break;
 		}
@@ -120,14 +119,14 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 				int k = (int)akey->var.number;
 				l_vm_var_array_resize(vm, a, k + 1);
 
+				l_vm_var_refs_decr(a->vars[k]);
 				a->vars[k] = var;
-				var->refs += 1;
+				l_vm_var_refs_incr(var);
 			}
 			else if (akey->type == VAR_TYPE_STRING)
 			{
 				l_vm_map_set(
 					arr->map, akey->var.string->chars, var);
-				var->refs += 1;
 			}
 			else
 			{
@@ -140,7 +139,6 @@ static l_vm_var* exec(l_vm* vm, l_vm_scope* scope, l_p_expr* expr)
 		{
 			l_vm_scope_set(
 				scope, key->expression.variable->name, var);
-			var->refs += 1;
 			break;
 		}
 		default:

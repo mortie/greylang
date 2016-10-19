@@ -136,6 +136,8 @@ typedef struct l_vm_var
 l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type);
 void l_vm_var_free(l_vm_var* var);
 void l_vm_var_clean(l_vm_var* var);
+void l_vm_var_refs_decr(l_vm_var* var);
+void l_vm_var_refs_incr(l_vm_var* var);
 
 char* l_vm_var_tostring(l_vm_var* var);
 int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
@@ -228,11 +230,12 @@ l_vm_var* l_vm_std_string_iter(l_vm* vm, l_vm_var* self, l_vm_var_array* args, i
 typedef struct l_vm_scope
 {
 	char** names;
-	l_vm_var** vars;
-	int varc;
-	int vara;
 	struct l_vm_scope* parent;
 	int immutable;
+
+	l_vm_var** vars;
+	int vara;
+	int varc;
 } l_vm_scope;
 
 l_vm_scope* l_vm_scope_create(l_vm_scope* parent);

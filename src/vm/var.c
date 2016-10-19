@@ -7,6 +7,7 @@ l_vm_var* l_vm_var_create(l_vm* vm, l_vm_var_type type)
 {
 	l_vm_var* var = malloc(sizeof(l_vm_var));
 	var->type = type;
+	var->refs = 0;
 
 	switch (type)
 	{
@@ -55,6 +56,20 @@ void l_vm_var_free(l_vm_var* var)
 {
 	l_vm_var_clean(var);
 	free(var);
+}
+
+void l_vm_var_refs_incr(l_vm_var* var)
+{
+	if (var == NULL) return;
+	var->refs += 1;
+}
+
+void l_vm_var_refs_decr(l_vm_var* var)
+{
+	if (var == NULL) return;
+	var->refs -= 1;
+	if (var->refs <= 0)
+		l_vm_var_free(var);
 }
 
 char* l_vm_var_tostring(l_vm_var* var)

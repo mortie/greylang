@@ -21,10 +21,12 @@ void l_vm_map_set(
 		char* name,
 		l_vm_var* var)
 {
+	l_vm_var_refs_incr(var);
 	for (int i = 0; i < map->len; ++i)
 	{
 		if (strcmp(map->names[i], name) == 0)
 		{
+			l_vm_var_refs_decr(map->vars[i]);
 			map->vars[i] = var;
 			return;
 		}
@@ -95,7 +97,7 @@ l_vm_var* l_vm_map_lookup(l_vm_map* map, char* name)
 void l_vm_map_free(l_vm_map* map) {
 	l_vm_map_free(map->internal);
 	for (int i = 0; i < map->len; ++i) {
-		l_vm_var_free(map->vars[i]);
+		l_vm_var_refs_decr(map->vars[i]);
 		free(map->names[i]);
 	}
 	free(map->names);

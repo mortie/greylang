@@ -1,0 +1,34 @@
+#!/usr/bin/env grey
+
+// RangeIter.next returns a number between min (inclusive) and max (exclusive).
+// When it returns none, the iteration will stop.
+RangeIter = {
+	next: {
+		self.ret = none;
+		if (self.i < self.max, {
+			self.ret = self.i;
+			self.i = self.i + 1;
+		});
+		self.ret
+	},
+
+	init: {
+		self.i = self.min;
+		self
+	}
+};
+
+// range is a function which returns an iterable,
+// e.g an object with an 'iter' function.
+// The 'iter' function must return an iterator, e.g
+// an object with a 'next' function.
+range = {(min, max)
+	{
+		iter: {
+			new(RangeIter, { min: min, max: max }).init();
+		}
+	}
+};
+
+// Prints each number between 10 (inclusive) and 20 (exclusive).
+print for range(10, 20);
