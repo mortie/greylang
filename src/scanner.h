@@ -21,6 +21,7 @@ typedef struct l_scanner
 
 	int character;
 	int line;
+	int linechar;
 	char curr;
 	char next;
 	l_token nexttoken;

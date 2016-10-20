@@ -240,15 +240,22 @@ l_vm_var* l_vm_exec(l_vm* vm, l_vm_scope* scope, l_p_expr** expressions, int exp
 {
 	for (int i = 0; i < expressionc; ++i)
 	{
-		if (i == expressionc - 1)
+		l_vm_var* var = exec(vm, scope, expressions[i]);
+		if (var->type == VAR_TYPE_RETURN)
 		{
-			return exec(vm, scope, expressions[i]);
-		}
-		else
-		{
-			l_vm_var* var = exec(vm, scope, expressions[i]);
-			if (var->type == VAR_TYPE_ERROR)
+			var->var.ret->nfuncs -= 1;
+			if (var->var.ret->nfuncs <= 0)
+				return var->var.ret->var;
+			else
 				return var;
+		}
+		else if (var->type == VAR_TYPE_ERROR)
+		{
+			return var;
+		}
+		else if (i == expressionc - 1)
+		{
+			return var;
 		}
 	}
 

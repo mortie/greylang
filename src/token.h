@@ -28,7 +28,7 @@ typedef struct l_token
 	char* content;
 	int contentlen;
 	int line;
-	int character;
+	int linechar;
 } l_token;
 
 char* l_token_type_string(l_token_type);

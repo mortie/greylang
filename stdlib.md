@@ -51,6 +51,13 @@ functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 
 * `new(object[, object])`
 	* Look at `examples/classes.grey`.
+* `return(n, value)`
+	* Return `value` through `n` functions.
+	* Because `if` and `while` and such execute functions, not blocks,
+	  you have to be able to return through some number of functions for
+	  `return`to be useful.
+	* Because the last expression in a function is returned by default, using
+	  `return` is generally unnecessary except as a mechanism to return early.
 
 ## Arithmatic
 

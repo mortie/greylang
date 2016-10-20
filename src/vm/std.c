@@ -10,6 +10,8 @@
 	do { \
 		if (var != NULL && var->type == VAR_TYPE_ERROR) \
 			return var; \
+		if (var != NULL && var->type == VAR_TYPE_RETURN) \
+			return var; \
 	} while(0)
 
 #define EXPECTTYPE(vm, expected, var) \
@@ -47,7 +49,37 @@ l_vm_var* l_vm_std_new(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix
 
 	obj->map->proto = proto->map;
 
+	// Call init if it exist
+	l_vm_var* initFn = l_vm_map_lookup(obj->map, "init");
+	if (initFn != NULL)
+	{
+		EXPECTTYPE(vm, VAR_TYPE_FUNCTION, initFn);
+		initFn = l_vm_var_function_set_self(vm, initFn->var.function, obj);
+		l_vm_var_array* args = malloc(sizeof(l_vm_var_array));
+		args->vars = NULL;
+		args->len = 0;
+		args->allocd = 0;
+		l_vm_var_function_exec(vm, initFn->var.function, args, 0);
+		free(args);
+	}
+
 	return obj;
+}
+
+l_vm_var* l_vm_std_return(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
+{
+	EXPECTARGC(vm, 2, args);
+	l_vm_var* num = args->vars[0];
+	l_vm_var* var = args->vars[1];
+	EXPECTTYPE(vm, VAR_TYPE_NUMBER, num);
+
+	l_vm_var_return* ret = malloc(sizeof(l_vm_var_return));
+	ret->nfuncs = num->var.number;
+	ret->var = var;
+
+	l_vm_var* v = l_vm_var_create(vm, VAR_TYPE_RETURN);
+	v->var.ret = ret;
+	return v;
 }
 
 l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix)
@@ -502,6 +534,9 @@ l_vm_var* l_vm_std_type(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infi
 		break;
 	case VAR_TYPE_ERROR:
 		str = "error";
+		break;
+	case VAR_TYPE_RETURN:
+		str = "return";
 		break;
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:

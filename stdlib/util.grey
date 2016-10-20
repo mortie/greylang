@@ -11,14 +11,13 @@ range = {(min, max)
 		},
 
 		init: {
-			self.i = self.min;
-			self
+			self.i = self.min
 		}
 	};
 
 	{
 		iter: {
-			new(RangeIter, { min: min, max: max }).init();
+			new(RangeIter, { min: min, max: max });
 		}
 	}
 };

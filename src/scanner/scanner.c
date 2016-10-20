@@ -42,9 +42,11 @@ static char nextchar(l_scanner* scanner)
 	}
 
 	scanner->character += 1;
+	scanner->linechar += 1;
 
 	if (c == '\n')
 	{
+		scanner->linechar = 0;
 		scanner->line += 1;
 	}
 
@@ -56,6 +58,7 @@ static l_token gettoken(l_scanner* scanner)
 	char c = scanner->curr;
 	char next = scanner->next;
 	int character = scanner->character;
+	int linechar = scanner->linechar;
 	int line = scanner->line;
 
 	char* content = "";
@@ -66,7 +69,7 @@ static l_token gettoken(l_scanner* scanner)
 	do { \
 		token.type = ttype; \
 		token.content = c; \
-		token.character = character; \
+		token.linechar = linechar; \
 		token.line = line; \
 	} while(0)
 
@@ -348,7 +351,7 @@ static l_token gettoken(l_scanner* scanner)
 		fprintf(stderr,
 			"line %i:%i: %s\n",
 			token.line,
-			token.character,
+			token.linechar,
 			token.content);
 		SETTOKEN(TOKEN_NONE, "");
 	}
@@ -370,6 +373,7 @@ static l_scanner* create()
 {
 	l_scanner* scanner = malloc(sizeof(l_scanner));
 	scanner->character = -1;
+	scanner->linechar = 0;
 	scanner->line = 1;
 	scanner->curr = '\0';
 	scanner->next = '\0';
@@ -445,7 +449,7 @@ void l_scanner_unexpecteda(
 		fprintf(stderr,
 			"line %i:%i (%s): Unexpected token %s\n",
 			token.line,
-			token.character,
+			token.linechar,
 			section,
 			l_token_type_string(token.type));
 		exit(1);
@@ -476,7 +480,7 @@ void l_scanner_unexpecteda(
 	fprintf(stderr,
 		"line %i:%i (%s): Expected %s, got %s\n",
 		token.line,
-		token.character,
+		token.linechar,
 		section,
 		str,
 		l_token_type_string(token.type));
@@ -491,7 +495,7 @@ void l_scanner_unexpected(l_token_type expected, l_token token, char* section)
 	fprintf(stderr,
 		"line %i:%i (%s): Expected %s, got %s\n",
 		token.line,
-		token.character,
+		token.linechar,
 		section,
 		l_token_type_string(expected),
 		l_token_type_string(token.type));

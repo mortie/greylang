@@ -44,6 +44,9 @@ void l_vm_var_clean(l_vm_var* var)
 	case VAR_TYPE_ERROR:
 		free(var->var.error);
 		break;
+	case VAR_TYPE_RETURN:
+		free(var->var.ret);
+		break;
 	case VAR_TYPE_NUMBER:
 	case VAR_TYPE_BOOL:
 	case VAR_TYPE_PTR:
@@ -128,6 +131,11 @@ char* l_vm_var_tostring(l_vm_var* var)
 		snprintf(str, len, format, err->line, err->msg);
 		break;
 	}
+	case VAR_TYPE_RETURN:
+	{
+		str = "[return]";
+		break;
+	}
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		str = "[none]";
@@ -162,6 +170,8 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2)
 		return var1->var.boolean == var2->var.boolean;
 	case VAR_TYPE_ERROR:
 		return var1->var.error == var2->var.error;
+	case VAR_TYPE_RETURN:
+		return 0;
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		return 1;

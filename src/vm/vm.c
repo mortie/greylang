@@ -26,6 +26,7 @@ l_vm* l_vm_create()
 	 */
 
 	STD("new", &l_vm_std_new);
+	STD("return", &l_vm_std_return);
 
 	STD("+", &l_vm_std_add);
 	STD("-", &l_vm_std_sub);

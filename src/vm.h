@@ -55,6 +55,7 @@ typedef enum l_vm_var_type
 	VAR_TYPE_NUMBER,
 	VAR_TYPE_BOOL,
 	VAR_TYPE_ERROR,
+	VAR_TYPE_RETURN,
 	VAR_TYPE_PTR,
 	VAR_TYPE_NONE
 } l_vm_var_type;
@@ -112,6 +113,12 @@ l_vm_var* l_vm_error(l_vm* vm, char* str);
 l_vm_var* l_vm_error_type(l_vm* vm, l_vm_var_type expected, l_vm_var_type got);
 l_vm_var* l_vm_error_argc(l_vm* vm, int expected, int got);
 
+typedef struct l_vm_var_return
+{
+	int nfuncs;
+	l_vm_var* var;
+} l_vm_var_return;
+
 typedef struct l_vm_var_none l_vm_var_none;
 
 typedef struct l_vm_var
@@ -125,6 +132,7 @@ typedef struct l_vm_var
 		double number;
 		int boolean;
 		l_vm_var_error* error;
+		l_vm_var_return* ret;
 		void* ptr;
 		l_vm_var_none* none;
 	} var;
@@ -148,6 +156,8 @@ int l_vm_var_eq(l_vm_var* var1, l_vm_var* var2);
 
 // new
 l_vm_var* l_vm_std_new(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
+// return
+l_vm_var* l_vm_std_return(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);
 
 // +
 l_vm_var* l_vm_std_add(l_vm* vm, l_vm_var* self, l_vm_var_array* args, int infix);

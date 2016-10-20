@@ -20,6 +20,8 @@ static char* typestr(l_vm_var_type type)
 		return "bool";
 	case VAR_TYPE_ERROR:
 		return "error";
+	case VAR_TYPE_RETURN:
+		return "return";
 	case VAR_TYPE_PTR:
 	case VAR_TYPE_NONE:
 		return "none";
