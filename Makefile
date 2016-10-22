@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -lm -lreadline -ldl
+CFLAGS = -std=c99 -Wall -Werror -Wpedantic -lm -lreadline -ldl
 OFLAGS = -O3
 VFLAGS = --track-origins=yes
 FLAGS-DBG = -g -DDEBUG
@@ -17,15 +17,6 @@ OFILES := $(patsubst $(CDIR)/%.c,$(ODIR)/%.o,$(CFILES))
 # Compile the project
 $(PROJECT): stdlib.out $(OFILES)
 	$(CC) -o $(PROJECT) $(CFLAGS) $(OFILES)
-
-# Compile .c files to .o files
-$(ODIR)/%.o: $(CDIR)/%.c
-	mkdir -p $(dir $@)
-	$(CC) -c $(patsubst $(ODIR)/%.o,$(CDIR)/%.c,$@) -o $@ $(OFLAGS)
-
-# Run stdlib preprocessor thing
-stdlib.out: $(shell find stdlib -type f)
-	./preprocess.sh
 
 # Compile without optimization and with debug info
 debug: OFLAGS = $(FLAGS-DBG)
@@ -54,3 +45,12 @@ clean:
 	rm -f $(PROJECT)
 	rm -f stdlib.out
 	rm -f vgcore.*
+
+# Compile .c files to .o files
+$(ODIR)/%.o: $(CDIR)/%.c
+	mkdir -p $(dir $@)
+	$(CC) -c $(patsubst $(ODIR)/%.o,$(CDIR)/%.c,$@) -o $@ $(OFLAGS)
+
+# Run stdlib preprocessor thing
+stdlib.out: $(shell find stdlib -type f)
+	./preprocess.sh
