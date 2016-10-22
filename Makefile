@@ -1,23 +1,56 @@
 CC = gcc
-CFLAGS = -Wall -lm -lreadline -ldl
-CFLAGS-BLD = -O3
-CFLAGS-DBG = -g -DDEBUG
+CFLAGS = -std=c99 -Wall -lm -lreadline -ldl
+OFLAGS = -O3
+VFLAGS = --track-origins=yes
+FLAGS-DBG = -g -DDEBUG
 PREFIX = /usr/local/bin
 
-TARGET = grey
+PROJECT = grey
 
-build: preprocess
-	$(CC) -o $(TARGET) $(shell find src -name '*.c') $(CFLAGS) $(CFLAGS-BLD)
+CDIR = src
+ODIR = obj
 
-debug: preprocess
-	$(CC) -o $(TARGET) $(shell find src -name '*.c') $(CFLAGS) $(CFLAGS-DBG)
+# Find all .C files, and thus the corresponding .o files
+CFILES := $(shell find $(CDIR) -type f -name '*.c')
+OFILES := $(patsubst $(CDIR)/%.c,$(ODIR)/%.o,$(CFILES))
 
-preprocess:
-	$(shell sh preprocess.sh)
+# Compile the project
+$(PROJECT): stdlib.out $(OFILES)
+	$(CC) -o $(PROJECT) $(CFLAGS) $(OFILES)
 
-install:
-	mv $(TARGET) $(PREFIX)/$(TARGET)
+# Compile .c files to .o files
+$(ODIR)/%.o: $(CDIR)/%.c
+	mkdir -p $(dir $@)
+	$(CC) -c $(patsubst $(ODIR)/%.o,$(CDIR)/%.c,$@) -o $@ $(OFLAGS)
 
+# Run stdlib preprocessor thing
+stdlib.out: $(shell find stdlib -type f)
+	./preprocess.sh
+
+# Compile without optimization and with debug info
+debug: OFLAGS = $(FLAGS-DBG)
+debug: CFLAGS += $(FLAGS-DBG)
+debug: $(PROJECT)
+
+# Compile and run
+run: $(PROJECT)
+	$(PROJECT)
+
+# Compile with debug info, run with valgrind
+test: debug
+	valgrind $(VFLAGS) ./$(PROJECT)
+
+# Install to $(PREFIX)
+install: $(PROJECT)
+	mv $(PROJECT) $(PREFIX)
+
+# Uninstall
+uninstall:
+	rm $(PREFIX)/$(PROJECT)
+
+# Clean the project
 clean:
-	rm $(TARGET)
-	rm "stdlib.out"
+	rm -f -r $(ODIR)
+	rm -f $(PROJECT)
+	rm -f stdlib.out
+	rm -f vgcore.*
