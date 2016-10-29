@@ -24,6 +24,8 @@ static int repl()
 	while (1)
 	{
 		char* str = l_plat_readline("> ");
+		if (str == NULL)
+			return 1;
 
 		l_scanner* stream = l_scanner_create_str(str);
 		l_vm_var* v = l_vm_run(vm, l_parse(stream));

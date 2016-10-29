@@ -32,7 +32,7 @@ char* l_plat_readline(char* prompt)
 	}
 #else
 	char* str = readline(prompt);
-	if (str[0] != '\0')
+	if (str != NULL && str[0] != '\0')
 		add_history(str);
 	return str;
 #endif
