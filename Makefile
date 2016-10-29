@@ -36,9 +36,10 @@ clean:
 	rm -fr dep
 	rm -fr obj
 	rm -f $(PROJECT)
+	rm -f stdlib.out
 	rm -f vgcore.*
 
-dep/src/%.d: src/%.c
+dep/src/%.d: src/%.c stdlib.out
 	mkdir -p $(@D)
 	printf $(dir obj/$*) > $@
 	gcc -MM $(W_FLAGS) $< -o - >> $@
@@ -46,10 +47,14 @@ dep/src/%.d: src/%.c
 
 include $(D_FILES)
 
-obj/%.o: src/%.c
+obj/%.o: src/%.c stdlib.out
 	mkdir -p $(@D)
 	$(CC) -c $(FLAGS) $(W_FLAGS) $(L_FLAGS) --std=$(STD) $< -o $@
 	$(call log,"Created object file",$@)
+
+stdlib.out: $(shell find stdlib -type f)
+	./preprocess.sh
+	$(call log,"Ran preprocessor for","stdlib.out")
 
 .PHONY: run debug test install uninstall clean
 .SILENT:
