@@ -1,56 +1,55 @@
-CC = gcc
-CFLAGS = -std=c99 -Wall -Werror -Wpedantic -lm -lreadline -ldl
-OFLAGS = -O3
-VFLAGS = --track-origins=yes
-FLAGS-DBG = -g -DDEBUG
-PREFIX = /usr/local/bin
+include conf.mk
 
-PROJECT = grey
+W_FLAGS=$(addprefix -W, $(WARNINGS))
+L_FLAGS=$(addprefix -l, $(LINKS))
 
-CDIR = src
-ODIR = obj
+C_FILES=$(shell find src -type f -name '*.c')
+O_FILES=$(patsubst src/%.c,obj/%.o,$(C_FILES))
+D_FILES=$(patsubst src/%.c,dep/src/%.d,$(C_FILES))
 
-# Find all .C files, and thus the corresponding .o files
-CFILES := $(shell find $(CDIR) -type f -name '*.c')
-OFILES := $(patsubst $(CDIR)/%.c,$(ODIR)/%.o,$(CFILES))
+col_dim=\e[0;34m
+col_bright=\e[1;95m
+col_arg=\e[0;92m
+col_end=\e[0m
+log=echo -e "$(col_dim)[$(col_bright)i$(col_dim)]$(col_end) $(1) $(col_arg)$(2)$(col_end)"
 
-# Compile the project
-$(PROJECT): stdlib.out $(OFILES)
-	$(CC) -o $(PROJECT) $(CFLAGS) $(OFILES)
+$(PROJECT): $(O_FILES)
+	$(CC) $(FLAGS) $(W_FLAGS) $(L_FLAGS) $(O_FILES) -o $(PROJECT)
+	$(call log,"Created $(PROJECT).")
 
-# Compile without optimization and with debug info
-debug: OFLAGS = $(FLAGS-DBG)
-debug: CFLAGS += $(FLAGS-DBG)
-debug: $(PROJECT)
-
-# Compile and run
 run: $(PROJECT)
 	$(PROJECT)
 
-# Compile with debug info, run with valgrind
+debug: FLAGS=$(FLAGS-DBG)
+debug: $(PROJECT)
+
 test: debug
-	valgrind $(VFLAGS) ./$(PROJECT)
+	valgrind $(FLAGS-VALGRIND) ./$(PROJECT)
 
-# Install to $(PREFIX)
 install: $(PROJECT)
-	mv $(PROJECT) $(PREFIX)
+	cp $(PROJECT) $(PREFIX)
 
-# Uninstall
 uninstall:
 	rm $(PREFIX)/$(PROJECT)
 
-# Clean the project
 clean:
-	rm -f -r $(ODIR)
+	rm -fr dep
+	rm -fr obj
 	rm -f $(PROJECT)
-	rm -f stdlib.out
 	rm -f vgcore.*
 
-# Compile .c files to .o files
-$(ODIR)/%.o: $(CDIR)/%.c
-	mkdir -p $(dir $@)
-	$(CC) -c $(patsubst $(ODIR)/%.o,$(CDIR)/%.c,$@) -o $@ $(OFLAGS)
+dep/src/%.d: src/%.c
+	mkdir -p $(@D)
+	printf $(dir obj/$*) > $@
+	gcc -MM $(W_FLAGS) $< -o - >> $@
+	$(call log,"Created dep file",$@)
 
-# Run stdlib preprocessor thing
-stdlib.out: $(shell find stdlib -type f)
-	./preprocess.sh
+include $(D_FILES)
+
+obj/%.o: src/%.c
+	mkdir -p $(@D)
+	$(CC) -c $(FLAGS) $(W_FLAGS) $(L_FLAGS) --std=$(STD) $< -o $@
+	$(call log,"Created object file",$@)
+
+.PHONY: run debug test install uninstall clean
+.SILENT:

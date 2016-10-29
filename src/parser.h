@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <alloca.h>
 
 #define l_parse l_parse_expr_list
 #define l_pretty_print(list, f) l_pretty_expr_list(list, 0, f)
