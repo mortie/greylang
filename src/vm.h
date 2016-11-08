@@ -1,13 +1,9 @@
-#ifndef L_VM_H
+#ifndef VM_H
 #define VM_H
 
-typedef struct l_vm_map
-{
-	int varc;
-	int vars;
-	int names;
+typedef struct vm_var vm_var;
+typedef struct vm_map vm_map;
 
-	struct l_vm_map *parent;
-} l_vm_map;
+#include "vm/map.h"
 
 #endif
