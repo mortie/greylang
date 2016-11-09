@@ -28,7 +28,7 @@ static int repl()
 			return 1;
 
 		l_scanner* stream = l_scanner_create_str(str);
-		l_vm_var* v = l_vm_run(vm, l_parse(stream));
+		vm_var* v = l_vm_run(vm, l_parse(stream));
 
 		char* s = l_vm_var_tostring(v);
 		if (v->type == VAR_TYPE_STRING)
