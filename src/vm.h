@@ -3,6 +3,7 @@
 
 #include "parser.h"
 
+typedef struct l_vm l_vm;
 typedef struct vm_var vm_var;
 typedef struct vm_map vm_map;
 

@@ -30,7 +30,7 @@ static int repl()
 		l_scanner* stream = l_scanner_create_str(str);
 		vm_var* v = l_vm_run(vm, l_parse(stream));
 
-		char* s = l_vm_var_tostring(v);
+		char* s = vm_var_tostring(v);
 		if (v->type == VAR_TYPE_STRING)
 			printf("\"%s\"\n", s);
 		else if (v->type != VAR_TYPE_ERROR)

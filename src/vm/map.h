@@ -79,3 +79,8 @@ int vm_map_set_r(vm_map *map, char *key, vm_var *var);
  *     The variable, or NULL if it doesn't exist.
  */
 vm_var *vm_map_lookup_r(vm_map *map, char *key);
+
+/*
+ * Free map and decrement the refcount of all variables.
+ */
+void vm_map_free(vm_map *map);

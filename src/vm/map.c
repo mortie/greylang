@@ -6,12 +6,14 @@
 vm_map *vm_map_create(vm_map *parent)
 {
 	vm_map *map = malloc(sizeof(*map));
+
 	map->varc = 0;
 	map->vars = NULL;
 	map->keys = NULL;
 	map->allocd = 0;
 	map->parent = parent;
 	map->immutable = 0;
+
 	return map;
 }
 
@@ -114,4 +116,21 @@ vm_var *vm_map_lookup_r(vm_map *map, char *key)
 		return NULL;
 	else
 		return vm_map_lookup_r(map->parent, key);
+}
+
+void vm_map_free(vm_map *map)
+{
+	for (int i = 0; i < map->varc; ++i)
+	{
+		if (map->vars[i] != NULL)
+			vm_var_decrefs(map->vars[i]);
+		free(map->keys[i]);
+
+		map->vars[i] = NULL;
+		map->keys[i] = NULL;
+	}
+
+	free(map->vars);
+	free(map->keys);
+	free(map);
 }
