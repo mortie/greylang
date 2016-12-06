@@ -1,6 +1,8 @@
 #ifndef VM_H
 #define VM_H
 
+#include <stdint.h>
+
 #include "parser.h"
 
 typedef struct l_vm l_vm;

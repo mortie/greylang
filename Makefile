@@ -23,7 +23,7 @@ run: $(PROJECT)
 debug: FLAGS=$(FLAGS-DBG)
 debug: $(PROJECT)
 
-test: debug
+valgrind: debug
 	valgrind $(FLAGS-VALGRIND) ./$(PROJECT)
 
 install: $(PROJECT)
@@ -32,12 +32,17 @@ install: $(PROJECT)
 uninstall:
 	rm $(PREFIX)/$(PROJECT)
 
+test: FLAGS=$(FLAGS-DBG)
+test: $(O_FILES)
+	make -C test run
+
 clean:
 	rm -fr dep
 	rm -fr obj
 	rm -f $(PROJECT)
 	rm -f stdlib.out
 	rm -f vgcore.*
+	make -C test clean
 
 dep/src/%.d: src/%.c stdlib.out
 	mkdir -p $(@D)

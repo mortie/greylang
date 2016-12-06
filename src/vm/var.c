@@ -51,6 +51,11 @@ char *vm_var_tostring(vm_var *var)
 		str = "[object]";
 		break;
 
+	case VAR_TYPE_ARRAY:
+	{
+		return vm_var_array_tostring(var->var.array);
+	}
+
 	case VAR_TYPE_FUNCTION:
 		str = "[function]";
 		break;

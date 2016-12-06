@@ -7,5 +7,5 @@ FLAGS=-O3
 FLAGS-DBG=-g
 FLAGS-VALGRIND=--track-origins=yes
 
-WARNINGS=all error
+WARNINGS=all
 LINKS=m readline dl

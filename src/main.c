@@ -31,9 +31,9 @@ static int repl()
 		vm_var* v = l_vm_run(vm, l_parse(stream));
 
 		char* s = vm_var_tostring(v);
-		if (v->type == VAR_TYPE_STRING)
+		if (v->type == VAR_TYPE_ARRAY && v->var.array->type == VAR_TYPE_CHAR)
 			printf("\"%s\"\n", s);
-		else if (v->type != VAR_TYPE_ERROR)
+		else
 			printf("%s\n", s);
 
 		free(str);
