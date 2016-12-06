@@ -1,12 +1,14 @@
-CC = gcc
+CC=gcc
+FLAGS=-g -Wall
+FLAGS-VALGRIND=--quiet --leak-check=full --show-leak-kinds=all
 
 TARGET = test
 
 $(TARGET):
-	$(CC) -o $(TARGET) *.c src/*.c
+	$(CC) $(FLAGS) -o $(TARGET) *.c src/*.c
 
 run: $(TARGET)
-	valgrind ./$(TARGET)
+	valgrind $(FLAGS-VALGRIND) ./$(TARGET)
 	rm -f $(TARGET)
 
 clean:
