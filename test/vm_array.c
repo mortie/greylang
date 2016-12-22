@@ -54,7 +54,7 @@ void test_vm_array()
 		vm_var_array_free(&arr);
 	}
 
-	it("returns NULL when looking pu undefined keys") {
+	it("returns NULL when looking up undefined keys") {
 		vm_var_array arr;
 		vm_var_array_init(&arr, VAR_TYPE_NUMBER);
 
