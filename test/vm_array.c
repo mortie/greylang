@@ -1,7 +1,7 @@
 #include "src/test.h"
 #include "../src/vm.h"
 
-void vm_array()
+void test_vm_array()
 {
 	it("sets and retrieves values") {
 		vm_var_array arr;
@@ -15,7 +15,7 @@ void vm_array()
 		asserteq(num, 10.0);
 
 		vm_var_array_free(&arr);
-	};
+	}
 
 	it("correctly resizes with consecutive inserts") {
 		vm_var_array arr;
@@ -52,6 +52,14 @@ void vm_array()
 		asserteq(num, 11.0);
 
 		vm_var_array_free(&arr);
+	}
+
+	it("returns NULL when looking pu undefined keys") {
+		vm_var_array arr;
+		vm_var_array_init(&arr, VAR_TYPE_NUMBER);
+
+		vm_var *ret = vm_var_array_get(&arr, 50);
+		asserteq(ret, NULL);
 	}
 
 	done();

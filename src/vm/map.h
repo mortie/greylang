@@ -10,6 +10,7 @@ typedef struct vm_map
 	int allocd;
 
 	int immutable;
+	int refs;
 
 	struct vm_map *parent;
 } vm_map;
@@ -84,3 +85,13 @@ vm_var *vm_map_lookup_r(vm_map *map, char *key);
  * Free map and decrement the refcount of all variables.
  */
 void vm_map_free(vm_map *map);
+
+/*
+ * Increase map refcount
+ */
+void vm_map_increfs(vm_map *map);
+
+/*
+ * Decrease map refcount, free if <= 0
+ */
+void vm_map_decrefs(vm_map *map);

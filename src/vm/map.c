@@ -13,6 +13,10 @@ vm_map *vm_map_create(vm_map *parent)
 	map->allocd = 0;
 	map->parent = parent;
 	map->immutable = 0;
+	map->refs = 0;
+
+	if (parent != NULL)
+		vm_map_increfs(parent);
 
 	return map;
 }
@@ -55,8 +59,8 @@ int vm_map_replace(vm_map *map, char *key, vm_var *var)
 		if (map->keys[i] != NULL && strcmp(map->keys[i], key) == 0)
 		{
 			vm_var_increfs(var);
-			map->vars[i] = var;
 			vm_var_decrefs(map->vars[i]);
+			map->vars[i] = var;
 			return 0;
 		}
 	}
@@ -130,7 +134,22 @@ void vm_map_free(vm_map *map)
 		map->keys[i] = NULL;
 	}
 
+	if (map->parent != NULL)
+		vm_map_decrefs(map->parent);
+
 	free(map->vars);
 	free(map->keys);
 	free(map);
+}
+
+void vm_map_increfs(vm_map *map)
+{
+	map->refs += 1;
+}
+
+void vm_map_decrefs(vm_map *map)
+{
+	map->refs -= 1;
+	if (map->refs <= 0)
+		vm_map_free(map);
 }
