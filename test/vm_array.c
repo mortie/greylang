@@ -40,5 +40,19 @@ void vm_array()
 		vm_var_array_free(&arr);
 	}
 
+	it("handles arbitrary insertions") {
+		vm_var_array arr;
+		vm_var_array_init(&arr, VAR_TYPE_NUMBER);
+
+		vm_var *in = vm_var_create(VAR_TYPE_NUMBER);
+		in->var.number = 11.0;
+
+		vm_var_array_set(&arr, 17, in);
+		double num = vm_var_array_get(&arr, 17)->var.number;
+		asserteq(num, 11.0);
+
+		vm_var_array_free(&arr);
+	}
+
 	done();
 }

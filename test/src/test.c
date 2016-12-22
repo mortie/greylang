@@ -26,8 +26,9 @@ void done(char *comment)
 	printf(
 		COLOR_BOLD COLOR_SUCCESS "✓ "
 		COLOR_RESET COLOR_SUCCESS "Success: "
-		COLOR_RESET COLOR_DESC "%s\n"
+		COLOR_RESET COLOR_DESC "%s"
 		COLOR_RESET, __description);
+	printf("\n");
 }
 
 void fail(char *comment)

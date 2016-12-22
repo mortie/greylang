@@ -22,30 +22,24 @@ void vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
 	if (index >= arr->allocd)
 	{
 		int oldallocd = arr->allocd;
+
 		if (arr->allocd == 0)
-		{
 			arr->allocd = 4;
-		}
-		else
-		{
-			while (index >= arr->allocd)
-				arr->allocd *= 2;
-		}
+
+		while (index >= arr->allocd)
+			arr->allocd *= 2;
 
 		arr->vars = realloc(arr->vars, sizeof(*(arr->vars)) * arr->allocd);
 		memset(arr->vars + oldallocd, 0,
 			(arr->allocd - oldallocd) * sizeof(*(arr->vars)));
 	}
 
-	if (arr->allocd > arr->varc)
-	{
+	if (arr->allocd > arr->varc && index >= arr->varc)
 		arr->varc = index + 1;
-	}
 
 	if (arr->vars[index] != NULL)
-	{
 		vm_var_decrefs(arr->vars[index]);
-	}
+
 	vm_var_increfs(var);
 	arr->vars[index] = var;
 }
