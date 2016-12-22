@@ -33,6 +33,38 @@ void vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
 		}
 
 		arr->vars = realloc(arr->vars, sizeof(*(arr->vars)) * arr->allocd);
-		memset(arr->vars + oldallocd + 1, 0, arr->allocd - oldallocd);
+		memset(arr->vars + oldallocd, 0,
+			(arr->allocd - oldallocd) * sizeof(*(arr->vars)));
 	}
+
+	if (arr->allocd > arr->varc)
+	{
+		arr->varc = index + 1;
+	}
+
+	if (arr->vars[index] != NULL)
+	{
+		vm_var_decrefs(arr->vars[index]);
+	}
+	vm_var_increfs(var);
+	arr->vars[index] = var;
+}
+
+vm_var *vm_var_array_get(vm_var_array *arr, int index)
+{
+	if (index >= arr->varc)
+		return NULL;
+
+	return arr->vars[index];
+}
+
+void vm_var_array_free(vm_var_array *arr)
+{
+	for (int i = 0; i < arr->varc; ++i)
+	{
+		if (arr->vars[i] != NULL)
+			vm_var_decrefs(arr->vars[i]);
+	}
+
+	free(arr->vars);
 }

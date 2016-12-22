@@ -36,7 +36,13 @@ void vm_var_array_init(vm_var_array *arr, vm_var_type type);
 char *vm_var_array_tostring(vm_var_array *arr);
 
 // Set an index to a value
-void vm_var_array_set(vm_var_array *arr, int inedx, vm_var *var);
+void vm_var_array_set(vm_var_array *arr, int index, vm_var *var);
+
+// Get a value from an index
+vm_var *vm_var_array_get(vm_var_array *arr, int index);
+
+// Free the array, and decrement refcounts
+void vm_var_array_free(vm_var_array *arr);
 
 /*
  * Function

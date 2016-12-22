@@ -1,12 +1,10 @@
 #include "src/test.h"
 
-void test_foo();
-void test_bar();
+void vm_array();
 
 int main()
 {
-	run(test_foo);
-	run(test_bar);
+	run(vm_array);
 
 	return 0;
 }

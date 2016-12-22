@@ -78,6 +78,10 @@ char *vm_var_tostring(vm_var *var)
 		else
 			str = "[false]";
 
+	case VAR_TYPE_CHAR:
+		// TODO: This has to do fancy stuff to convert uint32_t to a char*
+		str = "[char]";
+
 	case VAR_TYPE_NONE:
 		str = "[none]";
 	}

@@ -1,3 +1,6 @@
+#ifndef TEST_H
+#define TEST_H
+
 #include <string.h>
 #include <stdio.h>
 
@@ -21,13 +24,13 @@
  * }
  */
 
-char __description[256];
-int __done;
-int _ntests;
-int _npassed;
+extern char __description[256];
+extern int __done;
+extern int _ntests;
+extern int _npassed;
 
-char *__file;
-int __line;
+extern char *__file;
+extern int __line;
 
 void fail();
 void done();
@@ -55,9 +58,18 @@ void done();
 		} \
 	} while (0)
 
+#define asserteq_str(a, b) \
+	do { \
+		if (strcmp((a), (b)) != 0) { \
+			fail("Expected " #a " to equal " #b); \
+		} \
+	} while (0)
+
 #define asserteq(a, b) \
 	do { \
 		if ((a) != (b)) { \
 			fail("Expected " #a " to equal " #b); \
 		} \
 	} while (0)
+
+#endif
