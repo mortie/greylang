@@ -43,7 +43,7 @@ int vm_var_equals(vm_var *a, vm_var *b)
 
 char *vm_var_tostring(vm_var *var)
 {
-	char *str;
+	char *str = "";
 
 	switch (var->type)
 	{

@@ -17,8 +17,15 @@ char *vm_var_array_tostring(vm_var_array *arr)
 	return str;
 }
 
-void vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
+int vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
 {
+	if (
+			arr->type != VAR_TYPE_NONE &&
+			var->type != arr->type)
+	{
+		return -1;
+	}
+
 	if (index >= arr->allocd)
 	{
 		int oldallocd = arr->allocd;
@@ -42,6 +49,8 @@ void vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
 
 	vm_var_increfs(var);
 	arr->vars[index] = var;
+
+	return 0;
 }
 
 vm_var *vm_var_array_get(vm_var_array *arr, int index)

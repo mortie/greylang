@@ -15,6 +15,9 @@ typedef struct vm_map vm_map;
 typedef struct l_vm
 {
 	vm_map *root;
+	vm_var *var_none;
+	vm_var *var_true;
+	vm_var *var_false;
 } l_vm;
 
 l_vm *l_vm_create();

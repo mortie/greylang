@@ -35,8 +35,9 @@ void vm_var_array_init(vm_var_array *arr, vm_var_type type);
 // Return a string, allocated with malloc
 char *vm_var_array_tostring(vm_var_array *arr);
 
-// Set an index to a value
-void vm_var_array_set(vm_var_array *arr, int index, vm_var *var);
+// Set an index to a value, if var is of an appropriate type
+// Returns 0 on success, -1 on error
+int vm_var_array_set(vm_var_array *arr, int index, vm_var *var);
 
 // Get a value from an index
 vm_var *vm_var_array_get(vm_var_array *arr, int index);
@@ -94,7 +95,7 @@ typedef struct vm_var
 	vm_map *map;
 } vm_var;
 
- // Create a new vm_var, allocated on the heap with malloc.
+// Create a new vm_var, allocated on the heap with malloc.
 vm_var *vm_var_create(vm_var_type type);
 
 // Increase or decrease the ref count.
