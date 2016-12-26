@@ -14,6 +14,7 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 			(t.type == TOKEN_NAME) ||
 			(t.type == TOKEN_PERIOD) ||
 			(t.type == TOKEN_EQUALS) ||
+			(t.type == TOKEN_COLONEQUALS) ||
 			(t.type == TOKEN_OPENPAREN) ||
 			(t.type == TOKEN_OPENBRACKET)))
 	{
@@ -92,6 +93,16 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 		expr->expression.assignment =
 			l_parse_expr_assignment(stream, prev);
 		expr->type = EXPR_ASSIGNMENT;
+	}
+
+	/*
+	 * Declaration
+	 */
+	else if (prev != NULL && t.type == TOKEN_COLONEQUALS)
+	{
+		expr->expression.declaration =
+			l_parse_expr_declaration(stream, prev);
+		expr->type = EXPR_DECLARATION;
 	}
 
 	/*
@@ -228,6 +239,11 @@ void l_pretty_expr(
 			depth, file);
 		break;
 	case EXPR_ASSIGNMENT:
+		l_pretty_expr_declaration(
+			expr->expression.declaration,
+			depth, file);
+		break;
+	case EXPR_DECLARATION:
 		l_pretty_expr_assignment(
 			expr->expression.assignment,
 			depth, file);

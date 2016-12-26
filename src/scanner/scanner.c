@@ -181,7 +181,7 @@ static l_token gettoken(l_scanner* scanner)
 	/*
 	 * Colon
 	 */
-	else if (c == ':')
+	else if (c == ':' && next != '=')
 	{
 		SETTOKEN(TOKEN_COLON, ":");
 		nextchar(scanner);
@@ -193,6 +193,16 @@ static l_token gettoken(l_scanner* scanner)
 	else if (c == ';')
 	{
 		SETTOKEN(TOKEN_SEMICOLON, ";");
+		nextchar(scanner);
+	}
+
+	/*
+	 * Colon Equals
+	 */
+	else if (c == ':' && next == '=')
+	{
+		SETTOKEN(TOKEN_COLONEQUALS, ":=");
+		nextchar(scanner);
 		nextchar(scanner);
 	}
 

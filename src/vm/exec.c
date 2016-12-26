@@ -19,7 +19,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		l_p_comma_expr_list *exprs = e->arg_list;
 
 		if (func->type != VAR_TYPE_FUNCTION)
-			return vm->var_none; // TODO: errors
+			return l_vm_error(vm, "Expected function");
 
 		vm_var_array *args = malloc(sizeof(*args));
 		for (int i = 0; i < exprs->expressionc; ++i)
@@ -59,11 +59,11 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		{
 			vm_var_array *arr = obj->var.array;
 			if (key->type != VAR_TYPE_NUMBER)
-				return vm->var_none; // TODO: errors
+				return l_vm_error(vm, "Expected number in array lookup");
 
 			int num = (int)key->var.number;
 			if (num >= arr->varc)
-				return vm->var_none; // TODO: errors
+				return l_vm_error(vm, "Array index out of bounds");
 
 			vm_var *var = arr->vars[num];
 			if (var == NULL)
@@ -71,14 +71,17 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 			else
 				return var;
 		}
+
+		// TODO: object lookup
+		else if (
+				key->type == VAR_TYPE_ARRAY &&
+				key->var.array->type == VAR_TYPE_CHAR)
+		{
+			return l_vm_error(vm, "Object lookup with [] is not implemented");
+		}
 		else
 		{
-			if (
-					key->type != VAR_TYPE_ARRAY ||
-					key->var.array->type != VAR_TYPE_CHAR)
-			{
-				return vm->var_none; // TODO: errors
-			}
+			return l_vm_error(vm, "Confusing array/object lookup");
 		}
 	}
 
@@ -93,7 +96,8 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		{
 			l_p_expr_object_lookup *ol = ekey->expression.object_lookup;
 			vm_var *obj = vm_exec(vm, scope, ol->obj);
-			vm_map_set(obj->map, ol->key, val);
+			if (vm_map_set(obj->map, ol->key, val) == -1)
+				return l_vm_error(vm, "Scope is immutable");
 		}
 		else if (ekey->type == EXPR_ARRAY_LOOKUP)
 		{
@@ -106,30 +110,49 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 				int ret = vm_var_array_set(
 					arr->var.array, (int)(key->var.number), val);
 				if (ret == -1)
-					return vm->var_none; // TODO: errors
+					return l_vm_error(vm, "Can't insert value into array");
 			}
 			else if (
 					key->type == VAR_TYPE_ARRAY &&
 					key->var.array->type == VAR_TYPE_CHAR)
 			{
 				char *k = ""; // TODO: char array to string conversion
-				vm_map_set(arr->map, k, val);
+				if (vm_map_set(arr->map, k, val))
+					return l_vm_error(vm, "Scope is immutable");
 			}
 			else
 			{
-				return vm->var_none; // TODO: errors
+				return l_vm_error(vm, "Confusing array/object assignment");
 			}
 		}
 		else if (ekey->type == EXPR_VARIABLE)
 		{
-			vm_map_replace(scope, ekey->expression.variable->name, val);
+			if (vm_map_replace(scope, ekey->expression.variable->name, val) == -1)
+				return l_vm_error(vm, "Variable isn't defined");
 		}
 		else
 		{
-			return vm->var_none; // TODO: errors
+			return l_vm_error(vm, "Invalid assignment");
 		}
 
 		return val;
+	}
+
+	case EXPR_DECLARATION:
+	{
+		l_p_expr_assignment *e = expr->expression.assignment;
+
+		vm_var *val = vm_exec(vm, scope, e->val);
+		l_p_expr *ekey = e->key;
+
+		if (ekey->type != EXPR_VARIABLE)
+			return l_vm_error(vm, "Invalid declaration");
+
+		char *key = ekey->expression.variable->name;
+		if (vm_map_define(scope, key, val) == -1)
+			return l_vm_error(vm, "Variable already exists");
+
+		return vm->var_none;
 	}
 
 	case EXPR_FUNCTION:
@@ -158,7 +181,8 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		for (int i = 0; i < e->exprc; ++i)
 		{
 			vm_var *val = vm_exec(vm, scope, e->exprs[i]);
-			vm_map_set(var->map, e->names[i], val);
+			if (vm_map_set(var->map, e->names[i], val) == -1)
+				return l_vm_error(vm, "Scope is immutable");
 		}
 
 		return var;
@@ -204,7 +228,12 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 	case EXPR_VARIABLE:
 	{
-		return vm_map_lookup_r(scope, expr->expression.variable->name);
+		char *key = expr->expression.variable->name;
+		vm_var *var = vm_map_lookup_r(scope, key);
+		if (var == NULL)
+			return vm->var_none;
+		else
+			return var;
 	}
 	}
 
