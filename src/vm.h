@@ -12,6 +12,7 @@ typedef struct vm_map vm_map;
 #include "vm/var.h"
 #include "vm/map.h"
 #include "vm/exec.h"
+#include "vm/std.h"
 
 typedef struct l_vm
 {

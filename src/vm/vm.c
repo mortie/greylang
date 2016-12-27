@@ -20,6 +20,20 @@ l_vm *l_vm_create()
 	vm_map_define(vm->base, "true", vm->var_true);
 	vm_map_define(vm->base, "false", vm->var_false);
 
+#define STD(name, fn) \
+	do { \
+		vm_var_function *func = malloc(sizeof(*func)); \
+		vm_var_function_init(func, NULL); \
+		func->fptr = fn; \
+		vm_var *var = vm_var_create(VAR_TYPE_FUNCTION); \
+		var->var.function = func; \
+		vm_map_define(vm->base, name, var); \
+	} while (0)
+
+	STD("test", &vm_std_test);
+
+#undef STD
+
 	vm->base->immutable = 1;
 
 	return vm;

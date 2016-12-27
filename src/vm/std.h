@@ -3,6 +3,8 @@
  */
 
 #define STD(name) \
-	vm_var *vm_std_(name)(l_vm *vm, vm_var *var, int infix)
+	vm_var *name(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
-STD(tostring);
+STD(vm_std_test);
+
+#undef STD
