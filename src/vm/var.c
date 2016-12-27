@@ -78,12 +78,16 @@ char *vm_var_tostring(vm_var *var)
 		else
 			str = "[false]";
 
+		break;
+
 	case VAR_TYPE_CHAR:
 		// TODO: This has to do fancy stuff to convert uint32_t to a char*
 		str = "[char]";
+		break;
 
 	case VAR_TYPE_NONE:
 		str = "[none]";
+		break;
 	}
 
 	char *ret = malloc(strlen(str) + 1);

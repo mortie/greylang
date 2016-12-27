@@ -8,7 +8,6 @@ l_vm *l_vm_create()
 	l_vm *vm = malloc(sizeof(*vm));
 
 	vm->base = vm_map_create(NULL);
-	vm->base->immutable = 1;
 	vm->root = vm_map_create(vm->base);
 
 	vm->var_none = vm_var_create(VAR_TYPE_NONE);
@@ -16,6 +15,12 @@ l_vm *l_vm_create()
 	vm->var_true->var.boolean = 1;
 	vm->var_false = vm_var_create(VAR_TYPE_BOOL);
 	vm->var_false->var.boolean = 0;
+
+	vm_map_define(vm->base, "none", vm->var_none);
+	vm_map_define(vm->base, "true", vm->var_true);
+	vm_map_define(vm->base, "false", vm->var_false);
+
+	vm->base->immutable = 1;
 
 	return vm;
 }

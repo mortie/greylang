@@ -51,18 +51,19 @@ void vm_var_array_free(vm_var_array *arr);
 
 typedef struct vm_var_function
 {
-	vm_var *(*fptr)(l_vm *vm, vm_var *var, int infix);
+	vm_var *(*fptr)(l_vm *vm, vm_var *self, vm_var_array *args, int infix);
 
 	l_p_expr **exprs;
 	int exprc;
 
 	char **argnames;
 	int argnamec;
+	vm_map *scope;
 	vm_var *self;
 } vm_var_function;
 
 // Init function
-void vm_var_function_init(vm_var_function *func);
+void vm_var_function_init(vm_var_function *func, vm_map *scope);
 
 // Execute function
 vm_var *vm_var_function_exec(

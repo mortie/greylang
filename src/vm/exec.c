@@ -22,6 +22,8 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 			return l_vm_error(vm, "Expected function");
 
 		vm_var_array *args = malloc(sizeof(*args));
+		vm_var_array_init(args, VAR_TYPE_NONE);
+
 		for (int i = 0; i < exprs->expressionc; ++i)
 		{
 			vm_var *val = vm_exec(vm, scope, exprs->expressions[i]);
@@ -160,10 +162,13 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		l_p_expr_function *e = expr->expression.function;
 
 		vm_var_function *func = malloc(sizeof(*func));
-		vm_var_function_init(func);
+		vm_var_function_init(func, scope);
 
-		func->argnames = e->arg_definition->names;
-		func->argnamec = e->arg_definition->namec;
+		if (e->arg_definition != NULL)
+		{
+			func->argnames = e->arg_definition->names;
+			func->argnamec = e->arg_definition->namec;
+		}
 		func->exprs = e->expr_list->expressions;
 		func->exprc = e->expr_list->expressionc;
 
