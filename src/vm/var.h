@@ -78,6 +78,15 @@ vm_var *vm_var_function_exec(
 
 typedef uint32_t vm_var_char;
 
+// Get the number of bytes in a utf8 character based on the first character
+int vm_var_char_count_bytes(uint8_t first);
+
+// Get a var_char from a char*
+vm_var_char vm_var_char_from_utf8(char *str);
+
+// Convert a utf8 string to an aray of chars
+void vm_var_char_array_from_utf8(char *str, vm_var_array *arr);
+
 /*
  * Variable
  */
@@ -90,6 +99,7 @@ typedef struct vm_var
 		vm_var_function *function;
 		double number;
 		int boolean;
+		vm_var_char character;
 	} var;
 	vm_var_type type;
 	int refs;
