@@ -92,7 +92,6 @@ void vm_var_char_to_utf8(vm_var_char ch, char *buf);
 // Returns a string allocated with malloc.
 char *vm_var_char_array_to_utf8(vm_var_array *arr);
 
-
 /*
  * Variable
  */

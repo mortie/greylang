@@ -81,9 +81,11 @@ char *vm_var_tostring(vm_var *var)
 		break;
 
 	case VAR_TYPE_CHAR:
-		// TODO: This has to do fancy stuff to convert uint32_t to a char*
-		str = "[char]";
-		break;
+	{
+		char *ret = malloc(5);
+		vm_var_char_to_utf8(var->var.character, ret);
+		return ret;
+	}
 
 	case VAR_TYPE_NONE:
 		str = "[none]";

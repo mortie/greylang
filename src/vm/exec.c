@@ -214,10 +214,12 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 	case EXPR_STRING_LITERAL:
 	{
+		l_p_expr_string_literal *sl = expr->expression.string_literal;
+
 		vm_var_array *arr = malloc(sizeof(*arr));
 		vm_var_array_init(arr, VAR_TYPE_CHAR);
 
-		// TODO: make strings
+		vm_var_char_array_from_utf8(sl->string, arr);
 
 		vm_var *var = vm_var_create(VAR_TYPE_ARRAY);
 		var->var.array = arr;

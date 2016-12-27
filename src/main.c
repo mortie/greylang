@@ -33,6 +33,8 @@ static int repl()
 		char* s = vm_var_tostring(v);
 		if (v->type == VAR_TYPE_ARRAY && v->var.array->type == VAR_TYPE_CHAR)
 			printf("\"%s\"\n", s);
+		else if (v->type == VAR_TYPE_CHAR)
+			printf("'%s'\n", s);
 		else
 			printf("%s\n", s);
 

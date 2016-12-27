@@ -12,9 +12,16 @@ void vm_var_array_init(vm_var_array *arr, vm_var_type type)
 
 char *vm_var_array_tostring(vm_var_array *arr)
 {
-	char *str = malloc(strlen("[array]") + 1);
-	strcpy(str, "[array]");
-	return str;
+	if (arr->type == VAR_TYPE_CHAR)
+	{
+		return vm_var_char_array_to_utf8(arr);
+	}
+	else
+	{
+		char *str = malloc(strlen("[array]") + 1);
+		strcpy(str, "[array]");
+		return str;
+	}
 }
 
 int vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
