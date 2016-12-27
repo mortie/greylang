@@ -78,14 +78,20 @@ vm_var *vm_var_function_exec(
 
 typedef uint32_t vm_var_char;
 
-// Get the number of bytes in a utf8 character based on the first character
-int vm_var_char_count_bytes(uint8_t first);
-
-// Get a var_char from a char*
+// Get a vm_var_char from a char*
 vm_var_char vm_var_char_from_utf8(char *str);
 
-// Convert a utf8 string to an aray of chars
+// Convert a utf8 string to an aray of vm_var_char
 void vm_var_char_array_from_utf8(char *str, vm_var_array *arr);
+
+// Convert a vm_var_char to utf8.
+// buf must be at least 5 bytes.
+void vm_var_char_to_utf8(vm_var_char ch, char *buf);
+
+// Convert an array of vm_var_char to a utf8 string.
+// Returns a string allocated with malloc.
+char *vm_var_char_array_to_utf8(vm_var_array *arr);
+
 
 /*
  * Variable

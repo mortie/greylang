@@ -1,45 +1,44 @@
 #include "../vm.h"
 
-int vm_var_char_count_bytes(uint8_t first)
-{
-	if (first >= 0xF0)
-		return 4;
-	else if (first >= 0xE0)
-		return 3;
-	else if (first >= 0xC0)
-		return 2;
-	else
-		return 1;
-}
+#include <string.h>
+#include <stdlib.h>
+
+// The minimum value of the first `char` to indicate n bytes
+#define C4bytes 0xF0
+#define C3bytes 0xE0
+#define C2bytes 0xC0
+
+// The minimum value for the vm_var_char for the utf8 equivalent to be n bytes
+#define U4bytes 0x10000
+#define U3bytes 0x0800
+#define U2bytes 0x0080
 
 vm_var_char vm_var_char_from_utf8(char *str)
 {
-	uint32_t ch = 0;
+	vm_var_char ch = 0;
 	uint8_t first = str[0];
 
-	int nbytes = vm_var_char_count_bytes(first);
-
-	if (nbytes == 1)
-	{
-		ch |= str[0];
-	}
-	else if (nbytes == 2)
-	{
-		ch |= str[1] & 0b00111111;
-		ch |= (str[0] & 0b00011111) << 6;
-	}
-	else if (nbytes == 3)
-	{
-		ch |= str[2] & 0b00111111;
-		ch |= (str[1] & 0b00111111) << 6;
-		ch |= (str[0] & 0b00001111) << 12;
-	}
-	else if (nbytes == 4)
+	if (first >= C4bytes)
 	{
 		ch |= str[3] & 0b00111111;
 		ch |= (str[2] & 0b00111111) << 6;
 		ch |= (str[1] & 0b00111111) << 12;
 		ch |= (str[0] & 0b00000111) << 18;
+	}
+	else if (first >= C3bytes)
+	{
+		ch |= str[2] & 0b00111111;
+		ch |= (str[1] & 0b00111111) << 6;
+		ch |= (str[0] & 0b00001111) << 12;
+	}
+	else if (first >= C2bytes)
+	{
+		ch |= str[1] & 0b00111111;
+		ch |= (str[0] & 0b00011111) << 6;
+	}
+	else
+	{
+		ch |= str[0];
 	}
 
 	return ch;
@@ -54,9 +53,13 @@ void vm_var_char_array_from_utf8(char *str, vm_var_array *arr)
 	while (1)
 	{
 		uint8_t first = str[i];
-		int nbytes = vm_var_char_count_bytes(first);
+		int nbytes;
+		if (first >= C4bytes) nbytes = 4;
+		else if (first >= C3bytes) nbytes = 3;
+		else if (first >= C2bytes) nbytes = 2;
+		else nbytes = 1;
 
-		uint32_t ch = vm_var_char_from_utf8(str + i);
+		vm_var_char ch = vm_var_char_from_utf8(str + i);
 		vm_var *var = vm_var_create(VAR_TYPE_CHAR);
 		var->var.character = ch;
 		vm_var_array_set(arr, currChar, var);
@@ -66,4 +69,54 @@ void vm_var_char_array_from_utf8(char *str, vm_var_array *arr)
 		if (str[i] == 0)
 			break;
 	}
+}
+
+void vm_var_char_to_utf8(vm_var_char ch, char *buf)
+{
+	memset(buf, 0, 5);
+	if (ch >= U4bytes)
+	{
+		buf[0] = 0b11110000 | ((ch >> 18) & 0b00000111);
+		buf[1] = 0b10000000 | ((ch >> 12) & 0b00111111);
+		buf[2] = 0b10000000 | ((ch >> 6) & 0b00111111);
+		buf[3] = 0b10000000 | (ch & 0b00111111);
+	}
+	else if (ch >= U3bytes)
+	{
+		buf[0] = 0b11100000 | ((ch >> 12) & 0b00001111);
+		buf[1] = 0b10000000 | ((ch >> 6) & 0b00111111);
+		buf[2] = 0b10000000 | (ch & 0b00111111);
+	}
+	else if (ch >= U2bytes)
+	{
+		buf[0] = 0b11000000 | ((ch >> 6) & 0b00011111);
+		buf[1] = 0b10000000 | (ch & 0b00111111);
+	}
+	else
+	{
+		buf[0] = ch;
+	}
+}
+
+char *vm_var_char_array_to_utf8(vm_var_array *arr)
+{
+	char buf[5];
+	char *str = malloc((arr->varc * 4) + 1);
+	int len = 0;
+	str[0] = 0;
+
+	for (int i = 0; i < arr->varc; ++i)
+	{
+		vm_var_char ch = arr->vars[i]->var.character;
+		vm_var_char_to_utf8(ch, buf);
+
+		int nbytes = strlen(buf);
+		memcpy(str + len, buf, nbytes);
+		len += nbytes;
+		str[len] = 0;
+	}
+
+	str = realloc(str, len + 1);
+
+	return str;
 }
