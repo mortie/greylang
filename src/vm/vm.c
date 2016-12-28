@@ -30,7 +30,27 @@ l_vm *l_vm_create()
 		vm_map_define(vm->base, name, var); \
 	} while (0)
 
-	STD("test", &vm_std_test);
+	// Math
+	STD("+", &vm_std_add);
+	STD("-", &vm_std_sub);
+	STD("*", &vm_std_mul);
+	STD("/", &vm_std_div);
+	STD("^", &vm_std_pow);
+
+	// Logic
+	STD("==", &vm_std_eq);
+	STD("!=", &vm_std_neq);
+	STD(">", &vm_std_gt);
+	STD("<", &vm_std_lt);
+	STD(">=", &vm_std_gteq);
+	STD("<=", &vm_std_lteq);
+	STD("and", &vm_std_and);
+	STD("or", &vm_std_or);
+
+	// Util
+	STD("tostr", &vm_std_tostr);
+	STD("concat", &vm_std_concat);
+	STD("..", &vm_std_concat);
 
 #undef STD
 

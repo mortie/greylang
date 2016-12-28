@@ -1,4 +1,4 @@
-#include "../vm.h"
+#include "../../vm.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -38,7 +38,45 @@ int vm_var_equals(vm_var *a, vm_var *b)
 	if (a->type != b->type)
 		return 0;
 
-	return a == b;
+	switch (a->type)
+	{
+	case VAR_TYPE_OBJECT:
+		return a == b;
+
+	case VAR_TYPE_ARRAY:
+	{
+		vm_var_array *arra = a->var.array;
+		vm_var_array *arrb = b->var.array;
+
+		if (arra->varc != arrb->varc)
+			return 0;
+
+		for (int i = 0; i < arra->varc; ++i)
+		{
+			if (!vm_var_equals(arra->vars[i], arrb->vars[i]))
+				return 0;
+		}
+
+		return 1;
+	}
+
+	case VAR_TYPE_FUNCTION:
+		return a == b;
+
+	case VAR_TYPE_NUMBER:
+		return a->var.number == b->var.number;
+
+	case VAR_TYPE_BOOL:
+		return !!(a->var.boolean) == !!(b->var.boolean);
+
+	case VAR_TYPE_CHAR:
+		return a->var.character == b->var.character;
+
+	case VAR_TYPE_NONE:
+		return 1;
+	}
+
+	return 0;
 }
 
 char *vm_var_tostring(vm_var *var)

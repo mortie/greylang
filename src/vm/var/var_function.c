@@ -1,4 +1,4 @@
-#include "../vm.h"
+#include "../../vm.h"
 
 void vm_var_function_init(vm_var_function *func, vm_map *scope)
 {
