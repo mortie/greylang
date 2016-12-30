@@ -21,6 +21,7 @@ static void usage(char* name)
 static int repl()
 {
 	l_vm* vm = l_vm_create();
+	vm_map_increfs(vm->root);
 	while (1)
 	{
 		char* str = l_plat_readline("> ");
@@ -42,6 +43,7 @@ static int repl()
 
 		l_vm_cleanup(vm);
 	}
+	vm_map_decrefs(vm->root);
 
 	return 0;
 }

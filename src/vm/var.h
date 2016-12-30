@@ -51,15 +51,24 @@ void vm_var_array_free(vm_var_array *arr);
 
 typedef struct vm_var_function
 {
+	// If not null, parent will be executed,
+	// but with this function's self
+	struct vm_var_function *parent;
+
+	// If not null, function pointer will be executed
 	vm_var *(*fptr)(l_vm *vm, vm_var *self, vm_var_array *args, int infix);
 
+	// Will be executed if parent and fptr is null
 	l_p_expr **exprs;
 	int exprc;
 
+	// The names of the arguments, if executed with exprs.
 	char **argnames;
 	int argnamec;
+
 	vm_map *scope;
 	vm_var *self;
+	int refs;
 } vm_var_function;
 
 // Init function
@@ -70,7 +79,23 @@ vm_var *vm_var_function_exec(
 		l_vm *vm,
 		vm_var_function *func,
 		vm_var_array *args,
+		vm_var *self,
 		int infix);
+
+// Get a function with the 'self' value set to something else.
+// Increases the ref count of parent.
+void vm_var_function_with_self(
+		vm_var_function *parent,
+		vm_var_function *func,
+		vm_var *self);
+
+// Free function. Decreases the ref count of parent.
+void vm_var_function_free(vm_var_function *func);
+
+// Increase or decrease the ref count.
+// Function is free'd if counter reaches 0.
+void vm_var_function_increfs(vm_var_function *func);
+void vm_var_function_decrefs(vm_var_function *func);
 
 /*
  * Char

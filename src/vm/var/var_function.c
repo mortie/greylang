@@ -2,6 +2,8 @@
 
 void vm_var_function_init(vm_var_function *func, vm_map *scope)
 {
+	func->parent = NULL;
+
 	func->fptr = NULL;
 
 	func->exprs = NULL;
@@ -11,14 +13,28 @@ void vm_var_function_init(vm_var_function *func, vm_map *scope)
 	func->argnamec = 0;
 	func->scope = scope;
 	func->self = NULL;
+	func->refs = 0;
+
+	if (scope != NULL)
+		vm_map_increfs(scope);
 }
 
 vm_var *vm_var_function_exec(
 		l_vm *vm,
 		vm_var_function *func,
 		vm_var_array *args,
+		vm_var *self,
 		int infix)
 {
+	// func->parent not being NULL means the function is just
+	// a reference to another function, with a different self
+	if (func->parent != NULL)
+	{
+		return vm_var_function_exec(
+			vm, func->parent, args,
+			func->self, infix);
+	}
+
 	// If args is null, just make an empty array
 	vm_var_array fakeargs;
 	if (args == NULL)
@@ -36,6 +52,7 @@ vm_var *vm_var_function_exec(
 	}
 
 	vm_map *scope = vm_map_create(func->scope);
+	vm_map_increfs(scope);
 
 	// Define $n variables
 	for (int i = 0; i < args->varc; ++i)
@@ -62,13 +79,52 @@ vm_var *vm_var_function_exec(
 		vm_map_set(scope, "infix?", vm->var_false);
 
 	// Define self
-	vm_var *self;
-	if (func->self == NULL)
-		self = vm->var_none;
-	else
+	if (self == NULL && func->self != NULL)
 		self = func->self;
+	else
+		self = vm->var_none;
+
 	vm_map_set(scope, "self", self);
 
 	// Execute expressions and return the result
-	return vm_exec_exprs(vm, scope, func->exprs, func->exprc);
+	vm_var *var = vm_exec_exprs(vm, scope, func->exprs, func->exprc);
+	var->refs += 1;
+	vm_map_decrefs(scope);
+	var->refs -= 1;
+	return var;
+}
+
+void vm_var_function_with_self(
+		vm_var_function *parent,
+		vm_var_function *func,
+		vm_var *self)
+{
+	func->parent = parent;
+	func->self = self;
+	vm_var_function_increfs(parent);
+	vm_var_increfs(self);
+}
+
+void vm_var_function_free(vm_var_function *func)
+{
+	if (func->parent)
+		vm_var_function_decrefs(func->parent);
+
+	if (func->self)
+		vm_var_decrefs(func->self);
+
+	if (func->scope != NULL)
+		vm_map_decrefs(func->scope);
+}
+
+void vm_var_function_increfs(vm_var_function *func)
+{
+	func->refs += 1;
+}
+
+void vm_var_function_decrefs(vm_var_function *func)
+{
+	func->refs -= 1;
+	if (func->refs <= 0)
+		vm_var_function_free(func);
 }

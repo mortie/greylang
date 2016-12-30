@@ -17,6 +17,24 @@ vm_var *vm_var_create(vm_var_type type)
 
 void vm_var_free(vm_var *var)
 {
+	switch (var->type)
+	{
+	case VAR_TYPE_FUNCTION:
+		vm_var_function_decrefs(var->var.function);
+		break;
+
+	case VAR_TYPE_ARRAY:
+		vm_var_array_free(var->var.array);
+		break;
+
+	case VAR_TYPE_OBJECT:
+	case VAR_TYPE_NUMBER:
+	case VAR_TYPE_BOOL:
+	case VAR_TYPE_CHAR:
+	case VAR_TYPE_NONE:
+		break;
+	}
+
 	vm_map_free(var->map);
 	free(var);
 }

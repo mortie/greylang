@@ -101,5 +101,5 @@ void l_vm_cleanup(l_vm *vm)
 	{
 		vm_var_decrefs(vm->cleanups[i]);
 	}
-	vm->cleanupc = 0;
+	vm->cleanupc = vm->cleanup_offset;
 }

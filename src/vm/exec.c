@@ -49,7 +49,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		vm->cleanup_offset = vm->cleanupc;
 		vm_var *var = vm_var_function_exec(
 			vm, func->var.function,
-			args, e->infix);
+			args, NULL, e->infix);
 		vm->cleanup_offset = prevoffset;
 
 		l_vm_cleanup_add(vm, var);
@@ -214,6 +214,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 		vm_var *var = vm_var_create(VAR_TYPE_FUNCTION);
 		var->var.function = func;
+		vm_var_function_increfs(func);
 		l_vm_cleanup_add(vm, var);
 		return var;
 	}
