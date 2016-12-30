@@ -26,4 +26,7 @@ STD(vm_std_or);
 STD(vm_std_tostr);
 STD(vm_std_concat);
 
+// Special
+STD(vm_std_new);
+
 #undef STD

@@ -71,9 +71,25 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 			l_vm_cleanup_add(vm, var);
 
 		if (var == NULL)
+		{
 			return vm->var_none;
+		}
+		else if (
+				var->type == VAR_TYPE_FUNCTION &&
+				var->var.function->self == NULL)
+		{
+			vm_var_function *func = malloc(sizeof(*func));
+			vm_var_function_init_self(func, var->var.function, obj);
+
+			vm_var *v = vm_var_create(VAR_TYPE_FUNCTION);
+			v->var.function = func;
+			l_vm_cleanup_add(vm, v);
+			return v;
+		}
 		else
+		{
 			return var;
+		}
 	}
 
 	case EXPR_ARRAY_LOOKUP:
@@ -202,7 +218,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		l_p_expr_function *e = expr->expression.function;
 
 		vm_var_function *func = malloc(sizeof(*func));
-		vm_var_function_init(func, scope);
+		vm_var_function_init_scope(func, scope);
 
 		if (e->arg_definition != NULL)
 		{

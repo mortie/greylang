@@ -28,8 +28,7 @@ l_vm *l_vm_create()
 #define STD(name, fn) \
 	do { \
 		vm_var_function *func = malloc(sizeof(*func)); \
-		vm_var_function_init(func, NULL); \
-		func->fptr = fn; \
+		vm_var_function_init_fptr(func, fn); \
 		vm_var *var = vm_var_create(VAR_TYPE_FUNCTION); \
 		var->var.function = func; \
 		vm_map_define(vm->base, name, var); \
@@ -56,6 +55,9 @@ l_vm *l_vm_create()
 	STD("tostr", &vm_std_tostr);
 	STD("concat", &vm_std_concat);
 	STD("..", &vm_std_concat);
+
+	// Special
+	STD("new", &vm_std_new);
 
 #undef STD
 

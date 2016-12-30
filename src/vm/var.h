@@ -71,8 +71,21 @@ typedef struct vm_var_function
 	int refs;
 } vm_var_function;
 
-// Init function
-void vm_var_function_init(vm_var_function *func, vm_map *scope);
+// Init function with parent
+void vm_var_function_init_self(
+		vm_var_function *func,
+		vm_var_function *parent,
+		vm_var *self);
+
+// Init function with function pointer
+void vm_var_function_init_fptr(
+		vm_var_function *func,
+		vm_var *(*fptr)(l_vm *vm, vm_var *self, vm_var_array *args, int infix));
+
+// Init function with scope
+void vm_var_function_init_scope(
+	vm_var_function *func,
+	vm_map *scope);
 
 // Execute function
 vm_var *vm_var_function_exec(
@@ -81,13 +94,6 @@ vm_var *vm_var_function_exec(
 		vm_var_array *args,
 		vm_var *self,
 		int infix);
-
-// Get a function with the 'self' value set to something else.
-// Increases the ref count of parent.
-void vm_var_function_with_self(
-		vm_var_function *parent,
-		vm_var_function *func,
-		vm_var *self);
 
 // Free function. Decreases the ref count of parent.
 void vm_var_function_free(vm_var_function *func);

@@ -1,6 +1,6 @@
 #include "../../vm.h"
 
-void vm_var_function_init(vm_var_function *func, vm_map *scope)
+static void init(vm_var_function *func)
 {
 	func->parent = NULL;
 
@@ -11,12 +11,38 @@ void vm_var_function_init(vm_var_function *func, vm_map *scope)
 
 	func->argnames = NULL;
 	func->argnamec = 0;
-	func->scope = scope;
+	func->scope = NULL;
 	func->self = NULL;
 	func->refs = 0;
+}
 
-	if (scope != NULL)
-		vm_map_increfs(scope);
+void vm_var_function_init_self(
+		vm_var_function *func,
+		vm_var_function *parent,
+		vm_var *self)
+{
+	init(func);
+	func->parent = parent;
+	func->self = self;
+	vm_var_function_increfs(parent);
+	vm_var_increfs(self);
+}
+
+void vm_var_function_init_fptr(
+		vm_var_function *func,
+		vm_var *(*fptr)(l_vm *vm, vm_var *self, vm_var_array *args, int infix))
+{
+	init(func);
+	func->fptr = fptr;
+}
+
+void vm_var_function_init_scope(
+		vm_var_function *func,
+		vm_map *scope)
+{
+	init(func);
+	func->scope = scope;
+	vm_map_increfs(scope);
 }
 
 vm_var *vm_var_function_exec(
@@ -26,6 +52,13 @@ vm_var *vm_var_function_exec(
 		vm_var *self,
 		int infix)
 {
+
+	// Define self
+	if (self == NULL && func->self != NULL)
+		self = func->self;
+	else if (self == NULL)
+		self = vm->var_none;
+
 	// func->parent not being NULL means the function is just
 	// a reference to another function, with a different self
 	if (func->parent != NULL)
@@ -78,12 +111,6 @@ vm_var *vm_var_function_exec(
 	else
 		vm_map_set(scope, "infix?", vm->var_false);
 
-	// Define self
-	if (self == NULL && func->self != NULL)
-		self = func->self;
-	else
-		self = vm->var_none;
-
 	vm_map_set(scope, "self", self);
 
 	// Execute expressions and return the result
@@ -92,17 +119,6 @@ vm_var *vm_var_function_exec(
 	vm_map_decrefs(scope);
 	var->refs -= 1;
 	return var;
-}
-
-void vm_var_function_with_self(
-		vm_var_function *parent,
-		vm_var_function *func,
-		vm_var *self)
-{
-	func->parent = parent;
-	func->self = self;
-	vm_var_function_increfs(parent);
-	vm_var_increfs(self);
 }
 
 void vm_var_function_free(vm_var_function *func)
