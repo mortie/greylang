@@ -1,4 +1,5 @@
 #include "../vm.h"
+#include "../stdlib.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -71,6 +72,16 @@ l_vm *l_vm_create()
 	STD("for", &vm_std_for);
 
 #undef STD
+
+	/*
+	 * Load standard library
+	 */
+
+	{
+		l_scanner *stream = l_scanner_create_str(l_stdlib_str);
+		l_p_expr_list *exprs = l_parse(stream);
+		vm_exec_exprs(vm, vm->base, exprs->expressions, exprs->expressionc);
+	}
 
 	vm->base->immutable = 1;
 

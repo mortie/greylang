@@ -1,28 +1,22 @@
-// Iterator between min (inclusive) and max (exclusive)
-range = {(min, max)
-	RangeIter = {
-		next: {
-			self.ret = none;
-			if (self.i < self.max, {
-				self.ret = self.i;
-				self.i = self.i + 1;
-			});
-			self.ret
-		},
-
-		init: {
-			self.i = self.min
-		}
-	};
-
+// 'range' function which takes a min (inclusive) and max (exclusive)
+range := {(min, max)
 	{
-		iter: {
-			new(RangeIter, { min: min, max: max });
+		$iter: {
+			i := min;
+
+			next := {
+				if(i < max, {
+					i = i + 1;
+					i - 1
+				}, { none })
+			};
+
+			{ $next: next }
 		}
 	}
 };
 
 // x percent of y
-%of = {(x, y)
+%of := {(x, y)
 	y * (x / 100)
 };

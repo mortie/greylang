@@ -10,7 +10,10 @@ vm_var *vm_std_print(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	for (int i = 0; i < args->varc; ++i)
 	{
 		char *str = vm_var_tostring(args->vars[i]);
-		printf("%s", str);
+		if (i == 0)
+			printf("%s", str);
+		else
+			printf(" %s", str);
 		free(str);
 	}
 	printf("\n");
