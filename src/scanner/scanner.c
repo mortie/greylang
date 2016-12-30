@@ -336,11 +336,11 @@ static l_token gettoken(l_scanner* scanner)
 			// .. should be legal in a name, but . should not
 			if (cc == '.' && prev != '.' && scanner->next != '.')
 				break;
-			// ==, >=, and <= should be legal in a name, but = should not
+			// !=, ==, >=, and <= should be legal in a name, but = should not
 			if (cc == '=')
 			{
 				if (prev == '=' || scanner->next == '=');
-				else if (prev == '<' || prev == '>');
+				else if (prev == '<' || prev == '>' || prev == '!');
 				else
 					break;
 			}

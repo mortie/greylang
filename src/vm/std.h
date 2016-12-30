@@ -33,4 +33,10 @@ STD(vm_std_new);
 STD(vm_std_print);
 STD(vm_std_read);
 
+// Flow Control
+STD(vm_std_if);
+STD(vm_std_repeat);
+STD(vm_std_while);
+STD(vm_std_for);
+
 #undef STD

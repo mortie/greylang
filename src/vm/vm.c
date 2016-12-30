@@ -14,6 +14,7 @@ l_vm *l_vm_create()
 	vm->cleanupc = 0;
 	vm->cleanupa = 0;
 	vm->cleanup_offset = 0;
+	vm->currline = 0;
 
 	vm->var_none = vm_var_create(VAR_TYPE_NONE);
 	vm->var_true = vm_var_create(VAR_TYPE_BOOL);
@@ -63,6 +64,12 @@ l_vm *l_vm_create()
 	STD("print", &vm_std_print);
 	STD("read", &vm_std_read);
 
+	// Flow Control
+	STD("if", &vm_std_if);
+	STD("repeat", &vm_std_repeat);
+	STD("while", &vm_std_while);
+	STD("for", &vm_std_for);
+
 #undef STD
 
 	vm->base->immutable = 1;
@@ -78,7 +85,7 @@ vm_var *l_vm_run(l_vm *vm, l_p_expr_list *exprs)
 // TODO: better error handling
 vm_var *l_vm_error(l_vm *vm, char *msg)
 {
-	printf("Error: %s\n", msg);
+	printf("Error at line %i: %s\n", vm->currline, msg);
 	return vm->var_none;
 }
 

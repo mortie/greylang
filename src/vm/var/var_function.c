@@ -121,6 +121,14 @@ vm_var *vm_var_function_exec(
 	return var;
 }
 
+vm_var *vm_var_function_call(
+		l_vm *vm,
+		vm_var_function *func,
+		vm_var_array *args)
+{
+	return vm_var_function_exec(vm, func, args, NULL, 0);
+}
+
 void vm_var_function_free(vm_var_function *func)
 {
 	if (func->parent)

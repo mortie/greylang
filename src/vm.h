@@ -27,6 +27,8 @@ typedef struct l_vm
 	vm_var *var_none;
 	vm_var *var_true;
 	vm_var *var_false;
+
+	int currline;
 } l_vm;
 
 l_vm *l_vm_create();

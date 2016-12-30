@@ -95,6 +95,12 @@ vm_var *vm_var_function_exec(
 		vm_var *self,
 		int infix);
 
+// Simpler version of exec
+vm_var *vm_var_function_call(
+		l_vm *vm,
+		vm_var_function *func,
+		vm_var_array *args);
+
 // Free function. Decreases the ref count of parent.
 void vm_var_function_free(vm_var_function *func);
 

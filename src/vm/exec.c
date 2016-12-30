@@ -11,6 +11,8 @@
 
 vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 {
+	vm->currline = expr->line;
+
 	switch (expr->type)
 	{
 	case EXPR_EMPTY:
@@ -183,7 +185,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		}
 		else if (ekey->type == EXPR_VARIABLE)
 		{
-			if (vm_map_replace(scope, ekey->expression.variable->name, val) == -1)
+			if (vm_map_replace_r(scope, ekey->expression.variable->name, val) == -1)
 				return l_vm_error(vm, "Variable isn't defined");
 		}
 		else
