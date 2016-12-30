@@ -29,4 +29,8 @@ STD(vm_std_concat);
 // Special
 STD(vm_std_new);
 
+// I/O
+STD(vm_std_print);
+STD(vm_std_read);
+
 #undef STD

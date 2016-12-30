@@ -1,7 +1,7 @@
 #!/usr/bin/env grey
 
 // Classes don't really exist, we have prototypes
-Animal = {
+Animal := {
 	sound: "generic",
 	talk: {
 		print("I say ", self.sound)
@@ -9,19 +9,19 @@ Animal = {
 };
 
 // Dog looks like { sound: "Woof" }, with Animal as its prototype
-Dog = new(Animal, {
+Dog := new(Animal, {
 	sound: "Woof"
 });
 
 // Cat looks like { sound: "Meow" }, with Animal as its prototype
-Cat = new(Animal, {
+Cat := new(Animal, {
 	sound: "Meow"
 });
 
 // myDog gets its talk property from Animal, and its sound property from Dog
-myDog = new(Dog);
+myDog := new(Dog);
 myDog.talk(); // "I say Woof"
 
 // myCat gets its talk property from Animal, and its sound property from Cat
-myCat = new(Cat);
+myCat := new(Cat);
 myCat.talk(); // "I say Meow"

@@ -59,6 +59,10 @@ l_vm *l_vm_create()
 	// Special
 	STD("new", &vm_std_new);
 
+	// I/O
+	STD("print", &vm_std_print);
+	STD("read", &vm_std_read);
+
 #undef STD
 
 	vm->base->immutable = 1;
