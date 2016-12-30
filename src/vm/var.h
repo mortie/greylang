@@ -114,8 +114,11 @@ typedef struct vm_var
 // Create a new vm_var, allocated on the heap with malloc.
 vm_var *vm_var_create(vm_var_type type);
 
+// Free variable
+void vm_var_free(vm_var *var);
+
 // Increase or decrease the ref count.
-// Variable is freed if counter reaches 0.
+// Variable is free'd if counter reaches 0.
 void vm_var_increfs(vm_var *var);
 void vm_var_decrefs(vm_var *var);
 

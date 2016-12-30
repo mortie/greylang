@@ -10,6 +10,11 @@ l_vm *l_vm_create()
 	vm->base = vm_map_create(NULL);
 	vm->root = vm_map_create(vm->base);
 
+	vm->cleanups = NULL;
+	vm->cleanupc = 0;
+	vm->cleanupa = 0;
+	vm->cleanup_offset = 0;
+
 	vm->var_none = vm_var_create(VAR_TYPE_NONE);
 	vm->var_true = vm_var_create(VAR_TYPE_BOOL);
 	vm->var_true->var.boolean = 1;
@@ -61,12 +66,7 @@ l_vm *l_vm_create()
 
 vm_var *l_vm_run(l_vm *vm, l_p_expr_list *exprs)
 {
-	vm_var *ret = vm->var_none;
-	for (int i = 0; i < exprs->expressionc; ++i)
-	{
-		ret = vm_exec(vm, vm->root, exprs->expressions[i]);
-	}
-	return ret;
+	return vm_exec_exprs(vm, vm->root, exprs->expressions, exprs->expressionc);
 }
 
 // TODO: better error handling
@@ -74,4 +74,32 @@ vm_var *l_vm_error(l_vm *vm, char *msg)
 {
 	printf("Error: %s\n", msg);
 	return vm->var_none;
+}
+
+void l_vm_cleanup_add(l_vm *vm, vm_var *var)
+{
+	vm->cleanupc += 1;
+	if (vm->cleanupc >= vm->cleanupa)
+	{
+		if (vm->cleanupa == 0)
+			vm->cleanupa = 4;
+		else
+			vm->cleanupa *= 2;
+
+		vm->cleanups = realloc(
+			vm->cleanups,
+			sizeof(*(vm->cleanups)) * vm->cleanupa);
+	}
+
+	vm->cleanups[vm->cleanupc - 1] = var;
+	vm_var_increfs(var);
+}
+
+void l_vm_cleanup(l_vm *vm)
+{
+	for (int i = vm->cleanup_offset; i < vm->cleanupc; ++i)
+	{
+		vm_var_decrefs(vm->cleanups[i]);
+	}
+	vm->cleanupc = 0;
 }

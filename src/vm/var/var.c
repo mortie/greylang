@@ -15,7 +15,7 @@ vm_var *vm_var_create(vm_var_type type)
 	return var;
 }
 
-static void freevar(vm_var *var)
+void vm_var_free(vm_var *var)
 {
 	vm_map_free(var->map);
 	free(var);
@@ -30,7 +30,7 @@ void vm_var_decrefs(vm_var *var)
 {
 	var->refs -= 1;
 	if (var->refs <= 0)
-		freevar(var);
+		vm_var_free(var);
 }
 
 int vm_var_equals(vm_var *a, vm_var *b)

@@ -70,10 +70,5 @@ vm_var *vm_var_function_exec(
 	vm_map_set(scope, "self", self);
 
 	// Execute expressions and return the result
-	vm_var *ret = vm->var_none;
-	for (int i = 0; i < func->exprc; ++i)
-	{
-		ret = vm_exec(vm, scope, func->exprs[i]);
-	}
-	return ret;
+	return vm_exec_exprs(vm, scope, func->exprs, func->exprc);
 }

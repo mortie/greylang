@@ -39,6 +39,8 @@ static int repl()
 			printf("%s\n", s);
 
 		free(str);
+
+		l_vm_cleanup(vm);
 	}
 
 	return 0;
