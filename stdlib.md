@@ -46,20 +46,16 @@ functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 * `while(function, function)`:
 	* Run the second function as long as the first function returns true.
 	* `i = 0; while({ i < 10 }, { print("Hello World"); i = i + 1 })`
+* `for(iterable, function)`:
+	* Run the function for each value in the iterable.
+	* for(range(10, 20), {(val) print(val)});
 
-## General
+## Special
 
 * `new(object[, object])`
 	* Look at `examples/classes.grey`.
-* `return(n, value)`
-	* Return `value` through `n` functions.
-	* Because `if` and `while` and such execute functions, not blocks,
-	  you have to be able to return through some number of functions for
-	  `return`to be useful.
-	* Because the last expression in a function is returned by default, using
-	  `return` is generally unnecessary except as a mechanism to return early.
 
-## Arithmatic
+## Math
 
 All arithmatic is done using functions which are generally called as infix
 functions. All are just regular functions, as `+`, `-`, etc. are valid
@@ -84,18 +80,17 @@ Like arithmatic, all logic is done using regular functions.
 * `true and true`
 * `false or true`
 
-## Misc
+## I/O
 
 * `print(string[, string, ...])`:
 	* Print to console. Puts a space between each string.
 * `read(prompt)`:
 	* Read from console.
+
+## Util
+
 * `tostring(variable)`:
 	* Convert any variable to a string.
-* `tonumber(string)`:
-	* Convert a string to a number.
-* `type(variable)`:
-	* Return the type of a variable as a string.
 * `concat(string, string[, string])`:
 	* Concatenate strings.
 * `..`: Alias of `concat`.

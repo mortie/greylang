@@ -36,6 +36,15 @@ l_vm *l_vm_create()
 		vm_map_define(vm->base, name, var); \
 	} while (0)
 
+	// Flow Control
+	STD("if", &vm_std_if);
+	STD("repeat", &vm_std_repeat);
+	STD("while", &vm_std_while);
+	STD("for", &vm_std_for);
+
+	// Special
+	STD("new", &vm_std_new);
+
 	// Math
 	STD("+", &vm_std_add);
 	STD("-", &vm_std_sub);
@@ -58,18 +67,9 @@ l_vm *l_vm_create()
 	STD("concat", &vm_std_concat);
 	STD("..", &vm_std_concat);
 
-	// Special
-	STD("new", &vm_std_new);
-
 	// I/O
 	STD("print", &vm_std_print);
 	STD("read", &vm_std_read);
-
-	// Flow Control
-	STD("if", &vm_std_if);
-	STD("repeat", &vm_std_repeat);
-	STD("while", &vm_std_while);
-	STD("for", &vm_std_for);
 
 #undef STD
 

@@ -5,6 +5,15 @@
 #define STD(name) \
 	vm_var *name(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
+// Flow Control
+STD(vm_std_if);
+STD(vm_std_repeat);
+STD(vm_std_while);
+STD(vm_std_for);
+
+// Special
+STD(vm_std_new);
+
 // Math
 STD(vm_std_add);
 STD(vm_std_sub);
@@ -26,17 +35,8 @@ STD(vm_std_or);
 STD(vm_std_tostr);
 STD(vm_std_concat);
 
-// Special
-STD(vm_std_new);
-
 // I/O
 STD(vm_std_print);
 STD(vm_std_read);
-
-// Flow Control
-STD(vm_std_if);
-STD(vm_std_repeat);
-STD(vm_std_while);
-STD(vm_std_for);
 
 #undef STD
