@@ -4,7 +4,7 @@ This is grey-lang, my project to create a language.
 
 # Example
 
-	a = {(n, str)
+	a := {(n, str)
 		repeat(n, { print(str) });
 	};
 
@@ -17,7 +17,7 @@ contents of `str` when called.
 
 # Another example
 
-	%of = {(x, y)
+	%of := {(x, y)
 		y * (x / 100)
 	};
 

@@ -8,7 +8,7 @@ languages, so they're even more important than in other languages.
   functions, returned from functions, and assigned to variables.
 * Functions can declare arguments, like this:
 
-	f = {(str)
+	f := {(str)
 		print(str);
 	};
 	f("Hi World");
@@ -16,12 +16,12 @@ languages, so they're even more important than in other languages.
 * Declaring arguments is optional, and all arguments passed to the function is
   available as `$1`, `$2`, etc:
 
-	f = { print($1) };
+	f := { print($1) };
 	f("Hi World");
 
 * Functions can be called inline, like this:
 
-	plus = {(a, b) a + b };
+	plus := {(a, b) a + b };
 	print(10 plus 20);
 
 # Standard Library
@@ -81,17 +81,15 @@ Like arithmatic, all logic is done using regular functions.
 * `10 < 20`
 * `20 >= 10`
 * `10 <= 20`
-* `true and true`, or `true && true`
-* `false or true`, or `false || true`
+* `true and true`
+* `false or true`
 
 ## Misc
 
 * `print(string[, string, ...])`:
-	* Print to console.
+	* Print to console. Puts a space between each string.
 * `read(prompt)`:
 	* Read from console.
-* `error(message)`:
-	* Error.
 * `tostring(variable)`:
 	* Convert any variable to a string.
 * `tonumber(string)`:
@@ -103,6 +101,8 @@ Like arithmatic, all logic is done using regular functions.
 * `..`: Alias of `concat`.
 
 ## Methods
+
+None of these are implemented in the new vm yet, working on it.
 
 ### Array Methods
 
