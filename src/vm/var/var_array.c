@@ -95,4 +95,5 @@ void vm_var_array_free(vm_var_array *arr)
 	}
 
 	free(arr->vars);
+	free(arr->strcache);
 }
