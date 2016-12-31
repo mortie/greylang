@@ -12,7 +12,7 @@ STD(vm_std_while);
 STD(vm_std_for);
 
 // Special
-STD(vm_std_new);
+STD(vm_std_extend);
 
 // Math
 STD(vm_std_add);
@@ -33,6 +33,7 @@ STD(vm_std_or);
 
 // Util
 STD(vm_std_tostr);
+STD(vm_std_tonum);
 STD(vm_std_concat);
 
 // I/O

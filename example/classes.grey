@@ -4,24 +4,25 @@
 Animal := {
 	sound: "generic",
 	talk: {
-		print("I say ", self.sound)
-	}
+		print("I say", self.sound)
+	},
+	$init: {;}
 };
 
 // Dog looks like { sound: "Woof" }, with Animal as its prototype
-Dog := new(Animal, {
+Dog := extend(Animal, {
 	sound: "Woof"
 });
 
 // Cat looks like { sound: "Meow" }, with Animal as its prototype
-Cat := new(Animal, {
+Cat := extend(Animal, {
 	sound: "Meow"
 });
 
-// myDog gets its talk property from Animal, and its sound property from Dog
-myDog := new(Dog);
-myDog.talk(); // "I say Woof"
+// my-dog gets its talk property from Animal, and its sound property from Dog
+my-dog := Dog();
+my-dog.talk(); // "I say Woof"
 
-// myCat gets its talk property from Animal, and its sound property from Cat
-myCat := new(Cat);
-myCat.talk(); // "I say Meow"
+// my-cat gets its talk property from Animal, and its sound property from Cat
+my-cat := Cat();
+my-cat.talk(); // "I say Meow"

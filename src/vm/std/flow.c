@@ -108,8 +108,7 @@ vm_var *vm_std_for(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
 	while (1)
 	{
-		vm_var *val = vm_var_function_exec(
-			vm, nextf, NULL, nextv, 0);
+		vm_var *val = vm_var_function_call(vm, nextf, NULL);
 
 		if (val->type == VAR_TYPE_NONE)
 			break;

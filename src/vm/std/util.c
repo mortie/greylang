@@ -18,6 +18,27 @@ vm_var *vm_std_tostr(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	return var;
 }
 
+vm_var *vm_std_tonum(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
+{
+	EXPECTARGC(vm, 1, args);
+	vm_var *arr = args->vars[0];
+
+	if (
+			arr->type != VAR_TYPE_ARRAY ||
+			arr->var.array->type != VAR_TYPE_CHAR)
+	{
+		return l_vm_error(vm, "Invalid types");
+	}
+
+	vm_var *var = vm_var_create(VAR_TYPE_NUMBER);
+
+	char *str = vm_var_char_array_to_utf8(arr->var.array);
+	var->var.number = (double)atof(str);
+	free(str);
+
+	return var;
+}
+
 vm_var *vm_std_concat(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 {
 	char *strs[args->varc];

@@ -34,9 +34,6 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 		l_p_comma_expr_list *exprs = e->arg_list;
 
-		if (func->type != VAR_TYPE_FUNCTION)
-			return l_vm_error(vm, "Expected function");
-
 		// Create arguments array
 		vm_var_array *args = malloc(sizeof(*args));
 		vm_var_array_init(args, VAR_TYPE_NONE);
@@ -46,20 +43,52 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 			vm_var_array_set(args, i, val);
 		}
 
-		// Execute function
-		int prevoffset = vm->cleanup_offset;
-		vm->cleanup_offset = vm->cleanupc;
-		vm_var *var = vm_var_function_exec(
-			vm, func->var.function,
-			args, NULL, e->infix);
-		vm->cleanup_offset = prevoffset;
+		// Execute function if it's a function
+		if (func->type == VAR_TYPE_FUNCTION)
+		{
+			vm_var *var = vm_var_function_exec(
+				vm, func->var.function,
+				args, NULL, e->infix);
 
-		l_vm_cleanup_add(vm, var);
+			l_vm_cleanup_add(vm, var);
 
-		vm_var_array_free(args);
-		free(args);
+			vm_var_array_free(args);
+			free(args);
 
-		return var;
+			return var;
+		}
+
+		// Instantiate and create contsructor if it's an object with $init
+		else if (func->type == VAR_TYPE_OBJECT)
+		{
+			// Find $init
+			vm_var *init = vm_map_lookup_r(func->map, "$init");
+			if (init == NULL || init->type != VAR_TYPE_FUNCTION)
+				return l_vm_error(vm, "Expected function or object with $init");
+
+			// Create new object
+			vm_var *obj = vm_var_create(VAR_TYPE_OBJECT);
+			obj->map->parent = func->map;
+			vm_map_increfs(func->map);
+			l_vm_cleanup_add(vm, obj);
+
+			// Call
+			vm_var *ret = vm_var_function_exec(
+				vm, init->var.function, args, obj, 0);
+
+			l_vm_cleanup_add(vm, ret);
+
+			vm_var_array_free(args);
+			free(args);
+
+			return obj;
+		}
+
+		// Error if neither
+		else
+		{
+			return l_vm_error(vm, "Expected function or object with $init");
+		}
 	}
 
 	case EXPR_OBJECT_LOOKUP:

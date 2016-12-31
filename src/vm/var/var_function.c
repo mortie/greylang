@@ -52,12 +52,9 @@ vm_var *vm_var_function_exec(
 		vm_var *self,
 		int infix)
 {
-
-	// Define self
+	// Find self if it exists
 	if (self == NULL && func->self != NULL)
 		self = func->self;
-	else if (self == NULL)
-		self = vm->var_none;
 
 	// func->parent not being NULL means the function is just
 	// a reference to another function, with a different self
@@ -88,6 +85,10 @@ vm_var *vm_var_function_exec(
 			args, infix);
 	}
 
+	// We don't want to free variables we aren't supposed to yet
+	int prevoffset = vm->cleanup_offset;
+	vm->cleanup_offset = vm->cleanupc;
+
 	vm_map *scope = vm_map_create(func->scope);
 	vm_map_increfs(scope);
 
@@ -115,13 +116,18 @@ vm_var *vm_var_function_exec(
 	else
 		vm_map_set(scope, "infix?", vm->var_false);
 
-	vm_map_set(scope, "self", self);
+	// Define self
+	if (self)
+		vm_map_set(scope, "self", self);
 
-	// Execute expressions and return the result
+	// Execute expressions
 	vm_var *var = vm_exec_exprs(vm, scope, func->exprs, func->exprc);
 	var->refs += 1;
 	vm_map_decrefs(scope);
 	var->refs -= 1;
+
+	vm->cleanup_offset = prevoffset;
+
 	return var;
 }
 

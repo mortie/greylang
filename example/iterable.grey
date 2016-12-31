@@ -1,31 +1,34 @@
+#!/usr/bin/env grey
 
-// 'range' function which takes a min (inclusive) and max (exclusive)
-range := {(min, max)
+// 'Range' class
+Range := {
 
-	// Returns an object with an '$iter' function
-	{
-		$iter: {
+	// Constructor takes a min (inclusive) and max (exclusive)
+	$init: {(min, max)
+		self.min = min;
+		self.max = max;
+	},
 
-			// Declare i, the counter variable,
-			i := min;
+	// $iter is run when we iterate over it
+	$iter: {
 
-			// Create a 'next' function, which will be called for each
-			// iteration until it returns none
-			next := {
+		i := self.min;
 
-				// If i < max, return and increment i,
-				// otherwise return none to end the iteration
-				if(i < max, {
-					i = i + 1;
-					i - 1
-				}, { none })
-			};
+		// Create a 'next' function, which will be called for each
+		// iteration until it returns none
+		next := {
 
-			// Return object with 'next' function as '$next'
-			{ $next: next }
-		}
+			// If i < max, return and increment i,
+			// otherwise return none to end the iteration
+			if(i < self.max, {
+				i = i + 1;
+				i - 1;
+			}, { none });
+		};
+
+		// Return our object with $next set to our 'next'-function
+		{ $next: next };
 	}
 };
 
-// Print the key and val in range(10, 20)
-{(val, key) print(key, ": ", val)} for range(10, 20)
+{(val, key) print(key .. ": " .. val) } for Range(10, 20);

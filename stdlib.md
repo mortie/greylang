@@ -52,7 +52,7 @@ functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 
 ## Special
 
-* `new(object[, object])`
+* `extend(object[, object])`
 	* Look at `examples/classes.grey`.
 
 ## Math
@@ -89,8 +89,10 @@ Like arithmatic, all logic is done using regular functions.
 
 ## Util
 
-* `tostring(variable)`:
+* `tostr(variable)`:
 	* Convert any variable to a string.
+* `tonum(string)`:
+	* Convert a string to a number.
 * `concat(string, string[, string])`:
 	* Concatenate strings.
 * `..`: Alias of `concat`.

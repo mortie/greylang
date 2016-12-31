@@ -43,7 +43,7 @@ l_vm *l_vm_create()
 	STD("for", &vm_std_for);
 
 	// Special
-	STD("new", &vm_std_new);
+	STD("extend", &vm_std_extend);
 
 	// Math
 	STD("+", &vm_std_add);
@@ -64,6 +64,7 @@ l_vm *l_vm_create()
 
 	// Util
 	STD("tostr", &vm_std_tostr);
+	STD("tonum", &vm_std_tonum);
 	STD("concat", &vm_std_concat);
 	STD("..", &vm_std_concat);
 
