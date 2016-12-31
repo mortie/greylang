@@ -100,6 +100,15 @@ void vm_var_char_to_utf8(vm_var_char ch, char *buf)
 
 char *vm_var_char_array_to_utf8(vm_var_array *arr)
 {
+	// If we have a string cached, just use that
+	if (arr->strcache)
+	{
+		int len = strlen(arr->strcache) + 1;
+		char *str = malloc(len);
+		strcpy(str, arr->strcache);
+		return str;
+	}
+
 	char buf[5];
 	char *str = malloc((arr->varc * 4) + 1);
 	int len = 0;
@@ -117,6 +126,10 @@ char *vm_var_char_array_to_utf8(vm_var_array *arr)
 	}
 
 	str = realloc(str, len + 1);
+
+	// Cache string
+	arr->strcache = malloc(len + 1);
+	strcpy(arr->strcache, str);
 
 	return str;
 }

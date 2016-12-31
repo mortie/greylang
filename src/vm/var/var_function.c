@@ -75,6 +75,10 @@ vm_var *vm_var_function_exec(
 		vm_var_array_init(&fakeargs, VAR_TYPE_NONE);
 		args = &fakeargs;
 	}
+	else
+	{
+		vm_var_array_prepare(args);
+	}
 
 	// Just run the function pointer if that exists
 	if (func->fptr != NULL)

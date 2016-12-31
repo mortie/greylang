@@ -27,6 +27,14 @@ typedef struct vm_var_array
 	int varc;
 	int allocd;
 	vm_var_type type;
+
+	// For character arrays, we don't need to convert utf8 before
+	// we actually start modifying it or lookup characters.
+	// If false, the array will be initialized from strcache.
+	int ready;
+
+	// Cache of strings, mostly for character arrays
+	char *strcache;
 } vm_var_array;
 
 // Init the array with a type
@@ -41,6 +49,11 @@ int vm_var_array_set(vm_var_array *arr, int index, vm_var *var);
 
 // Get a value from an index
 vm_var *vm_var_array_get(vm_var_array *arr, int index);
+
+// Make sure the array is ready for use.
+// Use this before trying to modify or use an array
+// which might be an array of char.
+void vm_var_array_prepare(vm_var_array *arr);
 
 // Free the array, and decrement refcounts
 void vm_var_array_free(vm_var_array *arr);

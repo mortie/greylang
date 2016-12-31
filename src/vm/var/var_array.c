@@ -8,6 +8,9 @@ void vm_var_array_init(vm_var_array *arr, vm_var_type type)
 	arr->varc = 0;
 	arr->allocd = 0;
 	arr->type = type;
+
+	arr->ready = 1;
+	arr->strcache = NULL;
 }
 
 char *vm_var_array_tostring(vm_var_array *arr)
@@ -24,6 +27,15 @@ char *vm_var_array_tostring(vm_var_array *arr)
 	}
 }
 
+void vm_var_array_prepare(vm_var_array *arr)
+{
+	if (!arr->ready && arr->type == VAR_TYPE_CHAR)
+	{
+		vm_var_char_array_from_utf8(arr->strcache, arr);
+		arr->ready = 1;
+	}
+}
+
 int vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
 {
 	if (
@@ -31,6 +43,12 @@ int vm_var_array_set(vm_var_array *arr, int index, vm_var *var)
 			var->type != arr->type)
 	{
 		return -1;
+	}
+
+	if (arr->strcache != NULL && arr->ready)
+	{
+		free(arr->strcache);
+		arr->strcache = NULL;
 	}
 
 	if (index >= arr->allocd)

@@ -109,6 +109,8 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 			if (key->type != VAR_TYPE_NUMBER)
 				return l_vm_error(vm, "Expected number in array lookup");
 
+			vm_var_array_prepare(arr);
+
 			int num = (int)key->var.number;
 			if (num >= arr->varc)
 				return l_vm_error(vm, "Array index out of bounds");
@@ -165,6 +167,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 			if (arr->type == VAR_TYPE_ARRAY && key->type == VAR_TYPE_NUMBER)
 			{
+				vm_var_array_prepare(arr->var.array);
 				int ret = vm_var_array_set(
 					arr->var.array, (int)(key->var.number), val);
 				if (ret == -1)
@@ -281,7 +284,9 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		vm_var_array *arr = malloc(sizeof(*arr));
 		vm_var_array_init(arr, VAR_TYPE_CHAR);
 
-		vm_var_char_array_from_utf8(sl->string, arr);
+		arr->ready = 0;
+		arr->strcache = malloc(strlen(sl->string) + 1);
+		strcpy(arr->strcache, sl->string);
 
 		vm_var *var = vm_var_create(VAR_TYPE_ARRAY);
 		var->var.array = arr;
