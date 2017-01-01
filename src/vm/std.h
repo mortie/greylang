@@ -30,6 +30,7 @@ STD(vm_std_gteq);
 STD(vm_std_lteq);
 STD(vm_std_and);
 STD(vm_std_or);
+STD(vm_std_which);
 
 // Util
 STD(vm_std_tostr);

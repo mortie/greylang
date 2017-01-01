@@ -11,10 +11,10 @@ col_dim=\e[0;34m
 col_bright=\e[1;95m
 col_arg=\e[0;92m
 col_end=\e[0m
-log=echo -e "$(col_dim)[$(col_bright)i$(col_dim)]$(col_end) $(1) $(col_arg)$(2)$(col_end)"
+log=bash -c 'echo -e "$(col_dim)[$(col_bright)i$(col_dim)]$(col_end) $(1) $(col_arg)$(2)$(col_end)"'
 
 $(PROJECT): $(O_FILES)
-	$(CC) $(FLAGS) $(W_FLAGS) $(L_FLAGS) $(O_FILES) -o $(PROJECT)
+	$(CC) $(O_FILES) $(FLAGS) $(W_FLAGS) $(L_FLAGS) -o $(PROJECT)
 	$(call log,"Created $(PROJECT).")
 
 run: $(PROJECT)
@@ -54,7 +54,7 @@ include $(D_FILES)
 
 obj/%.o: src/%.c stdlib.out
 	mkdir -p $(@D)
-	$(CC) -c $(FLAGS) $(W_FLAGS) $(L_FLAGS) --std=$(STD) $< -o $@
+	$(CC) -c $< $(FLAGS) $(W_FLAGS) $(L_FLAGS) --std=$(STD) -o $@
 	$(call log,"Created object file",$@)
 
 stdlib.out: $(shell find stdlib -type f)

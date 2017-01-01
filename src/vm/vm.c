@@ -61,6 +61,7 @@ l_vm *l_vm_create()
 	STD("<=", &vm_std_lteq);
 	STD("and", &vm_std_and);
 	STD("or", &vm_std_or);
+	STD("?", &vm_std_which);
 
 	// Util
 	STD("tostr", &vm_std_tostr);
