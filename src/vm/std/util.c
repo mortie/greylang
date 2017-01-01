@@ -69,3 +69,17 @@ vm_var *vm_std_concat(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
 	return var;
 }
+
+vm_var *vm_std_which(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
+{
+	if (args->varc < 1)
+		EXPECTARGC(vm, 1, args);
+
+	for (int i = 0; i < args->varc; ++i)
+	{
+		if (args->vars[i]->type != VAR_TYPE_NONE)
+			return args->vars[i];
+	}
+
+	return vm->var_none;
+}

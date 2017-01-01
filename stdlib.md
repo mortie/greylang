@@ -96,6 +96,8 @@ Like arithmatic, all logic is done using regular functions.
 * `concat(string, string[, string])`:
 	* Concatenate strings.
 * `..`: Alias of `concat`.
+* `foo ? bar`:
+	* Returns the leftmost argument that's not none.
 
 ## Methods
 
