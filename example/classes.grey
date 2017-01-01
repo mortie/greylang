@@ -6,6 +6,7 @@ Animal := {
 	talk: {
 		print("I say", self.sound)
 	},
+
 	$init: {;}
 };
 
@@ -26,3 +27,13 @@ my-dog.talk(); // "I say Woof"
 // my-cat gets its talk property from Animal, and its sound property from Cat
 my-cat := Cat();
 my-cat.talk(); // "I say Meow"
+
+// $init can also take arguments
+Person := extend(Animal, {
+	$init: {(name)
+		self.sound = "Hello, my name is " .. name
+	}
+});
+
+my-person := Person("Peter");
+my-person.talk(); // "I say Hello, my name is Peter"
