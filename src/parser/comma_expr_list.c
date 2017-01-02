@@ -2,11 +2,11 @@
 
 #include <stdlib.h>
 
-l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream)
+l_p_comma_expr_list *l_parse_comma_expr_list(l_scanner *stream)
 {
 	int alloced = 16;
-	l_p_comma_expr_list* list = malloc(sizeof(l_p_comma_expr_list));
-	list->expressions = malloc(alloced * sizeof(l_p_expr));
+	l_p_comma_expr_list *list = malloc(sizeof(*list));
+	list->expressions = malloc(alloced * sizeof(*(list->expressions)));
 	list->expressionc = 0;
 
 	l_token t = l_scanner_peek(stream);
@@ -15,7 +15,7 @@ l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream)
 
 	while (1)
 	{
-		l_p_expr* expr = l_parse_expr(stream);
+		l_p_expr *expr = l_parse_expr(stream);
 
 		/*
 		 * Add expression
@@ -26,7 +26,7 @@ l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream)
 			alloced *= 2;
 			list->expressions = realloc(
 				list->expressions,
-				alloced * sizeof(l_p_expr));
+				alloced * sizeof(*(list->expressions)));
 		}
 		list->expressions[list->expressionc - 1] = expr;
 
@@ -55,9 +55,9 @@ l_p_comma_expr_list* l_parse_comma_expr_list(l_scanner* stream)
 }
 
 void l_pretty_comma_expr_list(
-		l_p_comma_expr_list* list,
+		l_p_comma_expr_list *list,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
 	for (int i = 0; i < list->expressionc; ++i)
 	{

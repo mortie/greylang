@@ -2,13 +2,13 @@
 
 #include <stdlib.h>
 
-l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
+l_p_expr_object_literal *l_parse_expr_object_literal(l_scanner *stream)
 {
-	l_p_expr_object_literal* expr = malloc(sizeof(l_p_expr_object_literal));
+	l_p_expr_object_literal *expr = malloc(sizeof(*expr));
 
 	int allocd = 8;
-	expr->names = malloc(sizeof(char*) * allocd);
-	expr->exprs = malloc(sizeof(l_p_expr*) * allocd);
+	expr->names = malloc(sizeof(*(expr->names)) * allocd);
+	expr->exprs = malloc(sizeof(*(expr->exprs)) * allocd);
 	expr->exprc = 0;
 
 	// #{
@@ -27,13 +27,13 @@ l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
 			};
 			l_scanner_unexpecteda(expected, 2, namet, "object literal");
 		}
-		char* name = namet.content;
+		char *name = namet.content;
 
 		// :
 		l_scanner_skip(stream, TOKEN_COLON, "object literal");
 
 		// value
-		l_p_expr* val = l_parse_expr(stream);
+		l_p_expr *val = l_parse_expr(stream);
 
 		// ,
 		l_token comma = l_scanner_peek(stream);
@@ -45,8 +45,8 @@ l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
 		if (allocd < expr->exprc)
 		{
 			allocd *= 2;
-			expr->names = realloc(expr->names, sizeof(char*) * allocd);
-			expr->exprs = realloc(expr->names, sizeof(l_p_expr*) * allocd);
+			expr->names = realloc(expr->names, sizeof(*(expr->names)) * allocd);
+			expr->exprs = realloc(expr->names, sizeof(*(expr->exprs)) * allocd);
 		}
 		expr->names[expr->exprc - 1] = name;
 		expr->exprs[expr->exprc - 1] = val;
@@ -61,11 +61,11 @@ l_p_expr_object_literal* l_parse_expr_object_literal(l_scanner* stream)
 }
 
 void l_pretty_expr_object_literal(
-		l_p_expr_object_literal* expr,
+		l_p_expr_object_literal *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
-	char* tabs;
+	char *tabs;
 	P_TABS(depth, tabs);
 
 	fprintf(file, "#{\n");

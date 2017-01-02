@@ -18,7 +18,7 @@
 		name[len] = '\0'; \
 	} while(0)
 
-static char nextchar(l_scanner* scanner)
+static char nextchar(l_scanner *scanner)
 {
 	if (scanner->curr == EOF || scanner->next == EOF)
 	{
@@ -53,7 +53,7 @@ static char nextchar(l_scanner* scanner)
 	return c;
 }
 
-static l_token gettoken(l_scanner* scanner)
+static l_token gettoken(l_scanner *scanner)
 {
 	char c = scanner->curr;
 	char next = scanner->next;
@@ -61,7 +61,7 @@ static l_token gettoken(l_scanner* scanner)
 	int linechar = scanner->linechar;
 	int line = scanner->line;
 
-	char* content = "";
+	char *content = "";
 	int contentlen = 0;
 	int contenta = 0;
 
@@ -369,7 +369,7 @@ static l_token gettoken(l_scanner* scanner)
 	return token;
 }
 
-static l_token nexttoken(l_scanner* scanner)
+static l_token nexttoken(l_scanner *scanner)
 {
 	l_token token;
 	do
@@ -379,9 +379,9 @@ static l_token nexttoken(l_scanner* scanner)
 	return token;
 }
 
-static l_scanner* create()
+static l_scanner *create()
 {
-	l_scanner* scanner = malloc(sizeof(l_scanner));
+	l_scanner *scanner = malloc(sizeof(*scanner));
 	scanner->character = -1;
 	scanner->linechar = 0;
 	scanner->line = 1;
@@ -391,7 +391,7 @@ static l_scanner* create()
 	return scanner;
 }
 
-static void init(l_scanner* scanner)
+static void init(l_scanner *scanner)
 {
 	nextchar(scanner);
 	nextchar(scanner);
@@ -401,9 +401,9 @@ static void init(l_scanner* scanner)
 	scanner->nexttoken3 = nexttoken(scanner);
 }
 
-l_scanner* l_scanner_create(FILE* f)
+l_scanner *l_scanner_create(FILE *f)
 {
-	l_scanner* scanner = create();
+	l_scanner *scanner = create();
 	scanner->input.f = f;
 	scanner->type = SCANNER_TYPE_FILE;
 	init(scanner);
@@ -411,9 +411,9 @@ l_scanner* l_scanner_create(FILE* f)
 	return scanner;
 }
 
-l_scanner* l_scanner_create_str(char* str)
+l_scanner *l_scanner_create_str(char *str)
 {
-	l_scanner* scanner = create();
+	l_scanner *scanner = create();
 	scanner->input.str = str;
 	scanner->type = SCANNER_TYPE_STR;
 	init(scanner);
@@ -421,7 +421,7 @@ l_scanner* l_scanner_create_str(char* str)
 	return scanner;
 }
 
-l_token l_scanner_next(l_scanner* scanner)
+l_token l_scanner_next(l_scanner *scanner)
 {
 	l_token token = nexttoken(scanner);
 
@@ -433,26 +433,26 @@ l_token l_scanner_next(l_scanner* scanner)
 	return next;
 }
 
-l_token l_scanner_peek(l_scanner* scanner)
+l_token l_scanner_peek(l_scanner *scanner)
 {
 	return scanner->nexttoken;
 }
 
-l_token l_scanner_peek2(l_scanner* scanner)
+l_token l_scanner_peek2(l_scanner *scanner)
 {
 	return scanner->nexttoken2;
 }
 
-l_token l_scanner_peek3(l_scanner* scanner)
+l_token l_scanner_peek3(l_scanner *scanner)
 {
 	return scanner->nexttoken3;
 }
 
 void l_scanner_unexpecteda(
-		l_token_type* expected,
+		l_token_type *expected,
 		int len,
 		l_token token,
-		char* section)
+		char *section)
 {
 	if (len == 0)
 	{
@@ -471,11 +471,11 @@ void l_scanner_unexpecteda(
 		totallen += strlen(l_token_type_string(expected[i]));
 	}
 
-	char* str = malloc(totallen + 1);
+	char *str = malloc(totallen + 1);
 	int i = 0;
 	for (int j = 0; j < len; ++j)
 	{
-		char* s = l_token_type_string(expected[j]);
+		char *s = l_token_type_string(expected[j]);
 		int sl = strlen(s);
 		memcpy(str + i, s, sl);
 		i += sl;
@@ -500,7 +500,7 @@ void l_scanner_unexpecteda(
 	exit(1);
 }
 
-void l_scanner_unexpected(l_token_type expected, l_token token, char* section)
+void l_scanner_unexpected(l_token_type expected, l_token token, char *section)
 {
 	fprintf(stderr,
 		"line %i:%i (%s): Expected %s, got %s\n",
@@ -513,7 +513,7 @@ void l_scanner_unexpected(l_token_type expected, l_token token, char* section)
 	exit(1);
 }
 
-void l_scanner_skip(l_scanner* scanner, l_token_type type, char* section)
+void l_scanner_skip(l_scanner *scanner, l_token_type type, char *section)
 {
 	l_token token = l_scanner_next(scanner);
 	if (token.type != type)
@@ -522,7 +522,7 @@ void l_scanner_skip(l_scanner* scanner, l_token_type type, char* section)
 	}
 }
 
-l_token l_scanner_expect(l_scanner* scanner, l_token_type type, char* section)
+l_token l_scanner_expect(l_scanner *scanner, l_token_type type, char *section)
 {
 	l_token token = l_scanner_next(scanner);
 	if (token.type != type)

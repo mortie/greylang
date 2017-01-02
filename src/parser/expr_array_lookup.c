@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expr_array_lookup* l_parse_expr_array_lookup(l_scanner* stream, l_p_expr* arr)
+l_p_expr_array_lookup *l_parse_expr_array_lookup(l_scanner *stream, l_p_expr *arr)
 {
-	l_p_expr_array_lookup* expr = malloc(sizeof(l_p_expr_array_lookup));
+	l_p_expr_array_lookup *expr = malloc(sizeof(*expr));
 	expr->arr = arr;
 
 	// [
@@ -20,9 +20,9 @@ l_p_expr_array_lookup* l_parse_expr_array_lookup(l_scanner* stream, l_p_expr* ar
 }
 
 void l_pretty_expr_array_lookup(
-		l_p_expr_array_lookup* expr,
+		l_p_expr_array_lookup *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
 	l_pretty_expr(expr->arr, depth, file);
 	fprintf(file, "[");

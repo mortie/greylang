@@ -13,25 +13,25 @@ enum opr_type
 	OPR_PRETTY
 };
 
-static void usage(char* name)
+static void usage(char *name)
 {
 	fprintf(stderr, "Usage: %s [options] <file>\n", name);
 }
 
 static int repl()
 {
-	l_vm* vm = l_vm_create();
+	l_vm *vm = l_vm_create();
 	vm_map_increfs(vm->root);
 	while (1)
 	{
-		char* str = l_plat_readline("> ");
+		char *str = l_plat_readline("> ");
 		if (str == NULL)
 			return 1;
 
-		l_scanner* stream = l_scanner_create_str(str);
-		vm_var* v = l_vm_run(vm, l_parse(stream));
+		l_scanner *stream = l_scanner_create_str(str);
+		vm_var *v = l_vm_run(vm, l_parse(stream));
 
-		char* s = vm_var_tostring(v);
+		char *s = vm_var_tostring(v);
 		if (v->type == VAR_TYPE_ARRAY && v->var.array->type == VAR_TYPE_CHAR)
 			printf("\"%s\"\n", s);
 		else if (v->type == VAR_TYPE_CHAR)
@@ -48,39 +48,39 @@ static int repl()
 	return 0;
 }
 
-static int exec(FILE* f)
+static int exec(FILE *f)
 {
-	l_scanner* stream = l_scanner_create(f);
-	l_p_expr_list* list = l_parse(stream);
+	l_scanner *stream = l_scanner_create(f);
+	l_p_expr_list *list = l_parse(stream);
 
-	l_vm* vm = l_vm_create();
+	l_vm *vm = l_vm_create();
 	l_vm_run(vm, list);
 
 	return 0;
 }
 
-static int pretty(FILE* f)
+static int pretty(FILE *f)
 {
-	l_scanner* stream = l_scanner_create(f);
-	l_p_expr_list* list = l_parse(stream);
+	l_scanner *stream = l_scanner_create(f);
+	l_p_expr_list *list = l_parse(stream);
 
 	l_pretty_expr_list(list, 0, stdout);
 
 	return 0;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	if (argc == 1)
 		return repl();
 
 	enum opr_type opr = OPR_EXEC;
-	char* file = NULL;
+	char *file = NULL;
 
 	int errors = 0;
 	for (int i = 1; i < argc; ++i)
 	{
-		char* arg = argv[i];
+		char *arg = argv[i];
 
 		if (strcmp(arg, "-") == 0)
 		{
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 	}
 
 	// Get file
-	FILE* f;
+	FILE *f;
 	if (strcmp(file, "-") == 0)
 	{
 		f = stdin;

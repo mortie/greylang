@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
+static l_p_expr *parse_expr(l_scanner *stream, l_p_expr *prev)
 {
-	l_p_expr* expr = malloc(sizeof(l_p_expr));
+	l_p_expr *expr = malloc(sizeof(*expr));
 
 	l_token t = l_scanner_peek(stream);
 	expr->line = t.line;
@@ -202,15 +202,15 @@ static l_p_expr* parse_expr(l_scanner* stream, l_p_expr* prev)
 	}
 }
 
-l_p_expr* l_parse_expr(l_scanner* stream)
+l_p_expr *l_parse_expr(l_scanner *stream)
 {
 	return parse_expr(stream, NULL);
 }
 
 void l_pretty_expr(
-		l_p_expr* expr,
+		l_p_expr *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
 	switch (expr->type)
 	{

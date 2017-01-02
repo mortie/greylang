@@ -15,8 +15,8 @@ typedef struct l_scanner
 {
 	union
 	{
-		FILE* f;
-		char* str;
+		FILE *f;
+		char *str;
 	} input;
 
 	int character;
@@ -31,15 +31,15 @@ typedef struct l_scanner
 	l_scanner_type type;
 } l_scanner;
 
-l_scanner* l_scanner_create(FILE* f);
-l_scanner* l_scanner_create_str(char* str);
-l_token l_scanner_next(l_scanner* scanner);
-l_token l_scanner_peek(l_scanner* scanner);
-l_token l_scanner_peek2(l_scanner* scanner);
-l_token l_scanner_peek3(l_scanner* scanner);
-void l_scanner_unexpecteda(l_token_type* expected, int len, l_token token, char* section);
-void l_scanner_unexpected(l_token_type expected, l_token token, char* section);
-void l_scanner_skip(l_scanner* scanner, l_token_type type, char* section);
-l_token l_scanner_expect(l_scanner* scanner, l_token_type type, char* section);
+l_scanner *l_scanner_create(FILE *f);
+l_scanner *l_scanner_create_str(char *str);
+l_token l_scanner_next(l_scanner *scanner);
+l_token l_scanner_peek(l_scanner *scanner);
+l_token l_scanner_peek2(l_scanner *scanner);
+l_token l_scanner_peek3(l_scanner *scanner);
+void l_scanner_unexpecteda(l_token_type *expected, int len, l_token token, char *section);
+void l_scanner_unexpected(l_token_type expected, l_token token, char *section);
+void l_scanner_skip(l_scanner *scanner, l_token_type type, char *section);
+l_token l_scanner_expect(l_scanner *scanner, l_token_type type, char *section);
 
 #endif

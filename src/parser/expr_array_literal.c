@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expr_array_literal* l_parse_expr_array_literal(l_scanner* stream)
+l_p_expr_array_literal *l_parse_expr_array_literal(l_scanner *stream)
 {
-	l_p_expr_array_literal* expr = malloc(sizeof(l_p_expr_array_literal));
+	l_p_expr_array_literal *expr = malloc(sizeof(*expr));
 
 	// [
 	l_scanner_skip(stream, TOKEN_OPENBRACKET, "array literal");
@@ -19,11 +19,11 @@ l_p_expr_array_literal* l_parse_expr_array_literal(l_scanner* stream)
 }
 
 void l_pretty_expr_array_literal(
-		l_p_expr_array_literal* expr,
+		l_p_expr_array_literal *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
-	char* tabs;
+	char *tabs;
 	P_TABS(depth, tabs);
 
 	fprintf(file, "%s[\n", tabs);

@@ -6,13 +6,13 @@
 	#include <readline/history.h>
 #endif
 
-char* l_plat_readline(char* prompt)
+char *l_plat_readline(char *prompt)
 {
 #ifdef _WIN32
 	printf("%s", prompt);
 	int allocd = 16;
 	int len = 1;
-	char* str = malloc(allocd);
+	char *str = malloc(allocd);
 	while (1)
 	{
 		char c = getc();
@@ -31,7 +31,7 @@ char* l_plat_readline(char* prompt)
 		str[len - 1] = '\0';
 	}
 #else
-	char* str = readline(prompt);
+	char *str = readline(prompt);
 	if (str != NULL && str[0] != '\0')
 		add_history(str);
 	return str;

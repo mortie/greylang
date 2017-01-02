@@ -26,12 +26,12 @@ typedef enum l_token_type
 typedef struct l_token
 {
 	l_token_type type;
-	char* content;
+	char *content;
 	int contentlen;
 	int line;
 	int linechar;
 } l_token;
 
-char* l_token_type_string(l_token_type);
+char *l_token_type_string(l_token_type);
 
 #endif

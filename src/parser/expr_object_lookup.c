@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expr_object_lookup* l_parse_expr_object_lookup(l_scanner* stream, l_p_expr* obj)
+l_p_expr_object_lookup *l_parse_expr_object_lookup(l_scanner *stream, l_p_expr *obj)
 {
-	l_p_expr_object_lookup* expr = malloc(sizeof(l_p_expr_object_lookup));
+	l_p_expr_object_lookup *expr = malloc(sizeof(*expr));
 	expr->obj = obj;
 
 	// .
@@ -18,9 +18,9 @@ l_p_expr_object_lookup* l_parse_expr_object_lookup(l_scanner* stream, l_p_expr* 
 }
 
 void l_pretty_expr_object_lookup(
-		l_p_expr_object_lookup* expr,
+		l_p_expr_object_lookup *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
 	l_pretty_expr(expr->obj, depth, file);
 	fprintf(file, ".%s", expr->key);

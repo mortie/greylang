@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream, l_p_expr* key)
+l_p_expr_assignment *l_parse_expr_assignment(l_scanner *stream, l_p_expr *key)
 {
-	l_p_expr_assignment* expr = malloc(sizeof(l_p_expr_assignment));
+	l_p_expr_assignment *expr = malloc(sizeof(*expr));
 
 	// key
 	expr->key = key;
@@ -19,9 +19,9 @@ l_p_expr_assignment* l_parse_expr_assignment(l_scanner* stream, l_p_expr* key)
 }
 
 void l_pretty_expr_assignment(
-		l_p_expr_assignment* expr,
+		l_p_expr_assignment *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
 	l_pretty_expr(expr->key, depth, file);
 	fprintf(file, " = ");

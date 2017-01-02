@@ -1,6 +1,6 @@
 #include "../token.h"
 
-char* l_token_type_string(l_token_type type)
+char *l_token_type_string(l_token_type type)
 {
 	switch (type)
 	{

@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func)
+l_p_expr_func_call *l_parse_expr_func_call(l_scanner *stream, l_p_expr *func)
 {
-	l_p_expr_func_call* expr = malloc(sizeof(l_p_expr_func_call));
+	l_p_expr_func_call *expr = malloc(sizeof(*expr));
 	expr->infix = 0;
 	expr->func = func;
 
@@ -21,11 +21,11 @@ l_p_expr_func_call* l_parse_expr_func_call(l_scanner* stream, l_p_expr* func)
 }
 
 void l_pretty_expr_func_call(
-		l_p_expr_func_call* expr,
+		l_p_expr_func_call *expr,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
-	char* tabs;
+	char *tabs;
 	P_TABS(depth, tabs);
 
 	l_pretty_expr(expr->func, depth, file);

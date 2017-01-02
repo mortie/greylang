@@ -2,11 +2,11 @@
 
 #include <stdlib.h>
 
-l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
+l_p_arg_definition *l_parse_arg_definition(l_scanner *stream)
 {
 	int namea = 4;
-	l_p_arg_definition* list = malloc(sizeof(l_p_arg_definition));
-	list->names = malloc(namea * sizeof(char*));
+	l_p_arg_definition *list = malloc(sizeof(*list));
+	list->names = malloc(namea * sizeof(*(list->names)));
 	list->namec = 0;
 
 	// Empty argument definition
@@ -22,7 +22,7 @@ l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 		if (namea < list->namec)
 		{
 			namea *= 2;
-			list->names = realloc(list->names, namea * sizeof(char*));
+			list->names = realloc(list->names, namea * sizeof(*(list->names)));
 		}
 		list->names[list->namec - 1] = name.content;
 
@@ -50,9 +50,9 @@ l_p_arg_definition* l_parse_arg_definition(l_scanner* stream)
 }
 
 void l_pretty_arg_definition(
-		l_p_arg_definition* arg_definition,
+		l_p_arg_definition *arg_definition,
 		int depth,
-		FILE* file)
+		FILE *file)
 {
 	for (int i = 0; i < arg_definition->namec; ++i)
 	{

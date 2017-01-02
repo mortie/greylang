@@ -87,11 +87,11 @@ no utf-8 parsing or encoding will be performed.
 
 # To Do
 
+* <del>Change code style of non-VM parts to match the VM</del>
 * Better error handling
 * Array prototype functions
 	* sub, reverse, insert, push, pop
 * Some way to do the equivalent of +=, -=, etc.
-* Change code style of non-VM parts to match the VM
 * Give getter and setter functions syntactic sugar to make them look like
   property lookups
 * Deal with reference cycles with functions
