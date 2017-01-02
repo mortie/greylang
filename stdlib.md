@@ -37,9 +37,12 @@ languages, so they're even more important than in other languages.
 Flow control functions' arguments are reversed if they're called as infix
 functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 
-* `if(condition, function)`:
-	* Run function if condition returns true.
+* `if(condition, if-func, else-func)`:
+	* Run if-func if condition is true, or else-func otherwise.
+	* Returns the return value of the executed function.
+	* If values are passed rather than functions, the value is returned.
 	* `if(1 == 1, { print("Hello World") });`
+	* `print(if(1 == 1, "yes", "no"));`
 * `repeat(count, function)`:
 	* Run function `count` times.
 	* `repeat(10, { print("Hello World") });`

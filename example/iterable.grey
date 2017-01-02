@@ -23,7 +23,7 @@ Range := {
 			if(i < self.max, {
 				i = i + 1;
 				i - 1;
-			}, { none });
+			}, none);
 		};
 
 		// Return our object with $next set to our 'next'-function

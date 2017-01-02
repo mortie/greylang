@@ -15,17 +15,17 @@ vm_var *vm_std_if(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 		elseFn = args->vars[2];
 
 	if (infix) SWAP(cond, ifFn);
-	EXPECTTYPE(vm, VAR_TYPE_BOOL, cond);
-	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, ifFn);
-	if (args->varc == 3)
-		EXPECTTYPE(vm, VAR_TYPE_FUNCTION, elseFn);
 
-	if (cond->var.boolean)
+	if (cond->var.boolean && ifFn->type == VAR_TYPE_FUNCTION)
 		return vm_var_function_call(vm, ifFn->var.function, NULL);
-	else if (elseFn != NULL)
+	else if (cond->var.boolean)
+		return ifFn;
+	else if (elseFn == NULL)
+		return vm->var_none;
+	else if (elseFn->type == VAR_TYPE_FUNCTION)
 		return vm_var_function_call(vm, elseFn->var.function, NULL);
 	else
-		return vm->var_none;
+		return elseFn;
 }
 
 vm_var *vm_std_repeat(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
