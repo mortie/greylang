@@ -9,7 +9,7 @@
 	do { \
 		if (len == 0) { name = malloc(32); a = 32; } \
 		len += 1; \
-		if (a < len) \
+		if (a <= len) \
 		{ \
 			a *= 2; \
 			name = realloc(name, a); \
@@ -33,16 +33,18 @@ static char nextchar(l_scanner *scanner)
 	{
 		case SCANNER_TYPE_FILE:
 			scanner->next = fgetc(scanner->input.f);
+			if (feof(scanner->input.f))
+				scanner->next = '\0';
 			break;
 		case SCANNER_TYPE_STR:
-			scanner->next = scanner->input.str[scanner->character + 1];
+			if (scanner->character >= 0 && scanner->input.str[scanner->character] == '\0')
+				scanner->next = '\0';
+			else
+				scanner->next = scanner->input.str[scanner->character + 1];
 			break;
 	}
 
-	// We don't want to increment the counter if we're at the end of the string
-	if (scanner->input.str[scanner->character + 1] != '\0')
-		scanner->character += 1;
-
+	scanner->character += 1;
 	scanner->linechar += 1;
 
 	if (c == '\n')
@@ -58,7 +60,6 @@ static l_token gettoken(l_scanner *scanner)
 {
 	char c = scanner->curr;
 	char next = scanner->next;
-	int character = scanner->character;
 	int linechar = scanner->linechar;
 	int line = scanner->line;
 
@@ -291,7 +292,7 @@ static l_token gettoken(l_scanner *scanner)
 	 */
 	else if (
 			(c == '/' && next == '/') ||
-			(c == '#' && character == 1))
+			(c == '#' && next == '!' && line == 1 && linechar == 0))
 	{
 		char cc = nextchar(scanner);
 		while (cc != '\0' && cc != '\n') cc = nextchar(scanner);
@@ -398,6 +399,8 @@ static void init(l_scanner *scanner)
 
 	nextchar(scanner);
 	nextchar(scanner);
+
+	scanner->linechar = 0;
 
 	scanner->nexttoken = nexttoken(scanner);
 	scanner->nexttoken2 = nexttoken(scanner);
