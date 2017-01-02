@@ -84,3 +84,21 @@ Note: this is more performant than it sounds, as strings cache their utf-8
 representation, and only need to parse the utf-8 text when you index individual
 values. In the common case where string literals are defined and then ignored,
 no utf-8 parsing or encoding will be performed. 
+
+# To Do
+
+* Better error handling
+* Array prototype functions
+	* sub, reverse, insert, push, pop
+* Some way to do the equivalent of +=, -=, etc.
+* Change code style of non-VM parts to match the VM
+* Give getter and setter functions syntactic sugar to make them look like
+  property lookups
+* Deal with reference cycles with functions
+* Free memory allocated while parsing
+* "Placeholder" function to indicate abstract methods
+* Make module system
+* Make various modules
+	* File system I/O
+	* JSON parsing
+	* HTTP (_long_ term)
