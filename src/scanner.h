@@ -19,6 +19,7 @@ typedef struct l_scanner
 		char *str;
 	} input;
 
+	int inited;
 	int character;
 	int line;
 	int linechar;

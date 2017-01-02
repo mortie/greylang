@@ -20,10 +20,10 @@
 
 static char nextchar(l_scanner *scanner)
 {
-	if (scanner->curr == EOF || scanner->next == EOF)
+	if (scanner->inited && (scanner->curr == '\0' || scanner->next == '\0'))
 	{
-		scanner->curr = scanner->next = EOF;
-		return EOF;
+		scanner->curr = scanner->next = '\0';
+		return '\0';
 	}
 
 	char c = scanner->next;
@@ -31,17 +31,18 @@ static char nextchar(l_scanner *scanner)
 
 	switch (scanner->type)
 	{
-	case SCANNER_TYPE_FILE:
-		scanner->next = fgetc(scanner->input.f);
-		break;
-	case SCANNER_TYPE_STR:
-		scanner->next = scanner->input.str[scanner->character + 1];
-		if (scanner->next == '\0')
-			scanner->next = EOF;
-		break;
+		case SCANNER_TYPE_FILE:
+			scanner->next = fgetc(scanner->input.f);
+			break;
+		case SCANNER_TYPE_STR:
+			scanner->next = scanner->input.str[scanner->character + 1];
+			break;
 	}
 
-	scanner->character += 1;
+	// We don't want to increment the counter if we're at the end of the string
+	if (scanner->input.str[scanner->character + 1] != '\0')
+		scanner->character += 1;
+
 	scanner->linechar += 1;
 
 	if (c == '\n')
@@ -86,7 +87,7 @@ static l_token gettoken(l_scanner *scanner)
 		char cc = nextchar(scanner);
 		while (cc != '"')
 		{
-			if (cc == EOF)
+			if (cc == '\0')
 			{
 				closed = 0;
 				break;
@@ -145,12 +146,12 @@ static l_token gettoken(l_scanner *scanner)
 		STRAPPEND(content, contenta, contentlen, c);
 		char cc = nextchar(scanner);
 		while (
-				cc != EOF && (
-				(cc >= '0' && cc <= '9') ||
-				(
-					cc == '.' && !period &&
-					scanner->next >= '0' && scanner->next <= '9')
-				))
+				cc != '\0' && (
+					(cc >= '0' && cc <= '9') ||
+					(
+					 cc == '.' && !period &&
+					 scanner->next >= '0' && scanner->next <= '9')
+					))
 		{
 			if (cc == '.') period = 1;
 			STRAPPEND(content, contenta, contentlen, cc);
@@ -276,7 +277,7 @@ static l_token gettoken(l_scanner *scanner)
 	{
 		char prev = c;
 		char cc = nextchar(scanner);
-		while (cc != EOF && !(prev == '*' && cc == '/'))
+		while (cc != '\0' && !(prev == '*' && cc == '/'))
 		{
 			prev = cc;
 			cc = nextchar(scanner);
@@ -289,11 +290,11 @@ static l_token gettoken(l_scanner *scanner)
 	 * Skip single line comment
 	 */
 	else if (
-		(c == '/' && next == '/') ||
-		(c == '#' && character == 1))
+			(c == '/' && next == '/') ||
+			(c == '#' && character == 1))
 	{
 		char cc = nextchar(scanner);
-		while (cc != EOF && cc != '\n') cc = nextchar(scanner);
+		while (cc != '\0' && cc != '\n') cc = nextchar(scanner);
 		token.type = TOKEN_IGNORED;
 		nextchar(scanner);
 	}
@@ -304,7 +305,7 @@ static l_token gettoken(l_scanner *scanner)
 	else if (isspace(c))
 	{
 		char cc = nextchar(scanner);
-		while (cc != EOF && isspace(cc))
+		while (cc != '\0' && isspace(cc))
 		{
 			cc = nextchar(scanner);
 		}
@@ -314,7 +315,7 @@ static l_token gettoken(l_scanner *scanner)
 	/*
 	 * None
 	 */
-	else if (c == EOF)
+	else if (c == '\0')
 	{
 		SETTOKEN(TOKEN_NONE, "");
 	}
@@ -326,7 +327,7 @@ static l_token gettoken(l_scanner *scanner)
 	{
 		char prev = '\0';
 		char cc = c;
-		while (cc != EOF && !isspace(cc) &&
+		while (cc != '\0' && !isspace(cc) &&
 				(cc != '(' && cc != ')') &&
 				(cc != '[' && cc != ']') &&
 				(cc != '{' && cc != '}') &&
@@ -359,10 +360,10 @@ static l_token gettoken(l_scanner *scanner)
 	if (token.type == TOKEN_ERROR)
 	{
 		fprintf(stderr,
-			"line %i:%i: %s\n",
-			token.line,
-			token.linechar,
-			token.content);
+				"line %i:%i: %s\n",
+				token.line,
+				token.linechar,
+				token.content);
 		SETTOKEN(TOKEN_NONE, "");
 	}
 
@@ -393,12 +394,16 @@ static l_scanner *create()
 
 static void init(l_scanner *scanner)
 {
+	scanner->inited = 0;
+
 	nextchar(scanner);
 	nextchar(scanner);
 
 	scanner->nexttoken = nexttoken(scanner);
 	scanner->nexttoken2 = nexttoken(scanner);
 	scanner->nexttoken3 = nexttoken(scanner);
+
+	scanner->inited = 1;
 }
 
 l_scanner *l_scanner_create(FILE *f)
