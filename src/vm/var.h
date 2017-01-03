@@ -181,3 +181,6 @@ int vm_var_equals(vm_var *a, vm_var *b);
 
 // Returns a string, allocated by malloc
 char *vm_var_tostring(vm_var *var);
+
+// Returns a string of the variable's type, not allocated
+char *vm_var_type_string(vm_var_type type);

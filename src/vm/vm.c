@@ -44,6 +44,7 @@ l_vm *l_vm_create()
 
 	// Special
 	STD("extend", &vm_std_extend);
+	STD("instanceof?", &vm_std_instanceof);
 
 	// Math
 	STD("+", &vm_std_add);
@@ -99,6 +100,19 @@ vm_var *l_vm_run(l_vm *vm, l_p_expr_list *exprs)
 vm_var *l_vm_error(l_vm *vm, char *msg)
 {
 	printf("Error at line %i: %s\n", vm->currline, msg);
+	return vm->var_none;
+}
+
+vm_var *l_vm_error_type(l_vm *vm, vm_var_type expected, vm_var *var)
+{
+	if (var == NULL)
+		var = vm->var_none;
+
+	printf("Error at line %i: Expected type %s, got type %s\n",
+		vm->currline,
+		vm_var_type_string(expected),
+		vm_var_type_string(var->type));
+
 	return vm->var_none;
 }
 

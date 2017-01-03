@@ -13,6 +13,7 @@ STD(vm_std_for);
 
 // Special
 STD(vm_std_extend);
+STD(vm_std_instanceof);
 
 // Math
 STD(vm_std_add);

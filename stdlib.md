@@ -57,6 +57,8 @@ functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 
 * `extend(object[, object])`
 	* Look at `examples/classes.grey`.
+* `instanceof?(object, object)`
+	* Returns whether  the first object is an instance of the second object.
 
 ## Math
 

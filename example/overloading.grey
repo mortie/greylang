@@ -1,0 +1,60 @@
+#!/usr/bin/env grey
+
+Vector := {
+	$init: {(x, y)
+		self.x = x;
+		self.y = y;
+	},
+
+	$add: {(v)
+		Vector(self.x + v.x, self.y + v.y);
+	},
+
+	$sub: {(v)
+		Vector(self.x - v.x, self.y - v.y);
+	},
+
+	$mul: {(v)
+		if(v instanceof? Vector, {
+			Vector(self.x * v.x, self.y * v.y);
+		}, {
+			Vector(self.x * v, self.y * v);
+		});
+	},
+
+	$div: {(v)
+		if(v instanceof? Vector, {
+			Vector(self.x / v.x, self.y / v.y);
+		}, {
+			Vector(self.x / v, self.y / v);
+		});
+	},
+
+	print: {
+		print("Vector (" .. self.x .. ", " .. self.y .. ")");
+		print();
+	}
+};
+
+vec1 := Vector(10, 10);
+print("vec1:");
+vec1.print();
+
+vec2 := Vector(5, 6);
+print("vec2:");
+vec2.print();
+
+print("vec1 + vec2:");
+(vec1 + vec2).print();
+
+print("vec1 - vec2:");
+(vec1 - vec2).print();
+
+print("vec1 * vec2:");
+(vec1 * vec2).print();
+
+print("vec1 * 5:");
+(vec1 * 5).print();
+
+print("vec1 / 5:");
+(vec1 / 5).print();

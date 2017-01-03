@@ -152,3 +152,26 @@ char *vm_var_tostring(vm_var *var)
 	strcpy(ret, str);
 	return ret;
 }
+
+char *vm_var_type_string(vm_var_type type)
+{
+	switch (type)
+	{
+	case VAR_TYPE_OBJECT:
+		return "object";
+	case VAR_TYPE_FUNCTION:
+		return "function";
+	case VAR_TYPE_ARRAY:
+		return "array";
+	case VAR_TYPE_NUMBER:
+		return "number";
+	case VAR_TYPE_BOOL:
+		return "bool";
+	case VAR_TYPE_CHAR:
+		return "char";
+	case VAR_TYPE_NONE:
+		return "none";
+	}
+
+	return "";
+}
