@@ -1,0 +1,19 @@
+Maybe := {
+	$init: {(val)
+		self.val = val;
+		self.checked = false;
+	},
+
+	get: {
+		if(self.checked,
+			{ self.val },
+			{ print("Unchecked maybe!") })
+	},
+
+	is?: {(class)
+		self.checked = true;
+		if (class == none, 
+			{ self.val != none },
+			{ self.val instanceof? class })
+	}
+};
