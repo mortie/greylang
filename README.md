@@ -89,6 +89,8 @@ no utf-8 parsing or encoding will be performed.
 
 * <del>Change code style of non-VM parts to match the VM</del>
 * Better error handling
+* Let functions specify their arguments' types
+* Char literals
 * Array prototype functions
 	* sub, reverse, insert, push, pop
 * Some way to do the equivalent of +=, -=, etc.
