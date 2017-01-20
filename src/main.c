@@ -20,7 +20,7 @@ static void usage(char *name)
 
 static int repl()
 {
-	l_vm *vm = l_vm_create();
+	l_vm *vm = l_vm_create("repl");
 	vm_map_increfs(vm->root);
 	while (1)
 	{
@@ -48,12 +48,12 @@ static int repl()
 	return 0;
 }
 
-static int exec(FILE *f)
+static int exec(FILE *f, char *fname)
 {
 	l_scanner *stream = l_scanner_create(f);
 	l_p_expr_list *list = l_parse(stream);
 
-	l_vm *vm = l_vm_create();
+	l_vm *vm = l_vm_create(fname);
 	l_vm_run(vm, list);
 
 	return 0;
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
 	}
 
 	if (opr == OPR_EXEC)
-		return exec(f);
+		return exec(f, file);
 	else if (opr == OPR_PRETTY)
 		return pretty(f);
 }

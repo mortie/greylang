@@ -14,6 +14,7 @@ typedef enum vm_var_type
 	VAR_TYPE_NUMBER,
 	VAR_TYPE_BOOL,
 	VAR_TYPE_CHAR,
+	VAR_TYPE_ERROR,
 	VAR_TYPE_NONE
 } vm_var_type;
 
@@ -119,8 +120,9 @@ void vm_var_function_free(vm_var_function *func);
 
 // Increase or decrease the ref count.
 // Function is free'd if counter reaches 0.
+// decrefs returns 1 if func was freed, 0 otherwise.
 void vm_var_function_increfs(vm_var_function *func);
-void vm_var_function_decrefs(vm_var_function *func);
+int vm_var_function_decrefs(vm_var_function *func);
 
 /*
  * Char
@@ -143,6 +145,26 @@ void vm_var_char_to_utf8(vm_var_char ch, char *buf);
 char *vm_var_char_array_to_utf8(vm_var_array *arr);
 
 /*
+ * Error
+ */
+
+typedef struct vm_var_error
+{
+	char *file;
+	int line;
+	char *msg;
+} vm_var_error;
+
+// Init error with message
+void vm_var_error_init(l_vm *vm, vm_var_error *err, char *msg);
+
+// Print error message
+void vm_var_error_print(vm_var_error *err, FILE *f);
+
+// Free error
+void vm_var_error_free(vm_var_error *err);
+
+/*
  * Variable
  */
 
@@ -155,6 +177,7 @@ typedef struct vm_var
 		double number;
 		int boolean;
 		vm_var_char character;
+		vm_var_error *error;
 	} var;
 	vm_var_type type;
 	int refs;

@@ -12,6 +12,7 @@ vm_var *vm_std_eq(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
 	for (int i = 1; i < args->varc; ++i)
 	{
+		RETIFERR(args->vars[i]);
 		if (!vm_var_equals(args->vars[i-1], args->vars[i]))
 			return v;
 	}
@@ -23,6 +24,7 @@ vm_var *vm_std_eq(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 vm_var *vm_std_neq(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 {
 	vm_var *v = vm_std_eq(vm, self, args, infix);
+	RETIFERR(v);
 	v->var.boolean = !v->var.boolean;
 	return v;
 }

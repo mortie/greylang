@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-l_vm *l_vm_create()
+l_vm *l_vm_create(char *currfile)
 {
 	l_vm *vm = malloc(sizeof(*vm));
 
@@ -15,6 +15,7 @@ l_vm *l_vm_create()
 	vm->cleanupc = 0;
 	vm->cleanupa = 0;
 	vm->cleanup_offset = 0;
+	vm->currfile = currfile;
 	vm->currline = 0;
 
 	vm->var_none = vm_var_create(VAR_TYPE_NONE);
@@ -45,6 +46,7 @@ l_vm *l_vm_create()
 	// Special
 	STD("extend", &vm_std_extend);
 	STD("instanceof?", &vm_std_instanceof);
+	STD("error", &vm_std_error);
 
 	// Math
 	STD("+", &vm_std_add);
@@ -93,14 +95,27 @@ l_vm *l_vm_create()
 
 vm_var *l_vm_run(l_vm *vm, l_p_expr_list *exprs)
 {
-	return vm_exec_exprs(vm, vm->root, exprs->expressions, exprs->expressionc);
+	vm_var *var = vm_exec_exprs(
+		vm, vm->root, exprs->expressions, exprs->expressionc);
+
+	if (var->type == VAR_TYPE_ERROR)
+	{
+		vm_var_error_print(var->var.error, stderr);
+		return vm->var_none;
+	}
+
+	return var;
 }
 
-// TODO: better error handling
 vm_var *l_vm_error(l_vm *vm, char *msg)
 {
-	printf("Error at line %i: %s\n", vm->currline, msg);
-	return vm->var_none;
+	vm_var *var = vm_var_create(VAR_TYPE_ERROR);
+
+	vm_var_error *err = malloc(sizeof(*err));
+	vm_var_error_init(vm, err, msg);
+	var->var.error = err;
+
+	return var;
 }
 
 vm_var *l_vm_error_type(l_vm *vm, vm_var_type expected, vm_var *var)
@@ -108,12 +123,18 @@ vm_var *l_vm_error_type(l_vm *vm, vm_var_type expected, vm_var *var)
 	if (var == NULL)
 		var = vm->var_none;
 
-	printf("Error at line %i: Expected type %s, got type %s\n",
-		vm->currline,
-		vm_var_type_string(expected),
-		vm_var_type_string(var->type));
+	char *expected_str = vm_var_type_string(expected);
+	char *got_str = vm_var_type_string(var->type);
+	const char *fmt = "Expected type %s, got type %s\n";
 
-	return vm->var_none;
+	int len = strlen(expected_str) + strlen(got_str) + strlen(fmt);
+
+	char *msg = malloc(len + 1);
+	sprintf(msg, fmt, expected_str, got_str);
+
+	vm_var *err = l_vm_error(vm, msg);
+	free(msg);
+	return err;
 }
 
 void l_vm_cleanup_add(l_vm *vm, vm_var *var)

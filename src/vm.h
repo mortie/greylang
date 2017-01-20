@@ -28,10 +28,11 @@ typedef struct l_vm
 	vm_var *var_true;
 	vm_var *var_false;
 
+	char *currfile;
 	int currline;
 } l_vm;
 
-l_vm *l_vm_create();
+l_vm *l_vm_create(char *file);
 vm_var *l_vm_run(l_vm *vm, l_p_expr_list *exprs);
 vm_var *l_vm_error(l_vm *vm, char *msg);
 vm_var *l_vm_error_type(l_vm *vm, vm_var_type expected, vm_var *var);

@@ -156,9 +156,14 @@ void vm_var_function_increfs(vm_var_function *func)
 	func->refs += 1;
 }
 
-void vm_var_function_decrefs(vm_var_function *func)
+int vm_var_function_decrefs(vm_var_function *func)
 {
 	func->refs -= 1;
 	if (func->refs <= 0)
+	{
 		vm_var_function_free(func);
+		return 1;
+	}
+
+	return 0;
 }

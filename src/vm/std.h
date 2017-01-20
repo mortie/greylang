@@ -14,6 +14,7 @@ STD(vm_std_for);
 // Special
 STD(vm_std_extend);
 STD(vm_std_instanceof);
+STD(vm_std_error);
 
 // Math
 STD(vm_std_add);

@@ -87,7 +87,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		// Error if neither
 		else
 		{
-			return l_vm_error(vm, "Expected function or object with $init");
+			return l_vm_error(vm, "Expected either function or object with $init");
 		}
 	}
 
@@ -355,7 +355,16 @@ vm_var *vm_exec_exprs(l_vm *vm, vm_map *scope, l_p_expr **exprs, int exprc)
 	for (int i = 0; i < exprc; ++i)
 	{
 		ret = vm_exec(vm, scope, exprs[i]);
+		if (ret->type == VAR_TYPE_ERROR)
+		{
+			ret->refs += 1;
+			l_vm_cleanup(vm);
+			ret->refs -= 1;
+			l_vm_cleanup_add(vm, ret);
+			return ret;
+		}
 	}
+
 	ret->refs += 1;
 	l_vm_cleanup(vm);
 	ret->refs -= 1;

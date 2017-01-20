@@ -54,6 +54,7 @@ vm_var *vm_std_concat(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	int total = 0;
 	for (int i = 0; i < args->varc; ++i)
 	{
+		RETIFERR(args->vars[i]);
 		int l = strlen(strs[i]);
 		memcpy(str + total, strs[i], l);
 		total +=  l;
@@ -77,6 +78,7 @@ vm_var *vm_std_which(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
 	for (int i = 0; i < args->varc; ++i)
 	{
+		RETIFERR(args->vars[i]);
 		if (args->vars[i]->type != VAR_TYPE_NONE)
 			return args->vars[i];
 	}

@@ -14,6 +14,10 @@ vm_var *vm_std_if(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	if (args->varc == 3)
 		elseFn = args->vars[2];
 
+	RETIFERR(cond);
+	RETIFERR(ifFn);
+	RETIFERR(elseFn);
+
 	if (infix) SWAP(cond, ifFn);
 
 	if (cond->var.boolean && ifFn->type == VAR_TYPE_FUNCTION)
@@ -45,7 +49,8 @@ vm_var *vm_std_repeat(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	for (int i = 0; i < num->var.number; ++i)
 	{
 		counter->var.number = (double)i;
-		vm_var_function_call(vm, func->var.function, arr);
+		vm_var *ret = vm_var_function_call(vm, func->var.function, arr);
+		RETIFERR(ret);
 	}
 
 	vm_var_array_free(arr);
@@ -67,10 +72,12 @@ vm_var *vm_std_while(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	while (1)
 	{
 		vm_var *res = vm_var_function_call(vm, cond->var.function, NULL);
+		RETIFERR(res);
 		if (res->type != VAR_TYPE_BOOL || !res->var.boolean)
 			break;
 
-		vm_var_function_call(vm, func->var.function, NULL);
+		res = vm_var_function_call(vm, func->var.function, NULL);
+		RETIFERR(res);
 	}
 
 	return vm->var_none;

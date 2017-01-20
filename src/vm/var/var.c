@@ -20,11 +20,18 @@ void vm_var_free(vm_var *var)
 	switch (var->type)
 	{
 	case VAR_TYPE_FUNCTION:
-		vm_var_function_decrefs(var->var.function);
+		if (vm_var_function_decrefs(var->var.function))
+			free(var->var.function);
 		break;
 
 	case VAR_TYPE_ARRAY:
 		vm_var_array_free(var->var.array);
+		free(var->var.array);
+		break;
+
+	case VAR_TYPE_ERROR:
+		vm_var_error_free(var->var.error);
+		free(var->var.error);
 		break;
 
 	case VAR_TYPE_OBJECT:
@@ -90,6 +97,9 @@ int vm_var_equals(vm_var *a, vm_var *b)
 	case VAR_TYPE_CHAR:
 		return a->var.character == b->var.character;
 
+	case VAR_TYPE_ERROR:
+		return a->var.error == b->var.error;
+
 	case VAR_TYPE_NONE:
 		return 1;
 	}
@@ -143,6 +153,10 @@ char *vm_var_tostring(vm_var *var)
 		return ret;
 	}
 
+	case VAR_TYPE_ERROR:
+		str = var->var.error->msg;
+		break;
+
 	case VAR_TYPE_NONE:
 		str = "[none]";
 		break;
@@ -169,6 +183,8 @@ char *vm_var_type_string(vm_var_type type)
 		return "bool";
 	case VAR_TYPE_CHAR:
 		return "char";
+	case VAR_TYPE_ERROR:
+		return "error";
 	case VAR_TYPE_NONE:
 		return "none";
 	}

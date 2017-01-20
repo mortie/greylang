@@ -9,6 +9,7 @@ vm_var *vm_std_print(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 {
 	for (int i = 0; i < args->varc; ++i)
 	{
+		RETIFERR(args->vars[i]);
 		char *str = vm_var_tostring(args->vars[i]);
 		if (i == 0)
 			printf("%s", str);

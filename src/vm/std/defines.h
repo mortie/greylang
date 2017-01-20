@@ -3,8 +3,15 @@
  * which contain the standard library
  */
 
+#define RETIFERR(var) \
+	do { \
+		if ((var)->type == VAR_TYPE_ERROR) \
+			return var; \
+	} while(0)
+
 #define EXPECTTYPE(vm, expected, var) \
 	do { \
+		RETIFERR(var); \
 		if (var == NULL || var->type != expected) \
 			return l_vm_error_type(vm, expected, var); \
 	} while(0)
