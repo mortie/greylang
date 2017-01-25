@@ -3,7 +3,7 @@
 In greylang, functions server as functions, blocks, and operators from other
 languages, so they're even more important than in other languages.
 
-* Functions are defined with just `{` and `}`; `{}` is a valid empty function.
+* Functions are defined with just `{` and `}`.
 * Functions are just any other data type, and can thus be passed to other
   functions, returned from functions, and assigned to variables.
 * Functions can declare arguments, like this:
@@ -23,6 +23,11 @@ languages, so they're even more important than in other languages.
 
 	plus := {(a, b) a + b };
 	print(10 plus 20);
+
+Note: both objects and functions are defined with `{` and `}`. `{}` is treated
+as an empty object, and `{;}` as an empty function. Other than that, it's
+interpreted as an object if the first token is a name or string and the second
+token is a colon; otherwise it's interpreted as a function.
 
 # Standard Library
 
