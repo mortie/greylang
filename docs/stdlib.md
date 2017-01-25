@@ -8,21 +8,27 @@ languages, so they're even more important than in other languages.
   functions, returned from functions, and assigned to variables.
 * Functions can declare arguments, like this:
 
+```
 	f := {(str)
 		print(str);
 	};
 	f("Hi World");
+```
 
 * Declaring arguments is optional, and all arguments passed to the function is
   available as `$1`, `$2`, etc:
 
+```
 	f := { print($1) };
 	f("Hi World");
+```
 
 * Functions can be called inline, like this:
 
+```
 	plus := {(a, b) a + b };
 	print(10 plus 20);
+```
 
 # Standard Library
 
