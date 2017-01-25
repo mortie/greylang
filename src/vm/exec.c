@@ -59,15 +59,41 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		}
 
 		// Instantiate and create contsructor if it's an object with $init
+		// and it isn't an instance of a class, or call $call otherwise
 		else if (func->type == VAR_TYPE_OBJECT)
 		{
-			// Find $init
-			vm_var *init = vm_map_lookup_r(func->map, "$init");
-			if (init == NULL || init->type != VAR_TYPE_FUNCTION)
-				return l_vm_error(vm, "Expected function or object with $init");
+			// Find $init if it's not an instance
+			vm_var *init;
+			if (!func->var.object.instance)
+				init = vm_map_lookup_r(func->map, "$init");
+
+			// If we didn't find init, or it's an instance, run $call
+			if (
+					func->var.object.instance ||
+					init == NULL)
+			{
+				// Find $call
+				vm_var *call = vm_map_lookup_r(func->map, "$call");
+				if (call == NULL || call->type != VAR_TYPE_FUNCTION)
+					return l_vm_error(vm, "Expected callable");
+
+				// Call
+				vm_var *ret = vm_var_function_exec(
+					vm, call->var.function, args, func, 0);
+
+				l_vm_cleanup_add(vm, ret);
+				vm_var_array_free(args);
+				free(args);
+
+				return ret;
+			}
+
+			if (init->type != VAR_TYPE_FUNCTION)
+				return l_vm_error(vm, "Expected callable");
 
 			// Create new object
 			vm_var *obj = vm_var_create(VAR_TYPE_OBJECT);
+			obj->var.object.instance = 1;
 			obj->map->parent = func->map;
 			vm_map_increfs(func->map);
 			l_vm_cleanup_add(vm, obj);
@@ -87,7 +113,7 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		// Error if neither
 		else
 		{
-			return l_vm_error(vm, "Expected either function or object with $init");
+			return l_vm_error(vm, "Expected callable");
 		}
 	}
 

@@ -12,6 +12,10 @@ vm_var *vm_var_create(vm_var_type type)
 
 	var->map = vm_map_create(NULL);
 
+	// Objects should default to not be an instance
+	if (type == VAR_TYPE_OBJECT)
+		var->var.object.instance = 0;
+
 	return var;
 }
 

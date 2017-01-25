@@ -19,6 +19,12 @@ In this document, `Foo` will refer to a class, and `foo` an instance of `Foo`.
 	* `it := foo.$iter()` - here, `it` should be a function
 	* `print for foo` calls `foo.$iter()` to get a function,
 	  then calls that function until it returns `none`
+* `$call`:
+	* Called when the object is called like a function.
+	* `foo()` calls `foo.$call()`
+	* If an object contains both `$init` and `$call`, `$call` will
+	  be called if it's an instance of a class, and `$init` if it's
+	  not an instance.
 
 ## Operator Overload
 

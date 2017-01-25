@@ -19,6 +19,15 @@ typedef enum vm_var_type
 } vm_var_type;
 
 /*
+ * Object
+ */
+
+typedef struct vm_var_object
+{
+	int instance;
+} vm_var_object;
+
+/*
  * Array
  */
 
@@ -172,6 +181,7 @@ typedef struct vm_var
 {
 	union
 	{
+		vm_var_object object;
 		vm_var_array *array;
 		vm_var_function *function;
 		double number;
