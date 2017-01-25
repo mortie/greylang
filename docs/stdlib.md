@@ -8,21 +8,27 @@ languages, so they're even more important than in other languages.
   functions, returned from functions, and assigned to variables.
 * Functions can declare arguments, like this:
 
+```
 	f := {(str)
 		print(str);
 	};
 	f("Hi World");
+```
 
 * Declaring arguments is optional, and all arguments passed to the function is
   available as `$1`, `$2`, etc:
 
+```
 	f := { print($1) };
 	f("Hi World");
+```
 
 * Functions can be called inline, like this:
 
+```
 	plus := {(a, b) a + b };
 	print(10 plus 20);
+```
 
 Note: both objects and functions are defined with `{` and `}`. `{}` is treated
 as an empty object, and `{;}` as an empty function. Other than that, it's
@@ -56,7 +62,7 @@ functions; e.g `if(true, {print("hi")})` becomes `{print("hi")} if true`.
 	* `i = 0; while({ i < 10 }, { print("Hello World"); i = i + 1 })`
 * `for(iterable, function)`:
 	* Run the function for each value in the iterable.
-	* for(range(10, 20), {(val) print(val)});
+	* `for(Range(10, 20), {(val) print(val)});`
 
 ## Special
 
