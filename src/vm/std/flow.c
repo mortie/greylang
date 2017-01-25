@@ -91,16 +91,11 @@ vm_var *vm_std_for(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	if (infix) SWAP(iterable, func);
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
 
-	// Call $iter, put result in 'iter'
+	// Call $iter, put result in 'nextf'
 	vm_var *iterv = vm_map_lookup_r(iterable->map, "$iter");
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, iterv);
-	vm_var *iter = vm_var_function_exec(
+	vm_var *nextv = vm_var_function_exec(
 		vm, iterv->var.function, NULL, iterable, 0);
-	EXPECTTYPE(vm, VAR_TYPE_OBJECT, iter);
-	vm_var_increfs(iter);
-
-	// Get iter.$next, put resulting vm_var_function in 'nextf'
-	vm_var *nextv = vm_map_lookup_r(iter->map, "$next");
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, nextv);
 	vm_var_function *nextf = nextv->var.function;
 
@@ -130,6 +125,5 @@ vm_var *vm_std_for(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	}
 
 	vm_var_array_free(&arr);
-	vm_var_decrefs(iter);
 	return vm->var_none;
 }

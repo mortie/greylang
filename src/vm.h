@@ -28,6 +28,16 @@ typedef struct l_vm
 	vm_var *var_true;
 	vm_var *var_false;
 
+	vm_var *proto_object;
+	vm_var *proto_function;
+	vm_var *proto_array;
+	vm_var *proto_string;
+	vm_var *proto_number;
+	vm_var *proto_bool;
+	vm_var *proto_char;
+	vm_var *proto_error;
+	vm_var *proto_none;
+
 	char *currfile;
 	int currline;
 } l_vm;

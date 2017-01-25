@@ -28,6 +28,10 @@ l_vm *l_vm_create(char *currfile)
 	vm_map_define(vm->base, "true", vm->var_true);
 	vm_map_define(vm->base, "false", vm->var_false);
 
+	/*
+	 * Global Functions
+	 */
+
 #define STD(name, fn) \
 	do { \
 		vm_var_function *func = malloc(sizeof(*func)); \
@@ -77,6 +81,49 @@ l_vm *l_vm_create(char *currfile)
 	STD("read", &vm_std_read);
 
 #undef STD
+
+	/*
+	 * Prototypes
+	 */
+
+#define PROTO(name, vname, p) \
+	do { \
+		vm_var *proto = vm_var_create(VAR_TYPE_OBJECT); \
+		proto->map->parent = p; \
+		vm->vname = proto; \
+		vm_map_define(vm->base, name, proto); \
+	} while (0);
+
+#define PROTOFN(name, vname, fn) \
+	do { \
+		vm_var_function *func = malloc(sizeof(*func)); \
+		vm_var_function_init_fptr(func, fn); \
+		vm_var *v = vm_var_create(VAR_TYPE_FUNCTION); \
+		var->var.function = func; \
+		vm_map_define(var->map, name, v); \
+	} while (0);
+
+	PROTO("Object", proto_object, NULL);
+
+	PROTO("Function", proto_function, vm->proto_object->map);
+
+	PROTO("Array", proto_array, vm->proto_object->map);
+
+	PROTO("String", proto_string, vm->proto_array->map);
+
+	PROTO("Number", proto_number, vm->proto_object->map);
+
+	PROTO("Bool", proto_bool, vm->proto_object->map);
+
+	PROTO("Char", proto_char, vm->proto_object->map);
+
+	PROTO("Error", proto_error, vm->proto_object->map);
+
+	// none instanceof? Object should be false
+	PROTO("None", proto_none, NULL);
+
+#undef PROTO
+#undef PROTOFN
 
 	/*
 	 * Load standard library

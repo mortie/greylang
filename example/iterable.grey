@@ -14,9 +14,9 @@ Range := {
 
 		i := self.min;
 
-		// Create a 'next' function, which will be called for each
-		// iteration until it returns none
-		next := {
+		// Create and return a 'next' function, which will be called for
+		// each iteration until it returns none
+		{
 
 			// If i < max, return and increment i,
 			// otherwise return none to end the iteration
@@ -25,9 +25,6 @@ Range := {
 				i - 1;
 			}, none);
 		};
-
-		// Return our object with $next set to our 'next'-function
-		{ $next: next };
 	}
 };
 
