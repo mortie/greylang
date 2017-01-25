@@ -29,8 +29,8 @@ but looks a lot better.
 
 # Docs
 
-* [Standard Library](https://github.com/mortie/greylang/blob/master/stdlib.md)
-* [Magic Names](https://github.com/mortie/greylang/blob/master/magic.md)
+* [Standard Library](https://github.com/mortie/greylang/blob/master/docs/stdlib.md)
+* [Magic Names](https://github.com/mortie/greylang/blob/master/docs/magic.md)
 
 # Features
 
