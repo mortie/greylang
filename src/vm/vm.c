@@ -68,13 +68,14 @@ l_vm *l_vm_create(char *currfile)
 	STD("<=", &vm_std_lteq);
 	STD("and", &vm_std_and);
 	STD("or", &vm_std_or);
-	STD("?", &vm_std_which);
 
 	// Util
 	STD("tostr", &vm_std_tostr);
 	STD("tonum", &vm_std_tonum);
 	STD("concat", &vm_std_concat);
 	STD("..", &vm_std_concat);
+	STD("?", &vm_std_which);
+	STD("in?", &vm_std_in);
 
 	// I/O
 	STD("print", &vm_std_print);

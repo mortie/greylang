@@ -14,7 +14,9 @@ Range := {
 				i - 1;
 			}, none);
 		};
-	}
+	},
+
+	$contains?: {(n) (n >= self.min) and (n < self.max) }
 };
 
 // x percent of y

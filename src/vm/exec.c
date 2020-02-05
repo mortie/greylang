@@ -35,12 +35,12 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		l_p_comma_expr_list *exprs = e->arg_list;
 
 		// Create arguments array
-		vm_var_array *args = malloc(sizeof(*args));
-		vm_var_array_init(args, VAR_TYPE_NONE);
+		vm_var_array args;
+		vm_var_array_init(&args, VAR_TYPE_NONE);
 		for (int i = 0; i < exprs->expressionc; ++i)
 		{
 			vm_var *val = vm_exec(vm, scope, exprs->expressions[i]);
-			vm_var_array_set(args, i, val);
+			vm_var_array_set(&args, i, val);
 		}
 
 		// Execute function if it's a function
@@ -48,12 +48,11 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 		{
 			vm_var *var = vm_var_function_exec(
 				vm, func->var.function,
-				args, NULL, e->infix);
+				&args, NULL, e->infix);
 
 			l_vm_cleanup_add(vm, var);
 
-			vm_var_array_free(args);
-			free(args);
+			vm_var_array_free(&args);
 
 			return var;
 		}
@@ -79,11 +78,10 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 				// Call
 				vm_var *ret = vm_var_function_exec(
-					vm, call->var.function, args, func, 0);
+					vm, call->var.function, &args, func, 0);
 
 				l_vm_cleanup_add(vm, ret);
-				vm_var_array_free(args);
-				free(args);
+				vm_var_array_free(&args);
 
 				return ret;
 			}
@@ -100,12 +98,11 @@ vm_var *vm_exec(l_vm *vm, vm_map *scope, l_p_expr *expr)
 
 			// Call
 			vm_var *ret = vm_var_function_exec(
-				vm, init->var.function, args, obj, 0);
+				vm, init->var.function, &args, obj, 0);
 
 			l_vm_cleanup_add(vm, ret);
 
-			vm_var_array_free(args);
-			free(args);
+			vm_var_array_free(&args);
 
 			return obj;
 		}

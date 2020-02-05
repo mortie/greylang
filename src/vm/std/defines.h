@@ -5,14 +5,14 @@
 
 #define RETIFERR(var) \
 	do { \
-		if ((var)->type == VAR_TYPE_ERROR) \
+		if ((var) != NULL && (var)->type == VAR_TYPE_ERROR) \
 			return var; \
 	} while(0)
 
 #define EXPECTTYPE(vm, expected, var) \
 	do { \
 		RETIFERR(var); \
-		if (var == NULL || var->type != expected) \
+		if (var == NULL || (var)->type != expected) \
 			return l_vm_error_type(vm, expected, var); \
 	} while(0)
 
@@ -31,6 +31,10 @@
 
 #define OVERLOAD(vm, name, a, b) \
 	do { \
+		if (a == NULL) \
+			a = vm->var_none; \
+		if (b == NULL) \
+			b = vm->var_none; \
 		vm_var *fn = vm_map_lookup_r(a->map, name); \
 		EXPECTTYPE(vm, VAR_TYPE_FUNCTION,  fn); \
 		vm_var_array args; \

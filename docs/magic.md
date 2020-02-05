@@ -26,6 +26,12 @@ In this document, `Foo` will refer to a class, and `foo` an instance of `Foo`.
 	  be called if it's an instance of a class, and `$init` if it's
 	  not an instance.
 
+## Utility
+
+* `$contains?`
+	* Whether the object contains a value
+	* `10 in? Range(5, 15)` does `Range(5, 15).$contains?(10)`
+
 ## Operator Overload
 
 All these functions should return a new instance if possible, instead of

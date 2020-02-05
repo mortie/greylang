@@ -85,3 +85,11 @@ vm_var *vm_std_which(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 
 	return vm->var_none;
 }
+
+vm_var *vm_std_in(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
+{
+	EXPECTARGC(vm, 2, args);
+	vm_var *a = args->vars[0];
+	vm_var *b = args->vars[1];
+	OVERLOAD(vm, "$contains?", b, a);
+}

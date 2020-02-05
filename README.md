@@ -89,6 +89,7 @@ no utf-8 parsing or encoding will be performed.
 # To Do
 
 * <del>Change code style of non-VM parts to match the VM</del>
+* instanceof -> is-a
 * Better error handling
 * Let functions specify their arguments' types
 * Char literals

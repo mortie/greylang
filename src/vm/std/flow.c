@@ -14,11 +14,11 @@ vm_var *vm_std_if(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	if (args->varc == 3)
 		elseFn = args->vars[2];
 
-	RETIFERR(cond);
+	if (infix) SWAP(cond, ifFn);
+
+	EXPECTTYPE(vm, VAR_TYPE_BOOL, cond);
 	RETIFERR(ifFn);
 	RETIFERR(elseFn);
-
-	if (infix) SWAP(cond, ifFn);
 
 	if (cond->var.boolean && ifFn->type == VAR_TYPE_FUNCTION)
 		return vm_var_function_call(vm, ifFn->var.function, NULL);
@@ -42,19 +42,27 @@ vm_var *vm_std_repeat(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
 
 	vm_var *counter = vm_var_create(VAR_TYPE_NUMBER);
-	vm_var_array *arr = malloc(sizeof(*arr));
-	vm_var_array_init(arr, VAR_TYPE_NONE);
-	vm_var_array_set(arr, 0, counter);
+	vm_var_array arr;
+	vm_var_array_init(&arr, VAR_TYPE_NONE);
+	vm_var_array_set(&arr, 0, counter);
+
+	vm_var_increfs(num);
+	vm_var_increfs(func);
 
 	for (int i = 0; i < num->var.number; ++i)
 	{
 		counter->var.number = (double)i;
-		vm_var *ret = vm_var_function_call(vm, func->var.function, arr);
-		RETIFERR(ret);
+		vm_var *ret = vm_var_function_call(vm, func->var.function, &arr);
+		if (ret->type == VAR_TYPE_ERROR)
+		{
+			vm_var_array_free(&arr);
+		}
 	}
 
-	vm_var_array_free(arr);
-	free(arr);
+	vm_var_array_free(&arr);
+
+	vm_var_decrefs(num);
+	vm_var_decrefs(func);
 
 	return vm->var_none;
 }
@@ -88,8 +96,11 @@ vm_var *vm_std_for(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	EXPECTARGC(vm, 2, args);
 	vm_var *iterable = args->vars[0];
 	vm_var *func = args->vars[1];
+
 	if (infix) SWAP(iterable, func);
+
 	EXPECTTYPE(vm, VAR_TYPE_FUNCTION, func);
+	RETIFERR(iterable);
 
 	// Call $iter, put result in 'nextf'
 	vm_var *iterv = vm_map_lookup_r(iterable->map, "$iter");
@@ -111,10 +122,14 @@ vm_var *vm_std_for(l_vm *vm, vm_var *self, vm_var_array *args, int infix)
 	while (1)
 	{
 		vm_var *val = vm_var_function_call(vm, nextf, NULL);
+		if (val->type == VAR_TYPE_ERROR)
+		{
+			vm_var_array_free(&arr);
+			return val;
+		}
 
 		if (val->type == VAR_TYPE_NONE)
 			break;
-
 
 		// Update first argument
 		vm_var_array_set(&arr, 0, val);

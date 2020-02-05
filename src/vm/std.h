@@ -38,6 +38,7 @@ STD(vm_std_tostr);
 STD(vm_std_tonum);
 STD(vm_std_concat);
 STD(vm_std_which);
+STD(vm_std_in);
 
 // I/O
 STD(vm_std_print);
